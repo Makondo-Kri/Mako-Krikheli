@@ -1,73 +1,74 @@
-# Gordon Beach Run · ריצה בחוף גורדון
+# Streets
 
-A retro platform game for phones. Tel Aviv, 1957: help Ben-Gurion race from
-Gordon Beach to Frishman Beach for his famous headstand. Hebrew and English,
-an animated GIF to share in WhatsApp, and a leaderboard.
+Free retro games set on real streets and beaches, played in the phone's browser.
 
-Play it in the browser, no install.
+**Now playing: Gordon Beach Run · ריצה בחוף גורדון.** Tel Aviv, 1957: help
+Ben-Gurion race from Gordon Beach to Frishman Beach. Hebrew and English,
+an animated GIF to share, a leaderboard, and challenge links that show the
+player's name and score.
 
 ## Files
 
-| File | What it is |
+| Path | What it is |
 |---|---|
-| `index.html` | The website page. **Built from `game.html`, don't edit it by hand.** |
-| `game.html` | The game itself (same file as the claude.ai version). |
-| `config.js` | Website address and leaderboard keys. |
-| `og-image.png` | The picture WhatsApp / Facebook show when someone shares the link. |
-| `favicon.png` | Browser tab icon. |
+| `index.html` | Streets home page. **Built, don't edit by hand** (edit `tools/streets.html`). |
+| `gordon-beach-run/game.html` | The game itself (same file as the claude.ai version). |
+| `gordon-beach-run/index.html` | The game page. **Built from `game.html`.** |
+| `gordon-beach-run/config.js` | Game address and leaderboard keys. |
+| `gordon-beach-run/c/` | Score-range preview pages (used when hosted on GitHub Pages). |
+| `api/og.js` | Picture server: draws the share picture with the player's name and score. |
+| `api/c.js` | Challenge link page that WhatsApp / Facebook read, then sends people to the game. |
+| `api/_card.js`, `api/_fonts`, `api/_assets` | Picture layout, fonts and the beach scene. |
 | `supabase-setup.sql` | Creates the leaderboard table. |
-| `tools/build.py` | Rebuilds `index.html` after you change `game.html` or `config.js`. |
+| `tools/build.py` | Rebuilds `index.html` pages and the score pages. |
+| `tools/make-images.cjs` | Redraws all ready-made preview pictures. |
 
-## 1. Put the website online (GitHub Pages, free)
+## Hosting
 
-1. On GitHub open **Makondo-Kri/Mako-Krikheli → Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Pick the branch that has these files (and the `/ (root)` folder), then **Save**.
-4. After a minute or two the game is live at
-   **https://makondo-kri.github.io/Mako-Krikheli/**
+### Vercel (recommended: share pictures show the player's name)
 
-GitHub Pages needs the repository to be **public** on a free GitHub plan.
+1. Go to **vercel.com** and sign up with **Continue with GitHub**.
+2. **Add New → Project**, find **Mako-Krikheli**, tap **Import**.
+3. Leave the settings as they are (Framework: *Other*, no build command) and tap **Deploy**.
+4. In the new project, **Settings → General → Project Name**, you can rename it to
+   `streets` so the address becomes something like `streets.vercel.app`
+   (if that name is taken, Vercel adds letters).
 
-If you host it somewhere else (Netlify, your own domain), change `siteUrl` in
-`config.js` to that address and run `python3 tools/build.py`, so link previews
-point to the right place.
+Vercel publishes the branch that is the repository's default branch, and
+re-publishes automatically on every push.
 
-## 2. Turn on the leaderboard (Supabase, free)
+On Vercel, the game's share links go to `/api/c?s=<score>&n=<name>`, so the
+WhatsApp preview shows the player's name and exact score.
 
-1. Create a free account at **supabase.com** and click **New project**
-   (any name, e.g. `gordon-beach-run`; pick a region close to Israel, e.g. Frankfurt).
-2. In the project, open **SQL Editor → New query**, paste everything from
-   `supabase-setup.sql`, and click **Run**.
-3. Open **Project Settings → API** (or **Data API**) and copy:
-   - **Project URL** → `supabaseUrl` in `config.js`
-   - **publishable** key (`sb_publishable_...`) or the older **anon public** key → `supabaseAnonKey` in `config.js`
+### GitHub Pages (also works, simpler pictures)
 
-   The anon key is meant to be public; the table rules only allow reading the
-   board and adding new scores.
-4. Commit the updated `config.js`. No rebuild needed for the keys.
+Settings → Pages → Deploy from a branch → this branch, `/ (root)`. Address:
+https://makondo-kri.github.io/Mako-Krikheli/
 
-With both values empty, the game simply hides the leaderboard.
+GitHub Pages can't draw pictures on demand, so share previews show the score
+range (for example "4,750+") without the name.
 
-### Looking after the board
+## Leaderboard (Supabase, already set up)
 
-- See and delete entries in Supabase → **Table Editor → scores** (for example
-  rude nicknames).
-- Scores are sent by the player's browser, so a determined person could post a
-  fake score. Delete those in the Table Editor. If it becomes a problem, the
-  next step is a small server-side check.
+The keys are in `gordon-beach-run/config.js`. To check or tidy the board:
+Supabase → **Table Editor → scores** (delete rude nicknames or fake scores
+there). To set it up again from scratch, run `supabase-setup.sql` in the
+Supabase SQL Editor and put the **Project URL** and the **publishable** key
+(`sb_publishable_...`) in `config.js`.
 
-## 3. Changing the game
+Scores are sent by the player's browser, so a determined person could post a
+fake score.
 
-Edit `game.html`, then run:
+## Changing things
 
-```
-python3 tools/build.py
-```
+- Game: edit `gordon-beach-run/game.html`, then run `python3 tools/build.py`.
+- Home page: edit `tools/streets.html`, then run `python3 tools/build.py`.
+- Pictures: `npm install && node tools/make-images.cjs` (needs Playwright).
 
-and commit both `game.html` and `index.html`.
+Commit the built files too.
 
 ## Notes
 
-- The real statue photo on the end card should be one you have the right to
-  share. Replace it with your own photo if needed.
+- The real statue photo on the game's end card should be one you have the right
+  to share. Replace it with your own photo if needed.
 - The melody is the traditional Hava Nagila folk tune, played as chiptune.

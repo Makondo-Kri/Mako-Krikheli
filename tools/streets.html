@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Streets · משחקי רטרו ברחובות אמיתיים</title>
+<meta name="description" content="Streets: free retro games set on real streets and beaches. Now playing: Gordon Beach Run, Ben-Gurion's race down the Tel Aviv shore.">
+<meta name="theme-color" content="#0c3a5a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Streets">
+<meta property="og:title" content="Streets · retro games on real streets · משחקי רטרו ברחובות אמיתיים">
+<meta property="og:description" content="Now playing: Gordon Beach Run. Help Ben-Gurion race down the Tel Aviv shore. Free in your browser.">
+<meta property="og:url" content="{{ROOT_URL}}">
+<meta property="og:image" content="{{ROOT_URL}}streets-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ROOT_URL}}streets-og.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;600;800&display=swap">
+<script src="gordon-beach-run/config.js"></script>
+<style>
+/* Layout: one column of "street signs" on a night-blue page; the featured game is the big sign */
+:root {
+  --night: #0c3a5a; --night-deep: #072538; --sand: #f6e3bb; --ink: #12304a;
+  --coral: #ff6a3d; --sun: #ffd23f; --foam: #ffffff;
+  --pixel: "Press Start 2P", ui-monospace, monospace;
+  --body: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100vh; font-family: var(--body); color: var(--foam);
+  background: radial-gradient(120% 70% at 50% 0%, var(--night), var(--night-deep));
+  padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+main { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.logo { font-family: var(--pixel); color: var(--sun); font-size: clamp(30px, 9vw, 54px); letter-spacing: .12em; margin: 0; line-height: 1.1; text-shadow: 4px 4px 0 var(--ink); }
+.tag { margin: 8px 0 0; font-size: 17px; color: #cfe3ee; }
+#lang { font-family: var(--body); font-weight: 800; font-size: 14px; color: var(--foam); background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.45); border-radius: 6px; min-width: 48px; height: 44px; cursor: pointer; }
+.sign { background: var(--sand); color: var(--ink); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 6px 6px 0 #04182a; overflow: hidden; }
+.sign img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 630; border-bottom: 3px solid var(--ink); image-rendering: pixelated; }
+.sign .body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+.street { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .05em; color: #b0461f; text-transform: uppercase; }
+.sign h2 { margin: 0; font-size: clamp(22px, 5.6vw, 28px); font-weight: 800; line-height: 1.2; text-wrap: balance; }
+.sign p { margin: 0; font-size: 16px; line-height: 1.45; }
+.play { display: flex; align-items: center; justify-content: center; min-height: 56px; margin-top: 4px; font-family: var(--pixel); font-size: 15px; color: var(--foam); background: var(--coral); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 4px 4px 0 var(--ink); text-decoration: none; }
+.play:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--ink); }
+.play:focus-visible, #lang:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+:root[lang="he"] .play { font-family: var(--body); font-weight: 800; font-size: 19px; }
+.board { border-top: 2px dashed rgba(18,48,74,.3); padding-top: 10px; }
+.board h3 { margin: 0 0 6px; font-size: 15px; font-weight: 800; }
+.board ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 15px; font-variant-numeric: tabular-nums; }
+.board li { display: flex; justify-content: space-between; gap: 10px; }
+.board li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.soon { border: 3px dashed rgba(255,255,255,.35); border-radius: 4px; padding: 18px; text-align: center; color: #cfe3ee; }
+.soon b { display: block; font-family: var(--pixel); font-size: 12px; color: var(--sun); margin-bottom: 8px; letter-spacing: .08em; }
+:root[lang="he"] .soon b { font-family: var(--body); font-size: 17px; letter-spacing: 0; }
+footer { text-align: center; font-size: 13px; color: #9fb8c8; }
+@media (prefers-reduced-motion: reduce) { .play:active { transform: none; } }
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div>
+      <h1 class="logo">STREETS</h1>
+      <p class="tag" data-t="tag">Retro games on real streets and beaches.</p>
+    </div>
+    <button id="lang" type="button" aria-label="Language">עב</button>
+  </header>
+
+  <article class="sign">
+    <img src="gordon-beach-run/og-image.png" alt="Pixel-art Ben-Gurion running on Gordon Beach" width="1200" height="630">
+    <div class="body">
+      <p class="street" data-t="street">Gordon Beach → Frishman Beach · Tel Aviv · 1957</p>
+      <h2 data-t="title">Gordon Beach Run</h2>
+      <p data-t="desc">Israel's first prime minister has ditched his morning meetings and is sprinting down the shore to his famous headstand. Dodge crabs, seagulls and jellyfish, and collect hummus.</p>
+      <a class="play" href="gordon-beach-run/" data-t="play">Play free</a>
+      <div class="board" id="board" hidden>
+        <h3 data-t="top">Top players</h3>
+        <ol id="boardList"></ol>
+      </div>
+    </div>
+  </article>
+
+  <div class="soon"><b data-t="soonTitle">MORE STREETS SOON</b><span data-t="soon">New games on other streets are on the way.</span></div>
+  <footer data-t="foot">Free to play in your phone's browser. No download.</footer>
+</main>
+<script>
+(() => {
+  const T = {
+    en: { tag: "Retro games on real streets and beaches.", street: "Gordon Beach → Frishman Beach · Tel Aviv · 1957", title: "Gordon Beach Run",
+      desc: "Israel's first prime minister has ditched his morning meetings and is sprinting down the shore to his famous headstand. Dodge crabs, seagulls and jellyfish, and collect hummus.",
+      play: "Play free", top: "Top players", soonTitle: "MORE STREETS SOON", soon: "New games on other streets are on the way.",
+      foot: "Free to play in your phone's browser. No download.", btn: "עב" },
+    he: { tag: "משחקי רטרו ברחובות ובחופים אמיתיים.", street: "חוף גורדון ← חוף פרישמן · תל אביב · 1957", title: "ריצה בחוף גורדון",
+      desc: "ראש הממשלה הראשון של ישראל ברח מישיבות הבוקר ורץ לאורך החוף לעמידת הראש המפורסמת שלו. התחמקו מסרטנים, שחפים ומדוזות, ואספו חומוס.",
+      play: "שחקו בחינם", top: "השחקנים המובילים", soonTitle: "עוד רחובות בקרוב", soon: "משחקים חדשים ברחובות אחרים בדרך.",
+      foot: "משחקים בחינם בדפדפן של הטלפון. בלי הורדה.", btn: "EN" },
+  };
+  const phone = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+  let lang = /^(he|iw)\b/i.test(phone) ? "he" : "en";
+  try { lang = localStorage.getItem("gbr-lang-v2") || lang; } catch (e) {}
+  function apply() {
+    const t = T[lang];
+    document.documentElement.lang = lang; document.documentElement.dir = lang === "he" ? "rtl" : "ltr";
+    document.querySelectorAll("[data-t]").forEach(el => { el.textContent = t[el.dataset.t]; });
+    document.getElementById("lang").textContent = t.btn;
+  }
+  document.getElementById("lang").addEventListener("click", () => {
+    lang = lang === "he" ? "en" : "he";
+    try { localStorage.setItem("gbr-lang-v2", lang); } catch (e) {}
+    apply();
+  });
+  apply();
+  // Top players from the game's leaderboard (hidden if it isn't set up or can't be reached)
+  const cfg = window.GBR_CONFIG || {};
+  if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
+    const k = cfg.supabaseAnonKey;
+    const headers = k.startsWith("eyJ") ? { apikey: k, Authorization: "Bearer " + k } : { apikey: k };
+    fetch(cfg.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/scores?select=nickname,score,golden&order=score.desc,created_at.asc&limit=5", { headers })
+      .then(r => r.ok ? r.json() : [])
+      .then(rows => {
+        if (!rows.length) return;
+        const list = document.getElementById("boardList");
+        rows.forEach((r, i) => {
+          const li = document.createElement("li");
+          const a = document.createElement("span"); a.textContent = (i + 1) + ". " + r.nickname + (r.golden ? " ★" : "");
+          const b = document.createElement("span"); b.textContent = String(r.score);
+          li.append(a, b); list.appendChild(li);
+        });
+        document.getElementById("board").hidden = false;
+      })
+      .catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>

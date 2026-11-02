@@ -1,0 +1,9 @@
+{
+  "name": "streets",
+  "private": true,
+  "type": "module",
+  "description": "Streets: retro games set on real streets and beaches. Static pages plus a small picture server for share previews.",
+  "dependencies": {
+    "@vercel/og": "0.6.8"
+  }
+}
