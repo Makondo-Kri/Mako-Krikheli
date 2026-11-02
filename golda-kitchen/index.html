@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Golda's Kitchen · המטבח של גולדה</title>
-<meta name="description" content="Streets: help Golda Meir find 8 cake ingredients in the Shuk HaCarmel maze in 2 minutes. A free retro game for your phone. עזרו לגולדה למצוא 8 מצרכים במבוך של שוק הכרמל בתוך 2 דקות.">
+<meta name="description" content="Streets: bake Golda Meir's cake before her ministers ring the bell. A free retro game for your phone. אפו את העוגה של גולדה לפני שהשרים מצלצלים בדלת.">
 <meta name="theme-color" content="#0c3a5a">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Streets">
 <meta property="og:title" content="Golda's Kitchen · המטבח של גולדה">
-<meta property="og:description" content="Golda Meir has 2 minutes to find 8 cake ingredients in the Shuk HaCarmel maze. Can you beat my score? · תצליחו לעקוף אותי?">
+<meta property="og:description" content="Bake Golda Meir's cake for her ministers: perfect, flat, salty or burnt? Can you beat my score? · תצליחו לעקוף אותי?">
 <meta property="og:url" content="https://makondo-kri.github.io/Mako-Krikheli/golda-kitchen/">
 <meta property="og:image" content="https://makondo-kri.github.io/Mako-Krikheli/golda-kitchen/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Pixel-art Golda Meir with her handbag in Shuk HaCarmel">
+<meta property="og:image:alt" content="Pixel-art Golda Meir baking in her kitchen">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://makondo-kri.github.io/Mako-Krikheli/golda-kitchen/og-image.png">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -58,7 +58,9 @@ body {
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
 }
-body.portrait #stage { align-items: flex-start; padding-top: 58px; }
+body.portrait #stage { align-items: center; padding-top: 58px; }
+#game { touch-action: none; }
+#endFact { white-space: pre-line; }
 #game { display: block; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: none; }
 body.portrait #game { border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,.45); }
 /* Whole-screen touch layer under the menus */
@@ -223,14 +225,13 @@ body.portrait .art { max-width: 260px; }
   </div>
 </div>
 
-<div id="touch" aria-hidden="true"></div>
 
 <div class="screen" id="titleScreen">
   <div class="card" style="max-width:40rem">
     <div class="col"><canvas class="art" id="titleArt" width="480" height="240" aria-hidden="true"></canvas></div>
     <div class="col">
       <a class="streets-link" id="streetsLink" href="../" hidden>STREETS</a>
-      <p class="eyebrow">שוק הכרמל ← המטבח של גולדה · Tel Aviv</p>
+      <p class="eyebrow">המטבח של גולדה · Tel Aviv 1970</p>
       <h1 data-i18n="title">Golda's Kitchen</h1>
       <p data-i18n="story">Tel Aviv, 1970. Prime Minister Golda Meir has her ministers coming over tonight, and the cake isn't baked yet.</p>
       <p class="challenge" id="challengeLine" hidden></p>
@@ -313,10 +314,6 @@ body.portrait .art { max-width: 260px; }
 <button id="readToast" type="button" hidden>Page of history found · READ</button>
 <div id="topbar"><button id="lang" class="topbtn" type="button" aria-label="Language">עב</button><button id="help" class="topbtn" type="button" aria-label="How to play" style="font-size:14px">?</button><button id="pause" class="topbtn" type="button" aria-label="Pause" hidden>❚❚</button><button id="sound" class="topbtn" type="button">SOUND ON</button></div>
 
-<div id="controls" aria-hidden="true">
-  <div id="dpad" class="cross"><div class="btn" id="bU">▲</div><div class="btn" id="bL">◀</div><div class="btn" id="bR">▶</div><div class="btn" id="bD">▼</div></div>
-</div>
-<div class="zone-label" id="zl" data-i18n="walkLbl">swipe anywhere to walk</div>
 
 <script>
 (() => {
@@ -359,62 +356,112 @@ const I18N = {
     rotate: "Tip: turn your phone sideways for a bigger screen", title: "Golda's Kitchen",
     chalWithName: (n, s) => n + "'s score: " + s + ". Can you beat it?", chalNoName: (s) => "Score to beat: " + s + ". Can you beat it?",
     chalWon: (n, s) => "You beat " + (n || "your friend") + "'s " + s + "!", chalLost: (n, s) => (n ? n + "'s " : "The ") + s + " still stands. Try again!",
-    story: "Tel Aviv, 1970. Prime Minister Golda Meir has her ministers coming over tonight, and the cake isn't baked yet. Shuk HaCarmel is a maze of stalls, and she has two minutes to find all 8 ingredients and get back to her kitchen door.",
     start: "Start", howto: "How to play", gotit: "Got it", paused: "Paused", resume: "Resume", restart: "Restart level",
-    back: "Back to the market", realCap: "", again: "Play again", savePhoto: "Save animated GIF", shareGif: "Share animated GIF",
+    back: "Back to the kitchen", realCap: "", again: "Play again", savePhoto: "Save animated GIF", shareGif: "Share animated GIF",
     boardTitle: "Top scores", boardAsk: "Put your score on the board?", nickPh: "Nickname", boardSave: "Add my score",
     boardLoading: "Loading the board…", boardEmpty: "No scores yet. Be the first!", boardErr: "Couldn't reach the board. Check your connection and try again.",
     boardNeedNick: "Type a nickname first (up to 16 letters).", boardDone: (r) => "You're on the board at #" + r + "!", boardSaving: "Saving…", shareLbl: "Share your run:", copy: "Copy link",
     copied: "Copied! Paste it into Messenger, WhatsApp or anywhere.", copyManual: "Copy the text below and paste it anywhere.",
-    shareMsg: (sc) => "I got Golda's cake to the kitchen table! Score " + sc + ". Can you beat me?",
     jumpBtn: "JUMP", walkLbl: "swipe anywhere or use the arrows", jumpLbl: "jump", langBtn: "עב",
     sound: ["SOUND ON", "MUSIC OFF", "SOUND OFF"],
-    legend: [["Walk", "Swipe anywhere on the screen, or press the arrow pad"], ["Keyboard", "Arrow keys or WASD"],
-      ["Clock", "2 minutes. The list at the top shows what's still missing"],
-      ["Ingredients", "Eggs, flour, sugar, lemon, butter, milk, cinnamon and chocolate"],
-      ["Cats & pigeons", "Touching one costs 5 seconds"], ["Coffee", "+10 seconds"],
-      ["Handbag", "10 seconds of whacking cats and pigeons out of the way"], ["₪", "Shekels for points"],
-      ["Scroll", "A page of her real story"], ["Goal", "With all 8 ingredients, the kitchen door opens. Time left = bonus"]],
-    ingName: { egg: "EGGS", flour: "FLOUR", sugar: "SUGAR", lemon: "LEMON", butter: "BUTTER", milk: "MILK", cinnamon: "CINNAMON", chocolate: "CHOCOLATE" },
-    startSub: "find all 8 ingredients in 2 minutes", hurrySub: "hurry to finish the list", doorSub: "the kitchen door is open",
-    listDone: (n, t) => n + "/" + t + " ingredients",
+    story: "Tel Aviv, 1970. Prime Minister Golda Meir's ministers are coming over tonight to talk around her kitchen table, and there's no cake yet. Read the recipe, pick the right ingredients, stir, and bake it just right before they ring the bell.",
+    shareMsg: (sc, st, title) => "I baked in Golda's kitchen: " + title + " " + st + " Score " + sc + ". Can you bake a better one?",
+    legend: [["Ingredients", "Tap them on the shelf to drop them in the bowl. Follow the recipe card: the right things, the right amounts"],
+      ["Careful", "Salt is not sugar, and the fish from the shuk does not go in a cake"], ["Oops", "EMPTY tips the bowl out so you can start again"],
+      ["Stir", "Drag your finger in circles around the bowl until the bar is green. Not too little, not too much"],
+      ["Oven", "Set the temperature from the recipe and press BAKE. Take the cake out when it's golden: too early is raw, too late is burnt"],
+      ["Clock", "The ministers ring the bell in 90 seconds. Time left is bonus"], ["Score", "Up to 5 stars. A perfect cake gets a golden photo"]],
+    ingName: { egg: "EGGS", flour: "FLOUR", sugar: "SUGAR", salt: "SALT", butter: "BUTTER", milk: "MILK", lemon: "LEMON", chocolate: "CHOCOLATE", honey: "HONEY", cinnamon: "CINNAMON", onion: "ONION", fish: "FISH" },
+    recipe: { lemon: "lemon cake", choc: "chocolate cake", honey: "honey cake" },
+    recipeTitle: { lemon: "LEMON CAKE", choc: "CHOCOLATE CAKE", honey: "HONEY CAKE" },
+    untilGolden: "until golden", inBowl: "IN THE BOWL", btnMix: "STIR ▶", btnEmpty: "EMPTY", btnOven: "OVEN ▶", btnBake: "BAKE", btnOut: "TAKE OUT!",
+    tipMix: "Stir in circles!", mixLow: "LUMPY", mixAlmost: "ALMOST", mixOk: "SMOOTH!", mixHigh: "TOO MUCH", tapOn: "tap to continue",
+    full: "The bowl is full", needSome: "Add ingredients first",
+    out: {
+      fish: { title: "Fish cake?!", desc: "A fish from the shuk ended up in the cake. The ministers ask for more coffee." },
+      onion: { title: "Onion cake?!", desc: "Onion belongs in the soup, not in the cake. Nobody takes a second slice." },
+      soup: { title: "Cake soup", desc: "Without flour the batter never set. The ministers eat it with spoons." },
+      burnt: { title: "Burnt to a crisp!", desc: "The smoke alarm got there before the ministers did." },
+      raw: { title: "Raw in the middle", desc: "It came out too soon, and the middle is still batter." },
+      salt: { title: "A salty surprise", desc: "Salt went in with the sugar. The ministers drink a lot of water." },
+      flat: { title: "Flat as a pita", desc: "Not enough eggs, so the cake never rose." },
+      dark: { title: "A bit too dark", desc: "It stayed in the oven a little too long. Good thing there's coffee." },
+      pale: { title: "Pale and soft", desc: "It came out a little early. Tasty, but not golden." },
+      lumpy: { title: "A lumpy cake", desc: "It needed more stirring: there are bits of flour inside." },
+      dense: { title: "Dense and chewy", desc: "Too much stirring made it heavy." },
+      sweetLow: { title: "Not sweet enough", desc: "The recipe needed more sweetness." },
+      sweetHigh: { title: "Way too sweet", desc: "Too much sugar. The ministers' teeth hurt." },
+    },
+    good: {
+      5: { title: n => "A perfect " + n + "!", desc: "Golden, tall and just like the recipe. The ministers want the recipe." },
+      4: { title: n => "A very good " + n, desc: "Almost perfect. Nobody leaves a crumb." },
+      3: { title: n => "A nice " + n, desc: "Not quite the recipe, but the ministers are happy." },
+      2: { title: n => "A " + n + ", more or less", desc: "Some of the amounts were off. The ministers are polite about it." },
+    },
+    react: { 1: "*cough* We already ate.", 2: "Um... is there coffee?", 3: "Not bad, Golda!", 4: "Delicious! Another slice?", 5: "Golda, give us the recipe!" },
+    overDesc: "The doorbell rang before the cake made it out of the oven. Next time, faster!",
     apronSub: "saves you from one hit", scarfSub: "whacks cats and pigeons", glowSub: "10 seconds: enemies turn to shekels", allIngSub: "the cake will be perfect",
-    winEyebrow: "The kitchen cabinet · 1969–1974", winTitle: "Golda served the cake!", overEyebrow: "Game over", overTitle: "Time's up! The cake will have to wait",
-    yourRun: "Your run", goldRun: "Your golden run", read: "Read", factCap: "A page of her story",
+    winEyebrow: "The kitchen cabinet · 1969–1974", winTitle: "Golda served the cake!", overEyebrow: "Ding dong!", overTitle: "The ministers are here, and there's no cake!",
+    yourRun: "Your cake", goldRun: "Your golden cake", read: "Read", factCap: "A page of her story",
     score: "SCORE", best: "BEST", golden: "GOLDEN FINISH", perfect: "PERFECT CAKE",
     saved: "Saved! Send the GIF in WhatsApp and challenge your friends.", making: "Making your GIF…", busy: "One moment, then try again.", noSave: "Saving isn't available here.",
-    shareTitle: "GOLDA'S KITCHEN", shareChallenge: "Can you beat my score?", shareCapGold: "My golden run · Golda's kitchen", shareCap: "My run · Golda's kitchen",
+    shareTitle: "GOLDA'S KITCHEN", shareChallenge: "Can you bake a better one?", shareCapGold: "My golden run · Golda's kitchen", shareCap: "My run · Golda's kitchen",
     shareHead: "Golda's kitchen cabinet",
   },
   he: {
     rotate: "טיפ: סובבו את הטלפון לרוחב למסך גדול יותר", title: "המטבח של גולדה",
     chalWithName: (n, s) => "הניקוד של " + n + ": " + s + ". תצליחו לעקוף?", chalNoName: (s) => "הניקוד לעקוף: " + s + ". תצליחו?",
     chalWon: (n, s) => "עקפתם את " + (n ? "הניקוד של " + n : "הניקוד") + " (" + s + ")!", chalLost: (n, s) => (n ? "הניקוד של " + n : "הניקוד") + " (" + s + ") עדיין מוביל. נסו שוב!",
-    story: "תל אביב, 1970. השרים של ראש הממשלה גולדה מאיר מגיעים הערב, והעוגה עוד לא אפויה. שוק הכרמל הוא מבוך של דוכנים, ויש לה שתי דקות למצוא את כל 8 המצרכים ולחזור לדלת המטבח.",
     start: "התחילו", howto: "איך משחקים", gotit: "הבנתי", paused: "המשחק בהפסקה", resume: "המשיכו", restart: "התחילו מחדש",
-    back: "חזרה לשוק", realCap: "", again: "שחקו שוב", savePhoto: "שמירת GIF מונפש", shareGif: "שתפו GIF מונפש",
+    back: "חזרה למטבח", realCap: "", again: "שחקו שוב", savePhoto: "שמירת GIF מונפש", shareGif: "שתפו GIF מונפש",
     boardTitle: "טבלת השיאים", boardAsk: "להכניס את הניקוד שלכם לטבלה?", nickPh: "כינוי", boardSave: "הוסיפו אותי",
     boardLoading: "טוענים את הטבלה…", boardEmpty: "עוד אין תוצאות. היו הראשונים!", boardErr: "לא הצלחנו להגיע לטבלה. בדקו את החיבור ונסו שוב.",
     boardNeedNick: "כתבו קודם כינוי (עד 16 תווים).", boardDone: (r) => "נכנסתם לטבלה במקום " + r + "!", boardSaving: "שומרים…", shareLbl: "שתפו את הריצה:", copy: "העתקת קישור",
     copied: "הועתק! הדביקו במסנג׳ר, בוואטסאפ או בכל מקום.", copyManual: "העתיקו את הטקסט למטה והדביקו בכל מקום.",
-    shareMsg: (sc) => "הבאתי את העוגה של גולדה לשולחן המטבח! ניקוד " + sc + ". תצליחו לעקוף אותי?",
     jumpBtn: "קפיצה", walkLbl: "החליקו על המסך או השתמשו בחצים", jumpLbl: "קפיצה", langBtn: "EN",
     sound: ["צליל: פועל", "מוזיקה: כבויה", "צליל: כבוי"],
-    legend: [["הליכה", "החליקו בכל מקום על המסך, או לחצו על החצים"], ["מקלדת", "מקשי החצים או WASD"],
-      ["שעון", "2 דקות. הרשימה למעלה מראה מה עוד חסר"],
-      ["מצרכים", "ביצים, קמח, סוכר, לימון, חמאה, חלב, קינמון ושוקולד"],
-      ["חתולים ויונים", "נגיעה באחד עולה 5 שניות"], ["קפה", "+10 שניות"],
-      ["תיק", "10 שניות שבהן גולדה מעיפה חתולים ויונים מהדרך"], ["₪", "שקלים לניקוד"],
-      ["מגילה", "דף מהסיפור האמיתי שלה"], ["המטרה", "עם כל 8 המצרכים דלת המטבח נפתחת. הזמן שנשאר = בונוס"]],
-    ingName: { egg: "ביצים", flour: "קמח", sugar: "סוכר", lemon: "לימון", butter: "חמאה", milk: "חלב", cinnamon: "קינמון", chocolate: "שוקולד" },
-    startSub: "מצאו 8 מצרכים בתוך 2 דקות", hurrySub: "מהרו להשלים את הרשימה", doorSub: "דלת המטבח פתוחה",
-    listDone: (n, t) => n + "/" + t + " מצרכים",
+    story: "תל אביב, 1970. השרים של ראש הממשלה גולדה מאיר מגיעים הערב לשיחה סביב שולחן המטבח שלה, ועוד אין עוגה. קראו את המתכון, בחרו את המצרכים הנכונים, ערבבו ואפו בדיוק כמו שצריך, לפני שהם מצלצלים בדלת.",
+    shareMsg: (sc, st, title) => "אפיתי במטבח של גולדה: " + title + " " + st + " ניקוד " + sc + ". תצליחו לאפות טובה יותר?",
+    legend: [["מצרכים", "הקישו עליהם במדף כדי להכניס לקערה. עקבו אחרי כרטיס המתכון: המצרכים הנכונים, בכמויות הנכונות"],
+      ["זהירות", "מלח זה לא סוכר, והדג מהשוק לא נכנס לעוגה"], ["אופס", "לרוקן שופך את הקערה ומתחילים מחדש"],
+      ["ערבוב", "גררו את האצבע בעיגולים סביב הקערה עד שהפס ירוק. לא מעט מדי ולא יותר מדי"],
+      ["תנור", "קבעו את החום מהמתכון ולחצו לאפות. הוציאו את העוגה כשהיא זהובה: מוקדם מדי היא לא אפויה, מאוחר מדי היא שרופה"],
+      ["שעון", "השרים מצלצלים בדלת בעוד 90 שניות. הזמן שנשאר = בונוס"], ["ניקוד", "עד 5 כוכבים. עוגה מושלמת מקבלת תמונה זהובה"]],
+    ingName: { egg: "ביצים", flour: "קמח", sugar: "סוכר", salt: "מלח", butter: "חמאה", milk: "חלב", lemon: "לימון", chocolate: "שוקולד", honey: "דבש", cinnamon: "קינמון", onion: "בצל", fish: "דג" },
+    recipe: { lemon: "עוגת לימון", choc: "עוגת שוקולד", honey: "עוגת דבש" },
+    recipeTitle: { lemon: "עוגת לימון", choc: "עוגת שוקולד", honey: "עוגת דבש" },
+    untilGolden: "עד שמזהיבה", inBowl: "בקערה", btnMix: "לערבב", btnEmpty: "לרוקן", btnOven: "לתנור", btnBake: "לאפות", btnOut: "להוציא!",
+    tipMix: "ערבבו בעיגולים!", mixLow: "גושים", mixAlmost: "כמעט", mixOk: "חלק!", mixHigh: "יותר מדי", tapOn: "הקישו להמשך",
+    full: "הקערה מלאה", needSome: "קודם תוסיפו מצרכים",
+    out: {
+      fish: { title: "עוגת דגים?!", desc: "דג מהשוק נכנס לעוגה. השרים מבקשים עוד קפה." },
+      onion: { title: "עוגת בצל?!", desc: "בצל שייך למרק, לא לעוגה. אף אחד לא לוקח פרוסה שנייה." },
+      soup: { title: "מרק עוגה", desc: "בלי קמח הבלילה לא התייצבה. השרים אוכלים בכפית." },
+      burnt: { title: "שרופה לגמרי!", desc: "גלאי העשן הגיע לפני השרים." },
+      raw: { title: "לא אפויה באמצע", desc: "היא יצאה מוקדם מדי, והאמצע עדיין בלילה." },
+      salt: { title: "הפתעה מלוחה", desc: "מלח נכנס לעוגה. השרים שותים הרבה מים." },
+      flat: { title: "שטוחה כמו פיתה", desc: "לא היו מספיק ביצים, והעוגה לא תפחה." },
+      dark: { title: "קצת כהה מדי", desc: "היא נשארה בתנור קצת יותר מדי. טוב שיש קפה." },
+      pale: { title: "חיוורת ורכה", desc: "היא יצאה קצת מוקדם. טעימה, אבל לא זהובה." },
+      lumpy: { title: "עוגה עם גושים", desc: "היה צריך לערבב עוד: נשארו בפנים גושי קמח." },
+      dense: { title: "דחוסה וכבדה", desc: "ערבוב יותר מדי הפך אותה לכבדה." },
+      sweetLow: { title: "לא מספיק מתוקה", desc: "המתכון ביקש יותר מתיקות." },
+      sweetHigh: { title: "מתוקה מדי", desc: "יותר מדי סוכר. לשרים כואבות השיניים." },
+    },
+    good: {
+      5: { title: n => n + " מושלמת!", desc: "זהובה, גבוהה ובדיוק לפי המתכון. השרים רוצים את המתכון." },
+      4: { title: n => n + " טובה מאוד", desc: "כמעט מושלמת. לא נשאר אפילו פירור." },
+      3: { title: n => n + " נחמדה", desc: "לא בדיוק לפי המתכון, אבל השרים מרוצים." },
+      2: { title: n => n + ", פחות או יותר", desc: "חלק מהכמויות לא היו מדויקות. השרים מנומסים." },
+    },
+    react: { 1: "*השתעלות* כבר אכלנו.", 2: "אה... יש קפה?", 3: "לא רע, גולדה!", 4: "טעים! עוד פרוסה?", 5: "גולדה, תני לנו את המתכון!" },
+    overDesc: "הפעמון צלצל לפני שהעוגה יצאה מהתנור. בפעם הבאה, מהר יותר!",
     apronSub: "מגן מפגיעה אחת", scarfSub: "מעיף חתולים ויונים", glowSub: "10 שניות: אויבים הופכים לשקלים", allIngSub: "העוגה תהיה מושלמת",
-    winEyebrow: "המטבחון · 1969–1974", winTitle: "גולדה הגישה את העוגה!", overEyebrow: "המשחק נגמר", overTitle: "נגמר הזמן! העוגה תצטרך לחכות",
-    yourRun: "הריצה שלך", goldRun: "הריצה הזהובה שלך", read: "קראו", factCap: "דף מהסיפור שלה",
+    winEyebrow: "המטבחון · 1969–1974", winTitle: "גולדה הגישה את העוגה!", overEyebrow: "דינג דונג!", overTitle: "השרים הגיעו, ואין עוגה!",
+    yourRun: "העוגה שלך", goldRun: "העוגה הזהובה שלך", read: "קראו", factCap: "דף מהסיפור שלה",
     score: "ניקוד", best: "שיא", golden: "סיום זהוב", perfect: "עוגה מושלמת",
     saved: "נשמר! שלחו את ה־GIF בוואטסאפ ואתגרו את החברים.", making: "מכינים את ה־GIF…", busy: "רגע אחד ונסו שוב.", noSave: "אי אפשר לשמור כאן.",
-    shareTitle: "המטבח של גולדה", shareChallenge: "תצליחו לעקוף אותי?", shareCapGold: "הריצה הזהובה שלי · המטבח של גולדה", shareCap: "הריצה שלי · המטבח של גולדה",
+    shareTitle: "המטבח של גולדה", shareChallenge: "תצליחו לאפות טובה יותר?", shareCapGold: "הריצה הזהובה שלי · המטבח של גולדה", shareCap: "הריצה שלי · המטבח של גולדה",
     shareHead: "המטבחון של גולדה",
   },
 };
@@ -436,7 +483,7 @@ function resize() {
   document.body.classList.toggle("portrait", portrait);
   VW = portrait ? 256 : Math.round(Math.max(300, Math.min(520, VH * aw / ah)));
   let scale = Math.min(aw / VW, ah / VH);
-  if (portrait) scale = Math.min(aw / VW, Math.max(120, ah - 230) / VH);
+  if (portrait) scale = Math.min(aw / VW, Math.max(120, ah - 30) / VH);
   const dpr = window.devicePixelRatio || 1;
   S = Math.max(1, Math.min(4, Math.round(scale * dpr)));
   cv.width = VW * S; cv.height = VH * S;
@@ -576,122 +623,73 @@ soundBtn.addEventListener("click", () => {
   if (soundMode === 0 && state === "play") musicStart(false); else if (soundMode !== 0) musicStop();
 });
 
-/* ---------- input: swipe anywhere, or the cross pad ---------- */
+/* ---------- input: tap the kitchen, stir in circles ---------- */
 const keys = {};
-const VEC = { U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0] };
-let wantDir = null;
-const KEY_DIR = { ArrowUp: "U", KeyW: "U", ArrowDown: "D", KeyS: "D", ArrowLeft: "L", KeyA: "L", ArrowRight: "R", KeyD: "R" };
+let btns = [], stir = null, BOWL = { x: 128, y: 150 };
+function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {} }
+function releaseTouches() { stir = null; }
+function toLogical(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * VW, (e.clientY - r.top) / r.height * VH]; }
+const hitBox = (b, x, y) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h;
 addEventListener("keydown", e => {
   if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
-  if (KEY_DIR[e.code]) { wantDir = KEY_DIR[e.code]; e.preventDefault(); }
-  if (e.code === "Space") e.preventDefault();
-  if ((e.code === "Enter" || e.code === "Space") && state !== "play" && state !== "clear" && document.getElementById("factScreen").hidden) { startGame(); }
+  if (e.code === "Space" || e.code.startsWith("Arrow")) e.preventDefault();
+  if ((e.code === "Enter" || e.code === "Space") && state !== "play" && state !== "result" && factScreen.hidden && helpScreen.hidden) { startGame(); return; }
   keys[e.code] = true;
 });
 addEventListener("keyup", e => { keys[e.code] = false; });
-const touchLayer = document.getElementById("touch"), dpad = document.getElementById("dpad");
-const padBtn = { U: document.getElementById("bU"), D: document.getElementById("bD"), L: document.getElementById("bL"), R: document.getElementById("bR") };
-const ptrs = new Map();
-function lightPad(d) { for (const k in padBtn) padBtn[k].classList.toggle("on", k === d); }
-function padDir(e) {
-  const r = dpad.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-  if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return null;
-  return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "R" : "L") : (dy > 0 ? "D" : "U");
-}
-function inPad(e) { const r = dpad.getBoundingClientRect(); return r.width > 0 && e.clientX > r.left - 24 && e.clientX < r.right + 24 && e.clientY > r.top - 24 && e.clientY < r.bottom + 24; }
-touchLayer.addEventListener("pointerdown", e => {
+cv.addEventListener("pointerdown", e => {
+  if (gamePaused || (state !== "play" && state !== "result")) return;
   e.preventDefault(); initAudio();
-  try { touchLayer.setPointerCapture(e.pointerId); } catch (_) {}
-  const rec = { x0: e.clientX, y0: e.clientY, pad: inPad(e) };
-  ptrs.set(e.pointerId, rec);
-  if (rec.pad) { const d = padDir(e); if (d) { wantDir = d; lightPad(d); } }
+  const [x, y] = toLogical(e);
+  if (state === "result") { if (resT > 40) finishResult(); return; }
+  const b = btns.find(b => hitBox(b, x, y));
+  if (b) { if (b.on) { pressed = { id: b.id, t: 6 }; press(b.id); } else sfx.bump(); return; }
+  if (phase === "mix") {
+    try { cv.setPointerCapture(e.pointerId); } catch (_) {}
+    stir = { id: e.pointerId, a: Math.atan2((y - BOWL.y) * 3, x - BOWL.x) };
+  }
 });
-touchLayer.addEventListener("pointermove", e => {
-  const rec = ptrs.get(e.pointerId); if (!rec) return;
-  if (rec.pad) { const d = padDir(e); if (d) { wantDir = d; lightPad(d); } return; }
-  const dx = e.clientX - rec.x0, dy = e.clientY - rec.y0;
-  if (Math.hypot(dx, dy) > 14) { wantDir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "R" : "L") : (dy > 0 ? "D" : "U"); rec.x0 = e.clientX; rec.y0 = e.clientY; lightPad(wantDir); }
+cv.addEventListener("pointermove", e => {
+  if (!stir || stir.id !== e.pointerId || gamePaused || phase !== "mix") return;
+  const [x, y] = toLogical(e), a = Math.atan2((y - BOWL.y) * 3, x - BOWL.x);
+  let d = a - stir.a; if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI;
+  stir.a = a; addStir(Math.min(1, Math.abs(d)));
 });
-["pointerup", "pointercancel", "lostpointercapture"].forEach(t => touchLayer.addEventListener(t, e => { ptrs.delete(e.pointerId); if (!ptrs.size) lightPad(null); }));
-function releaseTouches() { ptrs.clear(); lightPad(null); }
-function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {} }
+["pointerup", "pointercancel", "lostpointercapture"].forEach(t => cv.addEventListener(t, e => { if (stir && stir.id === e.pointerId) stir = null; }));
 document.addEventListener("touchmove", e => { if (!e.target.closest || !e.target.closest(".card")) e.preventDefault(); }, { passive: false });
 document.addEventListener("contextmenu", e => e.preventDefault());
 
-/* ---------- the market maze ---------- */
-const MW = 29, MH = 21, WALL = 1, FLOOR = 0, DOOR = 2;
-const maze = new Uint8Array(MW * MH);
-const mget = (x, y) => (x < 0 || y < 0 || x >= MW || y >= MH) ? WALL : maze[y * MW + x];
-const START = [1, MH - 2], EXIT = [MW - 1, 1];
-const ALL_ING = ["egg", "flour", "sugar", "lemon", "butter", "milk", "cinnamon", "chocolate"];
-const TIME_START = 120 * 60;
-let doorOpen = false;
-const open = (x, y) => { const v = mget(x, y); return v === FLOOR || (v === DOOR && doorOpen); };
-let ingredients = [], coffees = [], bags = [], coins = [], scrolls = [], enemies = [], parts = [];
-const gotIngredients = new Set();
+/* ---------- the kitchen ---------- */
+const ING = ["egg", "flour", "sugar", "salt", "butter", "milk", "lemon", "chocolate", "honey", "cinnamon", "onion", "fish"];
+const RECIPES = [
+  { id: "lemon", temp: 180, items: { egg: 3, flour: 2, sugar: 2, butter: 1, lemon: 1 } },
+  { id: "choc", temp: 180, items: { egg: 2, flour: 2, sugar: 2, butter: 1, chocolate: 2, milk: 1 } },
+  { id: "honey", temp: 160, items: { egg: 3, flour: 2, honey: 2, sugar: 1, cinnamon: 1 } },
+];
+const TEMPS = [140, 160, 180, 200, 220, 250];
+const TIME_START = 90 * 60, BAKE_F = 540, MAX_BOWL = 24;
+const PERFECT_CAKE = { kind: "lemon", h: 1, c: 1, topping: true };
 const factsFound = new Set();
-
-function buildMaze() {
-  // the same market every time (fair for the leaderboard)
-  const r = rng(1970);
-  maze.fill(WALL);
-  const stack = [START.slice()]; maze[START[1] * MW + START[0]] = FLOOR;
-  while (stack.length) {
-    const [cx, cy] = stack[stack.length - 1];
-    const dirs = [[2, 0], [-2, 0], [0, 2], [0, -2]].filter(([dx, dy]) => { const nx = cx + dx, ny = cy + dy; return nx > 0 && ny > 0 && nx < MW - 1 && ny < MH - 1 && mget(nx, ny) === WALL; });
-    if (!dirs.length) { stack.pop(); continue; }
-    const [dx, dy] = dirs[Math.floor(r() * dirs.length)];
-    maze[(cy + dy / 2) * MW + cx + dx / 2] = FLOOR; maze[(cy + dy) * MW + cx + dx] = FLOOR; stack.push([cx + dx, cy + dy]);
-  }
-  // knock through some stalls so the alleys loop, like a real market
-  for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
-    if (mget(x, y) !== WALL) continue;
-    const h = mget(x - 1, y) === FLOOR && mget(x + 1, y) === FLOOR && mget(x, y - 1) === WALL && mget(x, y + 1) === WALL;
-    const v = mget(x, y - 1) === FLOOR && mget(x, y + 1) === FLOOR && mget(x - 1, y) === WALL && mget(x + 1, y) === WALL;
-    if ((h || v) && r() < 0.2) maze[y * MW + x] = FLOOR;
-  }
-  maze[EXIT[1] * MW + EXIT[0]] = DOOR;
-  // distances from the start, to spread things around
-  const dist = new Int16Array(MW * MH).fill(-1), q = [START.slice()]; dist[START[1] * MW + START[0]] = 0;
-  while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of Object.values(VEC)) { const nx = x + dx, ny = y + dy; if (mget(nx, ny) === FLOOR && dist[ny * MW + nx] < 0) { dist[ny * MW + nx] = dist[y * MW + x] + 1; q.push([nx, ny]); } } }
-  const used = new Set([START[1] * MW + START[0]]);
-  const floors = []; for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) if (mget(x, y) === FLOOR) floors.push([x, y, dist[y * MW + x]]);
-  const deadEnds = floors.filter(([x, y]) => Object.values(VEC).filter(([dx, dy]) => mget(x + dx, y + dy) === FLOOR).length === 1 && !(x === START[0] && y === START[1]));
-  deadEnds.sort((a, b) => a[2] - b[2]);
-  const take = (list, n) => { const out = []; for (let i = 0; i < n && list.length; i++) { const idx = Math.min(list.length - 1, Math.floor((i + 0.5) * list.length / n)); const c = list[idx]; if (!used.has(c[1] * MW + c[0])) { used.add(c[1] * MW + c[0]); out.push(c); } } return out; };
-  const pickFree = (filter, n) => { const out = []; let guard = 0; while (out.length < n && guard++ < 2000) { const c = floors[Math.floor(r() * floors.length)]; if (filter(c) && !used.has(c[1] * MW + c[0])) { used.add(c[1] * MW + c[0]); out.push(c); } } return out; };
-  let ingCells = take(deadEnds.slice(), ALL_ING.length);
-  if (ingCells.length < ALL_ING.length) ingCells = ingCells.concat(pickFree(c => c[2] > 8, ALL_ING.length - ingCells.length));
-  const order = ALL_ING.slice().sort(() => r() - 0.5);
-  ingredients = ingCells.map((c, i) => ({ k: order[i], tx: c[0], ty: c[1], got: false }));
-  coffees = pickFree(c => c[2] > 10, 4).map(c => ({ tx: c[0], ty: c[1], got: false }));
-  bags = pickFree(c => c[2] > 14, 2).map(c => ({ tx: c[0], ty: c[1], got: false }));
-  coins = pickFree(c => c[2] > 3, 26).map(c => ({ tx: c[0], ty: c[1], got: false }));
-  const mid = floors.filter(c => c[2] > 18 && c[2] < 30);
-  scrolls = pickFree(c => c[2] > 18 && c[2] < 32, 1).map(c => ({ tx: c[0], ty: c[1], fact: 1, done: factsFound.has(1) }));
-  void mid;
-  // market cats and pigeons, starting well away from Golda
-  const homes = pickFree(c => c[2] > 16, 7);
-  enemies = homes.map((c, i) => ({ kind: i % 2 ? "pigeon" : "cat", tx: c[0], ty: c[1], x: c[0] * T + 8, y: c[1] * T + 8, dir: [0, 0], speed: i % 2 ? 0.95 : 0.75, gone: 0, home: c, t: i * 13 }));
-}
-
-/* ---------- game state ---------- */
-let state = "title", frame = 0, camX = 0, camY = 0, score = 0, shekels = 0, best = 0, timeLeft = TIME_START, clearT = 0;
+let state = "title", frame = 0, score = 0, shekels = 0, best = 0, timeLeft = TIME_START;
 try { best = +localStorage.getItem("golda-best") || 0; } catch (e) {}
-const P = { tx: 0, ty: 0, x: 0, y: 0, dir: [0, 0], face: "D", anim: 0, inv: 0, stun: 0, bagT: 0, swingT: 0, serve: false, glow: false };
-let bannerMsg = null, finT = 0, flashT = 0, areaT = 0, finaleGold = false, warned = false, lastSec = -1;
+let phase = "add", rec = RECIPES[0], recipeIdx = -1, bowl = {}, flies = [], mix = 0, spoonA = 0, stirAcc = 0;
+let tempI = 0, baking = false, bakeT = 0, dn = 0, cr = 0, resT = 0, flashT = 0, toastMsg = "", toastT = 0;
+let pressed = null, finaleGold = false, lastSec = -1, lastCake = null, lastResult = null, parts = [];
 
-function placePlayer() {
-  P.tx = START[0]; P.ty = START[1]; P.x = P.tx * T + 8; P.y = P.ty * T + 8; P.dir = [0, 0]; P.face = "R";
-  P.inv = 0; P.stun = 0; P.bagT = 0; P.swingT = 0; P.serve = false; wantDir = null;
-  camX = 0; camY = MH * T - VH;
-}
+const OX = () => Math.floor((VW - 256) / 2);
+const count = () => Object.values(bowl).reduce((a, b) => a + b, 0);
+const n = k => bowl[k] || 0;
+function cellPos(i) { const ox = OX(); return { x: ox + 90 + (i % 3) * 54, y: 20 + Math.floor(i / 3) * 32 }; }
+
 function startGame() {
   initAudio();
-  score = 0; shekels = 0; timeLeft = TIME_START; doorOpen = false; warned = false; lastSec = -1; finaleGold = false;
-  factsFound.clear(); gotIngredients.clear(); parts = [];
-  buildMaze(); placePlayer(); state = "play";
-  bannerMsg = { he: "שוק הכרמל", en: "SHUK HACARMEL", sub: I18N[lang].startSub }; areaT = 190;
+  recipeIdx = recipeIdx < 0 ? Math.floor(Math.random() * RECIPES.length) : (recipeIdx + 1) % RECIPES.length;
+  rec = RECIPES[recipeIdx];
+  score = 0; timeLeft = TIME_START; phase = "add"; bowl = {}; flies = []; mix = 0; spoonA = 0; stirAcc = 0;
+  tempI = 0; baking = false; bakeT = 0; dn = 0; cr = 0; resT = 0; flashT = 0; toastT = 0; pressed = null;
+  finaleGold = false; lastSec = -1; parts = []; lastResult = null;
+  state = "play";
+  document.body.classList.remove("shooting");
   document.getElementById("titleScreen").hidden = true;
   document.getElementById("endScreen").hidden = true;
   pauseBtn.hidden = false; gamePaused = false; pauseScreen.hidden = true; releaseTouches(); hideToast();
@@ -711,151 +709,144 @@ document.getElementById("resumeBtn").addEventListener("click", () => setPaused(f
 document.getElementById("restartBtn").addEventListener("click", () => { setPaused(false); startGame(); });
 
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
-function popup(x, y, text) { parts.push({ k: "text", x, y, vy: -0.5, t: 0, text }); }
-function addCoin(x, y) {
-  shekels++; score += 50; sfx.coin();
-  popup(x - 6, y - 8, "+50");
+function say(msg) { toastMsg = msg; toastT = 100; }
+function press(id) {
+  if (id.startsWith("ing:")) return addIng(id.slice(4));
+  if (id === "empty") { if (count()) { bowl = {}; flies = []; sfx.bump(); buzz(20); } return; }
+  if (id === "mix") { if (!count()) { say(L().needSome); sfx.bump(); return; } phase = "mix"; flies = []; sfx.flip(); return; }
+  if (id === "oven") { phase = "oven"; stir = null; sfx.flip(); return; }
+  if (id === "tdown") { tempI = Math.max(0, tempI - 1); tone(500, 500, 0.04, "square", 0.03); return; }
+  if (id === "tup") { tempI = Math.min(TEMPS.length - 1, tempI + 1); tone(700, 700, 0.04, "square", 0.03); return; }
+  if (id === "bake") { baking = true; bakeT = 0; sfx.power(); return; }
+  if (id === "out") takeOut();
 }
+function addIng(k) {
+  if (count() >= MAX_BOWL) { say(L().full); sfx.bump(); return; }
+  bowl[k] = n(k) + 1; buzz(10);
+  const c = cellPos(ING.indexOf(k)); flies.push({ k, x: c.x + 15, y: c.y, t: 0 });
+  tone(600, 900, 0.05, "square", 0.03);
+}
+function addStir(rad) {
+  mix = Math.min(2, mix + rad / (2 * Math.PI) * 0.13); spoonA += rad; stirAcc += rad;
+  if (stirAcc > Math.PI) { stirAcc = 0; tone(160 + Math.random() * 60, 120, 0.05, "triangle", 0.05); }
+}
+function doorbell() { tone(659, 659, 0.35, "triangle", 0.14); tone(523, 523, 0.5, "triangle", 0.14, 0.35); }
 
-// Moves a walker along the alleys, tile by tile. choose(e) returns the wanted direction at each crossing.
-function walk(e, speed, choose) {
-  let left = speed, guard = 0;
-  const atCentre = () => Math.abs(e.x - (e.tx * T + 8)) < 0.01 && Math.abs(e.y - (e.ty * T + 8)) < 0.01;
-  const decide = () => {
-    const w = choose(e);
-    if (w && open(e.tx + w[0], e.ty + w[1])) e.dir = w;
-    else if (!open(e.tx + e.dir[0], e.ty + e.dir[1])) e.dir = [0, 0];
+/* ---------- judging the cake ---------- */
+function judge() {
+  const it = rec.items, need = Object.keys(it);
+  let ing = 0;
+  for (const k of need) { const d = Math.abs(n(k) - it[k]); ing += (d === 0 ? 1 : d === 1 ? 0.5 : d === 2 ? 0.15 : 0) / need.length; }
+  const wrongN = ING.filter(k => !it[k]).reduce((a, k) => a + n(k), 0);
+  const ingScore = Math.max(0, 4000 * ing - 500 * wrongN);
+  const mixScore = mix >= 0.85 && mix <= 1.2 ? 1500 : mix >= 0.65 && mix <= 1.4 ? 800 : mix >= 0.4 ? 250 : 0;
+  const temp = TEMPS[tempI], tempScore = temp === rec.temp ? 1000 : Math.abs(temp - rec.temp) === 20 ? 500 : 0;
+  const dErr = dn < 1 ? 1 - dn : (dn - 1) * 0.4, cErr = Math.abs(cr - 1);
+  const bakeScore = 2000 * Math.max(0, 1 - (dErr + cErr) * 2.2);
+  const base = ingScore + mixScore + tempScore + bakeScore, q = base / 8500;
+  const eggsShort = (it.egg || 0) - n("egg"), sweet = n("sugar") + n("honey") - ((it.sugar || 0) + (it.honey || 0));
+  const f = {
+    fish: n("fish") > 0, onion: n("onion") > 0, soup: n("flour") === 0, burnt: cr > 1.45, raw: dn < 0.72, salt: n("salt") > 0,
+    flat: n("egg") === 0 || eggsShort >= 2, dark: cr > 1.18, pale: cr < 0.78, lumpy: mix < 0.6, dense: mix > 1.4,
+    sweetLow: sweet <= -2, sweetHigh: sweet >= 2,
   };
-  if (atCentre()) decide();
-  else if (e.want && e.want[0] === -e.dir[0] && e.want[1] === -e.dir[1]) { e.tx += e.dir[0]; e.ty += e.dir[1]; e.dir = e.want; }
-  while (left > 0 && (e.dir[0] || e.dir[1]) && guard++ < 4) {
-    const nx = (e.tx + e.dir[0]) * T + 8, ny = (e.ty + e.dir[1]) * T + 8;
-    const d = Math.abs(nx - e.x) + Math.abs(ny - e.y);
-    if (d <= left) { e.x = nx; e.y = ny; e.tx += e.dir[0]; e.ty += e.dir[1]; left -= d; decide(); }
-    else { e.x += e.dir[0] * left; e.y += e.dir[1] * left; left = 0; }
-  }
+  const order = ["fish", "onion", "soup", "burnt", "raw", "salt", "flat", "dark", "pale", "lumpy", "dense", "sweetLow", "sweetHigh"];
+  const key = order.find(k => f[k]) || "good";
+  let stars = q >= 0.92 ? 5 : q >= 0.75 ? 4 : q >= 0.55 ? 3 : q >= 0.35 ? 2 : 1;
+  const cap = { fish: 2, onion: 2, soup: 1, burnt: 1, raw: 2, salt: 2, flat: 3, dark: 4, pale: 4, lumpy: 4, dense: 4, sweetLow: 4, sweetHigh: 4 }[key];
+  if (cap) stars = Math.min(stars, cap);
+  const gold = key === "good" && stars === 5 && ing === 1 && wrongN === 0 && tempScore === 1000;
+  const sc = Math.round(base) + Math.ceil(timeLeft / 60) * 10 + (gold ? 1000 : 0);
+  let h = 1 - 0.3 * Math.max(0, eggsShort) - 0.25 * Math.max(0, (it.flour || 2) - n("flour"));
+  if (f.lumpy) h *= 0.9;
+  if (f.dense) h *= 0.7;
+  if (f.flat) h = Math.min(h, 0.3);
+  h = clamp(h, 0.2, 1.1);
+  const cake = { kind: rec.id, h, c: cr, raw: f.raw, soup: f.soup, lumpy: f.lumpy, fish: f.fish, onion: f.onion, salt: f.salt,
+    topping: stars >= 3 && !f.burnt && !f.raw && !f.soup };
+  return { key, stars, score: sc, gold, cake };
 }
-function wanderChoice(e) {
-  // cats and pigeons pick a random way at crossings and don't turn back unless they must
-  const opts = Object.values(VEC).filter(([dx, dy]) => open(e.tx + dx, e.ty + dy) && !(dx === -e.dir[0] && dy === -e.dir[1]) && mget(e.tx + dx, e.ty + dy) !== DOOR);
-  if (!opts.length) return [-e.dir[0], -e.dir[1]];
-  if (opts.some(o => o[0] === e.dir[0] && o[1] === e.dir[1]) && Math.random() < 0.55) return e.dir;
-  return opts[Math.floor(Math.random() * opts.length)];
+function outcomeText(r, t) {
+  const name = t.recipe[rec.id];
+  if (r.key !== "good") return t.out[r.key];
+  const g = t.good[Math.max(2, r.stars)];
+  return { title: g.title(name), desc: g.desc };
 }
+function takeOut() {
+  baking = false;
+  lastResult = judge(); score = lastResult.score; finaleGold = lastResult.gold; lastCake = lastResult.cake;
+  state = "result"; resT = 0; musicStop(); releaseTouches();
+  document.body.classList.add("shooting"); pauseBtn.hidden = true;
+  tone(1568, 1568, 0.25, "triangle", 0.1);
+}
+function finishResult() { if (state === "result") endGame(true); }
 
 /* ---------- update ---------- */
 function stepPlay() {
-  // the clock
   timeLeft--;
   const sec = Math.ceil(timeLeft / 60);
   if (sec !== lastSec) { lastSec = sec; if (sec <= 10 && sec > 0) tone(1200, 1200, 0.05, "square", 0.03); }
-  if (!warned && timeLeft <= 20 * 60) { warned = true; bannerMsg = { he: "!עוד 20 שניות", en: "20 SECONDS LEFT!", sub: I18N[lang].hurrySub }; areaT = 150; sfx.hurt(); }
-  if (timeLeft <= 0) { timeLeft = 0; sfx.hurt(); buzz([60, 40, 120]); musicStop(); endGame(false); return; }
-
-  if (P.inv > 0) P.inv--;
-  if (P.bagT > 0) P.bagT--;
-  if (P.swingT > 0) P.swingT--;
-  P.want = wantDir ? VEC[wantDir] : null;
-  if (P.stun > 0) P.stun--;
-  else {
-    const before = [P.x, P.y];
-    walk(P, P.bagT > 0 ? 1.55 : 1.3, e => e.want);
-    if (P.dir[0] || P.dir[1]) { P.face = P.dir[0] > 0 ? "R" : P.dir[0] < 0 ? "L" : P.dir[1] > 0 ? "D" : "U"; }
-    if (P.x !== before[0] || P.y !== before[1]) P.anim += 0.18;
+  if (timeLeft <= 0) {
+    timeLeft = 0;
+    if (baking) { takeOut(); return; }
+    doorbell(); buzz([60, 40, 120]); musicStop(); endGame(false); return;
   }
-  const here = (o) => Math.abs(P.x - (o.tx * T + 8)) < 9 && Math.abs(P.y - (o.ty * T + 8)) < 9;
-  for (const g of ingredients) if (!g.got && here(g)) {
-    g.got = true; gotIngredients.add(g.k); score += 300; sfx.power(); buzz(20);
-    popup(g.tx * T, g.ty * T - 4, I18N[lang].ingName[g.k]);
-    if (gotIngredients.size === ALL_ING.length) {
-      doorOpen = true; sfx.oneup();
-      bannerMsg = { he: "!הביתה למטבח", en: "TO THE KITCHEN!", sub: I18N[lang].doorSub }; areaT = 170;
-    }
+  if (toastT > 0) toastT--;
+  if (pressed && --pressed.t <= 0) pressed = null;
+  for (const fl of flies) { fl.t++; if (fl.t === 14) tone(260, 110, 0.09, "triangle", 0.12); }
+  flies = flies.filter(fl => fl.t < 15);
+  if (phase === "mix" && (keys.Space || keys.ArrowLeft || keys.ArrowRight || keys.ArrowUp || keys.ArrowDown)) addStir(0.3);
+  if (phase === "oven" && baking) {
+    bakeT++;
+    const r = TEMPS[tempI] / rec.temp;
+    dn += r / BAKE_F; cr += r * r * r / BAKE_F;
+    if (cr > 1.3 && frame % 7 === 0) parts.push({ k: "smoke", x: OX() + 30 + Math.random() * 100, y: 80, vy: -0.5, t: 0 });
+    if (cr > 1.5 && bakeT % 24 === 0) { tone(2100, 2100, 0.09, "square", 0.04); buzz(20); }
+    if (cr >= 2.1) takeOut();
   }
-  for (const c of coffees) if (!c.got && here(c)) { c.got = true; timeLeft += 10 * 60; sfx.power(); popup(c.tx * T, c.ty * T - 4, "+10s"); }
-  for (const b of bags) if (!b.got && here(b)) {
-    b.got = true; P.bagT = 10 * 60; P.swingT = 14; sfx.oneup(); buzz(40);
-    bannerMsg = { he: "!התיק של גולדה", en: "GOLDA'S HANDBAG!", sub: I18N[lang].scarfSub }; areaT = 150;
-  }
-  for (const c of coins) if (!c.got && here(c)) { c.got = true; addCoin(c.tx * T + 8, c.ty * T + 8); }
-  for (const sc of scrolls) if (!sc.done && here(sc)) { sc.done = true; factsFound.add(sc.fact); score += 500; sfx.coin(); showFact(sc.fact); }
-
-  for (const e of enemies) {
-    e.t++;
-    if (e.gone > 0) { if (--e.gone === 0) { e.tx = e.home[0]; e.ty = e.home[1]; e.x = e.tx * T + 8; e.y = e.ty * T + 8; e.dir = [0, 0]; } continue; }
-    walk(e, e.speed, wanderChoice);
-    if (Math.abs(e.x - P.x) < 10 && Math.abs(e.y - P.y) < 10) {
-      if (P.bagT > 0) {
-        e.gone = 8 * 60; score += 100; P.swingT = 12; sfx.stomp(); buzz(25);
-        popup(e.x - 10, e.y - 10, "WHACK!");
-        for (let k = 0; k < 6; k++) parts.push({ k: "spark", x: e.x + (Math.random() - 0.5) * 12, y: e.y + (Math.random() - 0.5) * 12, vy: -0.5, t: 0 });
-      } else if (P.inv === 0) {
-        timeLeft = Math.max(1, timeLeft - 5 * 60); P.stun = 24; P.inv = 90; sfx.hurt(); buzz(80);
-        popup(P.x - 8, P.y - 14, "-5s");
-        e.dir = [-e.dir[0], -e.dir[1]];
-      }
-    }
-  }
-
-  // the open kitchen door is the finish
-  if (doorOpen && P.tx === EXIT[0] && P.ty === EXIT[1]) {
-    state = "clear"; clearT = 0; finT = 0; P.serve = true; P.dir = [0, 0];
-    finaleGold = timeLeft >= 30 * 60;
-    const bonus = Math.floor(timeLeft / 60) * 20;
-    score += bonus; popup(P.x - 30, P.y - 16, "TIME +" + bonus);
-    if (finaleGold) { score += 2000; popup(P.x - 40, P.y - 28, "GOLDEN FINISH +2000"); }
-    musicStop(); sfx.win();
-  }
-  updateCam();
 }
-function updateCam() {
-  const mw = MW * T, mh = MH * T;
-  const tx = mw <= VW ? (mw - VW) / 2 : clamp(P.x - VW / 2, 0, mw - VW);
-  // room above the maze for the score/list bar, and below it for the arrow pad in landscape
-  const top = 40, bot = document.body.classList.contains("portrait") ? 0 : 24;
-  const ty = mh + top + bot <= VH ? (mh - VH) / 2 : clamp(P.y - VH / 2 + 10, -top, mh - VH + bot);
-  camX += (tx - camX) * 0.2; camY += (ty - camY) * 0.2;
+function stepResult() {
+  resT++;
+  const st = lastResult.stars;
+  if (resT >= 30 && resT % 14 === 2 && (resT - 30) / 14 < st) sfx.coin();
+  if (resT === 30 + st * 14 + 6) { if (st >= 4) sfx.win(); else if (st === 3) sfx.oneup(); else sfx.hurt(); }
+  if (resT === 230) { flashT = 16; sfx.shutter(); buzz(30); }
+  if (flashT > 0) flashT--;
+  if (resT === 290) finishResult();
 }
-function stepClear() {
-  clearT++;
-  if (clearT === 20) document.body.classList.add("shooting");
-  if (clearT > 20) finT++;
-  if (finT === 45) { flashT = 16; sfx.shutter(); buzz(30); }
-  if (finT === 150) endGame(true);
-  updateCam();
-}
-let lastWon = false;
 function renderEnd() {
-  const t = L(), won = lastWon;
-  document.getElementById("endEyebrow").textContent = won ? t.winEyebrow : t.overEyebrow;
-  document.getElementById("endTitle").textContent = won ? t.winTitle : t.overTitle;
-  document.getElementById("endFact").textContent = PHOTO_FACT[lang];
+  const t = L(), won = lastWon, r = lastResult;
+  const pad = v => String(v).padStart(6, "0");
+  const stars = r ? "★".repeat(r.stars) + "☆".repeat(5 - r.stars) : "";
+  const o = won && r ? outcomeText(r, t) : null;
+  document.getElementById("endEyebrow").textContent = won ? stars + "  " + t.recipe[rec.id] : t.overEyebrow;
+  document.getElementById("endTitle").textContent = won ? o.title : t.overTitle;
+  document.getElementById("endFact").textContent = (won ? o.desc : t.overDesc) + "\n\n" + PHOTO_FACT[lang];
   document.querySelector(".fig-game figcaption").textContent = won && finaleGold ? t.goldRun : t.yourRun;
-  document.getElementById("endStats").innerHTML =
-    t.score + " " + String(score).padStart(6, "0") + " · " + t.best + " " + String(best).padStart(6, "0") +
-    "<br>" + t.listDone(gotIngredients.size, ALL_ING.length) + " · ₪" + shekels + (won && finaleGold ? " · " + t.golden : "");
-  const msg = t.shareMsg(String(score).padStart(6, "0")) + " " + shareUrl();
-  const cr = document.getElementById("challengeResult");
-  cr.hidden = !CHALLENGE;
-  if (CHALLENGE) cr.textContent = score > CHALLENGE.score ? t.chalWon(CHALLENGE.nick, CHALLENGE.score) : t.chalLost(CHALLENGE.nick, CHALLENGE.score);
+  document.getElementById("endStats").innerHTML = t.score + " " + pad(score) + " · " + t.best + " " + pad(best) + (won && finaleGold ? "<br>" + t.golden : "");
+  const msg = (won ? t.shareMsg(pad(score), stars, o.title) : t.shareMsg(pad(score), "", t.overTitle)) + " " + shareUrl();
+  const cr2 = document.getElementById("challengeResult");
+  cr2.hidden = !CHALLENGE;
+  if (CHALLENGE) cr2.textContent = score > CHALLENGE.score ? t.chalWon(CHALLENGE.nick, CHALLENGE.score) : t.chalLost(CHALLENGE.nick, CHALLENGE.score);
   document.getElementById("shareRow").hidden = !won;
   document.getElementById("waLink").href = "https://wa.me/?text=" + encodeURIComponent(msg);
   document.getElementById("fbLink").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(shareUrl());
   document.getElementById("copyField").value = msg;
   shareBtn.textContent = IN_CLAUDE ? t.savePhoto : t.shareGif;
   const ep = document.getElementById("endPages"); ep.innerHTML = "";
-  FACTS.forEach((f, i) => {
+  FACTS.forEach((fct, i) => {
     const btn = document.createElement("button"); btn.type = "button"; btn.className = "go alt small";
-    btn.textContent = t.read + " " + f.year.slice(-4); btn.addEventListener("click", () => showFact(i)); ep.appendChild(btn);
+    btn.textContent = t.read + " " + fct.year.slice(-4); btn.addEventListener("click", () => showFact(i)); ep.appendChild(btn);
   });
 }
+let lastWon = false;
 function endGame(won) {
   document.body.classList.remove("shooting");
   pauseBtn.hidden = true; releaseTouches();
   state = won ? "won" : "over";
   if (score > best) { best = score; try { localStorage.setItem("golda-best", String(best)); } catch (e) {} }
   lastWon = won; renderEnd();
-  const ef = document.getElementById("endFact"); ef.hidden = !won;
+  document.getElementById("endFact").hidden = false;
   document.getElementById("photoWrap").hidden = !won;
   if (won) drawArt(document.getElementById("photo"), "photo");
   document.getElementById("photo").classList.toggle("gold", won && finaleGold);
@@ -869,121 +860,321 @@ function endGame(won) {
 function step() {
   frame++;
   if (state === "play") stepPlay();
-  else if (state === "clear") stepClear();
+  else if (state === "result") stepResult();
   for (const p of parts) { p.t++; p.y += p.vy; }
-  parts = parts.filter(p => p.t < 50);
+  parts = parts.filter(p => p.t < 60);
 }
 
 /* ---------- drawing ---------- */
 const R = (c, x, y, w, h) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
-const wx = x => Math.round(x - camX), wy = y => Math.round(y - camY);
-const AWN = [["#e2483a", "#ffffff"], ["#2f8a4a", "#f6e3bb"], ["#f0a93a", "#ffffff"], ["#2f74c0", "#ffffff"], ["#9b3fa6", "#f6e3bb"]];
-const FRUIT = ["#ff8c1a", "#e2483a", "#7ab83a", "#ffd23f", "#9b3fa6"];
+const INK = "#12304a", BODYF = "Rubik, system-ui, sans-serif", PIXF = "'Press Start 2P', monospace";
+function txt(s, x, y, size, color, align = "left", pix = false) {
+  const he = lang === "he" && !pix;
+  ctx.font = he ? "800 " + Math.round(size * 1.6) + "px " + BODYF : size + "px " + PIXF;
+  ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = "top"; ctx.direction = he ? "rtl" : "ltr";
+  ctx.fillText(s, x, he ? y - Math.round(size * 0.35) : y);
+  ctx.direction = "ltr"; ctx.textAlign = "left";
+}
+function txtWrap(s, cx, y, size, color, maxW, lh) {
+  const he = lang === "he";
+  ctx.font = he ? "800 " + Math.round(size * 1.6) + "px " + BODYF : size + "px " + PIXF;
+  const words = s.split(" "), lines = []; let cur = "";
+  for (const w of words) { const tryL = cur ? cur + " " + w : w; if (ctx.measureText(tryL).width > maxW && cur) { lines.push(cur); cur = w; } else cur = tryL; }
+  if (cur) lines.push(cur);
+  lines.forEach((l, i) => txt(l, cx, y + i * lh, size, color, "center"));
+  return lines.length;
+}
+function hexMix(a, b, t) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const ch = s => Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t);
+  return "#" + ((1 << 24) + (ch(16) << 16) + (ch(8) << 8) + ch(0)).toString(16).slice(1);
+}
+const CRUST = {
+  light: [[0, "#f6e7b4"], [0.75, "#f1d48a"], [1, "#e0a64a"], [1.2, "#b8732e"], [1.45, "#5a3518"], [1.8, "#1d1612"]],
+  choc: [[0, "#a8764f"], [1, "#6a3c22"], [1.25, "#4a2814"], [1.5, "#241510"], [1.8, "#121010"]],
+};
+function crustCol(kind, c) {
+  const st = CRUST[kind === "choc" ? "choc" : "light"];
+  if (c <= st[0][0]) return st[0][1];
+  for (let i = 1; i < st.length; i++) if (c <= st[i][0]) return hexMix(st[i - 1][1], st[i][1], (c - st[i - 1][0]) / (st[i][0] - st[i - 1][0]));
+  return st[st.length - 1][1];
+}
+const BATTER = { lemon: "#f3d98a", choc: "#7a4a2a", honey: "#d99a3a" };
+function batterCol() {
+  let c = BATTER[rec.id];
+  if (n("chocolate")) c = hexMix(c, "#5a3018", Math.min(0.8, n("chocolate") * 0.3));
+  if (n("honey")) c = hexMix(c, "#d99a3a", Math.min(0.6, n("honey") * 0.25));
+  if (n("fish")) c = hexMix(c, "#8fa9b8", 0.4);
+  if (n("onion")) c = hexMix(c, "#c9a3c0", 0.25);
+  if (!n("flour")) c = hexMix(c, "#fff4cf", 0.3);
+  return c;
+}
 
-function drawCoin(x, y, t) {
-  const w = Math.max(1, Math.round(Math.abs(Math.cos(t * 0.08)) * 10));
-  const cx = Math.round(x + 5 - w / 2);
-  R("#b07a00", cx, y, w, 12); R("#ffcf33", cx + (w > 2 ? 1 : 0), y + 1, Math.max(1, w - 2), 10);
-  if (w > 5) { R("#fff1a6", cx + 2, y + 2, 1, 6); R("#b07a00", cx + w / 2 - 1 | 0, y + 4, 2, 4); }
-}
-function drawTile(tx, ty) {
-  const v = mget(tx, ty), x = wx(tx * T), y = wy(ty * T);
-  if (v === FLOOR) {
-    R("#cfc2a6", x, y, T, T); R("#bfb293", x, y + 8, T, 1); R("#bfb293", x + ((ty % 2) ? 4 : 11), y, 1, 8); R("#bfb293", x + ((ty % 2) ? 11 : 4), y + 8, 1, 8);
-    if (hash(tx, ty) < 0.06) R("#ff8c1a", x + 6, y + 6, 3, 3);
-    // shade under the stall to the north
-    if (mget(tx, ty - 1) === WALL) R("rgba(60,40,20,.18)", x, y, T, 4);
-    return;
+// The shop shelf ingredients, drawn on a 12 x 12 grid
+const ICON = {
+  egg() { R("#c98d5a", 6, 3, 4, 1); R("#c98d5a", 5, 4, 6, 6); R("#c98d5a", 6, 10, 4, 1); R("#a8703f", 9, 5, 2, 5);
+    R("#fbf6ea", 2, 4, 4, 1); R("#fbf6ea", 1, 5, 6, 6); R("#fbf6ea", 2, 11, 4, 1); R("#ddd2bc", 5, 7, 2, 4); R("#ffffff", 2, 6, 1, 2); },
+  flour() { R("#e9dcc0", 2, 4, 8, 8); R("#d8c8a6", 8, 4, 2, 8); R("#e9dcc0", 3, 2, 6, 2); R("#c9b48e", 4, 1, 4, 1); R("#b39a6e", 3, 3, 6, 1); R("#2f74c0", 2, 7, 8, 2); R("#d9a441", 5, 9, 2, 2); },
+  sugar() { R("#bfe0ee", 2, 3, 8, 9); R("#ffffff", 3, 5, 6, 6); R("#d5e4ee", 3, 8, 6, 1); R("#d5e4ee", 6, 5, 1, 6); R("#2f74c0", 2, 1, 8, 2); R("#5b9ad8", 2, 1, 8, 1); },
+  salt() { R("#ffffff", 3, 4, 6, 8); R("#d6d6d6", 7, 4, 2, 8); R("#9aa3ab", 3, 1, 6, 3); R("#c3c9ce", 4, 1, 4, 1); R("#3b3b3b", 4, 2, 1, 1); R("#3b3b3b", 6, 2, 1, 1); R("#e2483a", 3, 8, 6, 1); },
+  butter() { R("#f4f0e6", 1, 6, 10, 5); R("#ffe27a", 1, 4, 10, 3); R("#fff3a8", 2, 4, 8, 1); R("#e8c94f", 9, 4, 2, 3); R("#2f74c0", 3, 8, 6, 1); },
+  milk() { R("#2f74c0", 5, 0, 2, 1); R("#ffffff", 5, 1, 2, 2); R("#ffffff", 4, 3, 4, 1); R("#ffffff", 3, 4, 6, 8); R("#e3e3e3", 7, 4, 2, 8); R("#2f74c0", 3, 7, 6, 2); },
+  lemon() { R("#ffd23f", 3, 3, 6, 8); R("#ffd23f", 2, 4, 8, 6); R("#ffd23f", 1, 6, 10, 2); R("#f0b81f", 8, 6, 2, 3); R("#f0b81f", 6, 9, 3, 1); R("#fff4b0", 3, 5, 2, 1); R("#3e9a3a", 6, 1, 3, 2); R("#2d7a2a", 5, 2, 1, 1); },
+  chocolate() { R("#5a3018", 1, 2, 10, 6); R("#3e1f0e", 1, 4, 10, 1); R("#3e1f0e", 4, 2, 1, 6); R("#3e1f0e", 7, 2, 1, 6); R("#c0392b", 1, 7, 10, 4); R("#e8b923", 1, 8, 10, 1); },
+  honey() { R("#8a5a2e", 2, 2, 8, 2); R("#6b4422", 2, 3, 8, 1); R("#e8a317", 2, 4, 8, 8); R("#c27c0a", 7, 5, 2, 6); R("#f6e3bb", 3, 7, 5, 3); R("#222222", 5, 8, 2, 1); R("#ffd23f", 5, 7, 1, 1); },
+  cinnamon() { R("#a0522d", 1, 3, 10, 2); R("#8b4513", 1, 6, 10, 2); R("#a0522d", 1, 9, 10, 2); R("#d2894f", 1, 3, 1, 2); R("#d2894f", 1, 6, 1, 2); R("#d2894f", 1, 9, 1, 2); R("#6b3410", 3, 4, 8, 1); R("#6b3410", 3, 10, 8, 1); },
+  onion() { R("#c98a3a", 4, 3, 4, 1); R("#c98a3a", 3, 4, 6, 7); R("#c98a3a", 2, 6, 8, 4); R("#a86e2a", 5, 4, 1, 7); R("#e0a85a", 3, 5, 1, 3); R("#7ab83a", 5, 0, 2, 3); R("#e8dcc0", 4, 11, 4, 1); },
+  fish() { R("#8fa9b8", 2, 4, 7, 5); R("#8fa9b8", 1, 5, 9, 3); R("#8fa9b8", 10, 3, 2, 2); R("#8fa9b8", 10, 8, 2, 2); R("#8fa9b8", 9, 5, 2, 3); R("#d8e4ea", 2, 7, 7, 1); R("#6f8a99", 4, 3, 3, 1); R("#222222", 2, 5, 1, 1); R("#6f8a99", 6, 4, 1, 4); },
+};
+function icon(k, x, y, p) { ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(p, p); ICON[k](); ctx.restore(); }
+
+// The cake, side view. (cx, by) = middle of the plate top, in small pixels
+function drawCake(cx, by, k, o = {}) {
+  const base = crustCol(k.kind, k.c), dark = hexMix(base, "#000000", 0.22), lite = hexMix(base, "#ffffff", 0.18);
+  const batter = BATTER[k.kind];
+  if (o.pan) { R("#4a4a4a", cx - 17, by - 1, 34, 2); R("#2e2e2e", cx - 17, by + 1, 34, 1); }
+  else { R("#ffffff", cx - 20, by - 1, 40, 2); R("#d9d4c8", cx - 17, by + 1, 34, 1); }
+  if (k.soup && !o.pan) { R(batter, cx - 18, by - 3, 36, 2); R(hexMix(batter, "#ffffff", 0.25), cx - 12, by - 4, 22, 1); R(batter, cx + 18, by - 1, 3, 2); return; }
+  const H = Math.max(2, Math.round(o.hNow != null ? o.hNow : 4 + 12 * k.h)), W = 30, x0 = cx - 15;
+  for (let i = 0; i < W; i++) {
+    let hh = H;
+    if (k.raw && !o.pan) hh -= Math.round(Math.min(H - 2, 4) * Math.sin(Math.PI * i / (W - 1)));
+    if (k.lumpy && hash(i, 7) > 0.75) hh += 1;
+    if (i === 0 || i === W - 1) hh -= 1;
+    R(i >= W - 4 ? dark : base, x0 + i, by - 1 - hh, 1, hh);
+    R(lite, x0 + i, by - 1 - hh, 1, 1);
   }
-  if (v === DOOR) {
-    R("#efe6d2", x, y, T, T); R("#8a5a2e", x + 2, y + 1, 12, 15);
-    if (doorOpen) { R("#ffe9a6", x + 3, y + 2, 10, 14); R("#3b2a17", x + 3, y + 2, 3, 14); if ((frame >> 4) % 2) R("rgba(255,233,166,.5)", x - 4, y - 4, T + 8, T + 8); }
-    else { R("#3b2a17", x + 3, y + 2, 10, 14); R("#e8c547", x + 10, y + 9, 2, 2); }
-    return;
+  const top = by - 1 - H;
+  if (k.raw && !o.pan) { R(batter, cx - 6, top + 3, 12, 2); R(batter, cx - 2, top + 5, 3, 4); R(batter, cx + 4, top + 4, 2, 6); }
+  if (k.fish) { ctx.globalAlpha = 0.3; R("#5fa05f", x0, top, W, H); ctx.globalAlpha = 1; R("#8fa9b8", x0 + W - 8, top - 5, 3, 6); R("#8fa9b8", x0 + W - 10, top - 7, 3, 2); R("#8fa9b8", x0 + W - 6, top - 7, 3, 2); }
+  if (k.onion) {
+    for (let j = 0; j < 5; j++) R("#9b4f8a", x0 + 3 + j * 5, top + 3 + (j % 2) * 3, 2, 1);
+    for (let j = 0; j < 3; j++) { const yy = top - 4 - ((frame * 0.3 + j * 4) % 10); R("#7ab83a", cx - 6 + j * 6 + Math.round(Math.sin(frame * 0.1 + j)), Math.round(yy), 1, 3); }
   }
-  // a market stall seen from above: striped awning, with produce at the front
-  const border = tx === 0 || ty === 0 || tx === MW - 1 || ty === MH - 1;
-  if (border) {
-    R("#efe6d2", x, y, T, T); R("#d8cbb0", x, y + 12, T, 4); R("#7fa7c0", x + 3, y + 3, 4, 5); R("#7fa7c0", x + 9, y + 3, 4, 5);
-    return;
-  }
-  const a = AWN[Math.floor(hash(tx * 3, ty * 7) * AWN.length)];
-  for (let k = 0; k < T; k += 4) R(a[(k / 4) % 2], x + k, y, 4, 11);
-  R("rgba(0,0,0,.15)", x, y + 10, T, 1);
-  R("#8a5a2e", x, y + 11, T, 5);
-  const f = FRUIT[Math.floor(hash(tx, ty * 5) * FRUIT.length)];
-  R(f, x + 2, y + 12, 3, 3); R(f, x + 6, y + 12, 3, 3); R(f, x + 10, y + 12, 3, 3);
-}
-function drawIngredient(k, x, y) {
-  if (k === "egg") { R("#f7f2e6", x - 4, y - 3, 4, 6); R("#f7f2e6", x + 1, y - 3, 4, 6); R("#ffffff", x - 3, y - 2, 1, 2); R("#ffffff", x + 2, y - 2, 1, 2); R("#a8743f", x - 6, y + 2, 13, 3); }
-  else if (k === "flour") { R("#f2ede0", x - 5, y - 5, 10, 11); R("#d9cfb8", x - 5, y - 5, 10, 2); R("#2f74c0", x - 3, y, 6, 3); R("#ffffff", x - 2, y + 1, 4, 1); }
-  else if (k === "sugar") { R("#2f74c0", x - 5, y - 5, 10, 11); R("#ffffff", x - 4, y - 2, 8, 4); R("#2f74c0", x - 2, y - 1, 4, 1); R("#ffffff", x - 5, y - 6, 3, 1); }
-  else if (k === "lemon") { R("#f0d640", x - 5, y - 3, 10, 7); R("#f0d640", x - 3, y - 4, 6, 9); R("#fff3a0", x - 3, y - 2, 2, 2); R("#7ab83a", x + 2, y - 6, 3, 2); }
-  else if (k === "butter") { R("#ffffff", x - 6, y - 3, 12, 7); R("#f6d860", x - 5, y - 2, 10, 5); R("#e2483a", x - 6, y - 3, 12, 1); }
-  else if (k === "milk") { R("#ffffff", x - 3, y - 5, 6, 11); R("#ffffff", x - 2, y - 7, 4, 2); R("#2f74c0", x - 2, y - 8, 4, 1); R("#2f74c0", x - 3, y, 6, 2); }
-  else if (k === "cinnamon") { R("#8a4a22", x - 5, y - 3, 10, 2); R("#a0522d", x - 5, y, 10, 2); R("#8a4a22", x - 4, y + 3, 9, 2); R("#5b2f14", x + 4, y - 3, 1, 8); }
-  else { R("#5b2f14", x - 5, y - 4, 10, 9); R("#7a4a22", x - 4, y - 3, 3, 3); R("#7a4a22", x + 1, y - 3, 3, 3); R("#7a4a22", x - 4, y + 1, 3, 3); R("#7a4a22", x + 1, y + 1, 3, 3); R("#e2483a", x - 5, y + 2, 10, 2); }
-}
-function drawCoffee(x, y) {
-  R("#ffffff", x - 4, y - 3, 8, 7); R("#6b3d1d", x - 3, y - 3, 6, 2); R("#ffffff", x + 4, y - 1, 2, 3); R("#d9d4c8", x - 5, y + 4, 10, 1);
-  const s = (frame >> 3) % 2; R("rgba(255,255,255,.7)", x - 2 + s, y - 7, 1, 3); R("rgba(255,255,255,.7)", x + 1 - s, y - 8, 1, 3);
-}
-function drawBagItem(x, y) {
-  R("#111111", x - 5, y - 2, 10, 8); R("#2a2a2a", x - 4, y - 1, 8, 2); R("#e8c547", x - 1, y, 2, 2);
-  ctx.strokeStyle = "#111"; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y - 2, 3.5, Math.PI, 0); ctx.stroke();
-  if ((frame >> 3) % 3 === 0) { R("#ffffff", x + 6, y - 7, 1, 3); R("#ffffff", x + 5, y - 6, 3, 1); }
-}
-function drawScrollItem(x, y) {
-  R("#8a6a3a", x - 5, y - 4, 10, 9); R("#f3e2b3", x - 4, y - 3, 8, 7); R("#b89a63", x - 3, y - 1, 6, 1); R("#b89a63", x - 3, y + 1, 5, 1);
-  R("#8a6a3a", x - 6, y - 5, 2, 11); R("#8a6a3a", x + 4, y - 5, 2, 11);
-}
-function drawCatTop(e, x, y) {
-  const lf = (e.t >> 3) % 2, horiz = e.dir[0] !== 0, f = e.dir[0] < 0 || e.dir[1] < 0 ? -1 : 1;
-  R("rgba(0,0,0,.15)", x - 6, y + 4, 12, 3);
-  if (horiz) {
-    R("#c96f24", x - 6, y - 2, 10, 6); R("#e08a3a", x - 6, y - 2, 10, 2);
-    const hx = f > 0 ? x + 3 : x - 9; R("#e08a3a", hx, y - 4, 6, 6); R("#c96f24", hx, y - 5, 2, 2); R("#c96f24", hx + 4, y - 5, 2, 2); R("#111", hx + (f > 0 ? 4 : 1), y - 2, 1, 1);
-    const tx = f > 0 ? x - 9 : x + 4; R("#c96f24", tx, y - 1 - lf, 4, 2);
-  } else {
-    R("#c96f24", x - 3, y - 5, 6, 10); R("#e08a3a", x - 3, y - 5, 2, 10);
-    const hy = f > 0 ? y + 3 : y - 9; R("#e08a3a", x - 3, hy, 6, 6); R("#c96f24", x - 3, hy - 1, 2, 2); R("#c96f24", x + 1, hy - 1, 2, 2);
-    if (f > 0) { R("#111", x - 2, hy + 2, 1, 1); R("#111", x + 1, hy + 2, 1, 1); }
-    R("#c96f24", x - 1 + (lf ? 1 : -1), f > 0 ? y - 9 : y + 5, 2, 4);
+  if (k.salt) for (let j = 0; j < 6; j++) if (((frame >> 3) + j) % 3 === 0) R("#ffffff", x0 + 3 + j * 5, top - 1, 1, 1);
+  if (k.c > 1.4) for (let j = 0; j < 4; j++) { const t = (frame * 0.4 + j * 6) % 20; ctx.globalAlpha = Math.max(0, 0.6 - t / 34); R("#555555", cx - 8 + j * 5 + Math.round(Math.sin(t * 0.3 + j) * 2), Math.round(top - 3 - t), 3, 3); ctx.globalAlpha = 1; }
+  if (k.topping && !o.pan) {
+    if (k.kind === "lemon") {
+      R("#fffaf0", x0, top - 1, W, 2); for (const dx of [3, 9, 16, 23, 27]) R("#fffaf0", x0 + dx, top + 1, 1, 2 + (dx % 3));
+      R("#ffd23f", cx - 7, top - 3, 4, 2); R("#ffd23f", cx + 3, top - 3, 4, 2); R("#f0b81f", cx - 6, top - 2, 2, 1); R("#f0b81f", cx + 4, top - 2, 2, 1);
+    } else if (k.kind === "choc") {
+      R("#3a1d0e", x0, top - 1, W, 3); for (const dx of [2, 8, 14, 21, 26]) R("#3a1d0e", x0 + dx, top + 2, 2, 2 + (dx % 3));
+      R("#e2483a", cx - 1, top - 4, 3, 3); R("#2d7a2a", cx, top - 5, 1, 1);
+    } else {
+      R("#e8a317", x0, top - 1, W, 2); for (const dx of [4, 11, 18, 25]) R("#e8a317", x0 + dx, top + 1, 1, 3);
+      for (const dx of [6, 13, 20]) R("#f6e3bb", x0 + dx, top - 2, 2, 1);
+    }
   }
 }
-function drawPigeonTop(e, x, y) {
-  const flap = (e.t >> 2) % 2;
-  R("rgba(0,0,0,.15)", x - 5, y + 5, 10, 2);
-  R("#8e96a3", x - 3, y - 3, 6, 8); R("#6f7784", x - 3, y + 3, 6, 2);
-  if (flap) { R("#a8b0bc", x - 8, y - 2, 5, 3); R("#a8b0bc", x + 3, y - 2, 5, 3); } else { R("#a8b0bc", x - 6, y, 3, 4); R("#a8b0bc", x + 3, y, 3, 4); }
-  R("#7a8290", x - 2, y - 6, 4, 4); R("#3f8a7a", x - 2, y - 3, 4, 1); R("#e8b4a0", x - 1, y - 7, 2, 1);
+// A minister at the table (small pixels, base = table top)
+function drawGuest(x, by, i, mood) {
+  const SUIT = ["#3b3f4a", "#4a3b2f", "#2f3b4a"][i % 3], SK = ["#e8b48e", "#d9a07a", "#f0c4a0"][i % 3], HAIR = ["#cfcfcf", "#2a2a2a", "#8a8a8a"][i % 3];
+  const bob = Math.round(Math.sin(frame * 0.08 + i * 2) * 0.6);
+  ctx.save(); ctx.translate(x, by + bob);
+  R(SUIT, -6, -8, 12, 8); R("#ffffff", -1, -8, 2, 4); R("#7a2a2a", 0, -7, 1, 3);
+  R(SK, -3, -15, 6, 7); R(SK, -1, -9, 2, 1);
+  if (i % 3 === 0) { R(HAIR, -3, -13, 1, 3); R(HAIR, 2, -13, 1, 3); }
+  else if (i % 3 === 1) { R(HAIR, -3, -16, 6, 2); R(HAIR, -3, -14, 1, 2); }
+  else { R(HAIR, -3, -16, 6, 1); }
+  R("#222222", -2, -12, 1, 1); R("#222222", 1, -12, 1, 1);
+  if (i % 3 === 2) { R("#222222", -3, -12, 6, 1); }
+  if (mood >= 4) { R("#8a3a2a", -1, -10, 2, 1); R("#8a3a2a", -2, -11, 1, 1); R("#8a3a2a", 1, -11, 1, 1); }
+  else if (mood === 3) R("#8a3a2a", -1, -10, 2, 1);
+  else { R("#8a3a2a", -1, -10, 2, 1); R("#8a3a2a", -2, -9, 1, 1); R("#8a3a2a", 1, -9, 1, 1); }
+  if (mood <= 1 && (frame >> 4) % 2) { R(SK, 2, -10, 2, 2); R("#bbbbbb", 4, -12, 2, 2); }
+  R("#ffffff", -2, -3, 4, 3); R("#d9d4c8", 2, -2, 1, 1); R("#6b4422", -1, -3, 2, 1);
+  ctx.restore();
 }
-function drawGoldaTop(x, y, face, anim, o) {
-  // Golda from above: grey bun, dark dress, handbag on her arm
-  const SK = "#e8b48e", HR = "#a7adb4", HRL = "#cfd4d8", HRD = "#7f868e", DR = "#2b3350", DRD = "#1d2338", SH = "#1b1b1b";
-  const st = Math.floor(anim) % 2;
-  if (o.glow) { R("rgba(255,214,40,.35)", x - 10, y - 14, 20, 24); }
-  R("rgba(0,0,0,.18)", x - 6, y + 5, 12, 3);
-  R(SH, x - 4, y + 4 + (st ? 0 : 1), 3, 2); R(SH, x + 1, y + 4 + (st ? 1 : 0), 3, 2);
-  R(DR, x - 5, y - 4, 10, 9); R(DRD, x - 5, y + 4, 10, 1);
-  if (face !== "U") R("#f2efe6", x - 1, y - 4, 2, 2);
-  R(DR, x - 7, y - 3, 2, 5); R(DR, x + 5, y - 3, 2, 5); R(SK, x - 7, y + 2, 2, 1); R(SK, x + 5, y + 2, 2, 1);
-  // handbag, swung forward when she whacks something
-  const side = face === "L" ? -1 : 1;
-  if (o.swing > 0) {
-    const bx = face === "L" ? x - 13 : face === "R" ? x + 7 : x - 3, by = face === "U" ? y - 16 : face === "D" ? y + 6 : y - 4;
-    R("#111111", bx, by, 6, 5); R("#e8c547", bx + 2, by, 2, 1);
-  } else { R("#111111", x + (side > 0 ? 6 : -10), y, 4, 4); R(o.bag ? "#e8c547" : "#555", x + (side > 0 ? 7 : -9), y, 2, 1); }
-  // head
-  R(SK, x - 4, y - 11, 8, 7);
-  if (face === "U") { R(HR, x - 4, y - 12, 8, 7); R(HRD, x - 2, y - 8, 4, 3); R(HRL, x - 3, y - 12, 4, 1); }
-  else {
-    R(HR, x - 4, y - 12, 8, 3); R(HRL, x - 2, y - 12, 3, 1); R(HR, x - 5, y - 11, 1, 4); R(HR, x + 4, y - 11, 1, 4); R(HR, x - 2, y - 15, 4, 3); R(HRD, x - 2, y - 13, 4, 1);
-    if (face === "D") { R("#222", x - 2, y - 8, 1, 1); R("#222", x + 1, y - 8, 1, 1); R("#c58f6a", x - 1, y - 6, 2, 1); }
-    else { const fx = face === "R" ? 1 : -1; R("#222", x + fx * 2, y - 8, 1, 1); R(SK, x + fx * 4, y - 8, 1, 2); }
+function goldaBig(x, y, face, o = {}) { ctx.save(); ctx.translate(x, y); ctx.scale(2, 2); drawHeroSprite(0, 0, { face, anim: 0, ...o }); ctx.restore(); }
+function drawWall(tileY) {
+  R("#f3ead7", 0, 0, VW, VH);
+  for (let x = 0; x < VW; x += 16) R("#ede0c6", x, 0, 1, tileY);
+  for (let y = tileY; y < VH; y += 8) for (let x = 0; x < VW; x += 8) R(((x + y) / 8) % 2 ? "#ffffff" : "#d8e8f2", x, y, 8, 8);
+  R("#b7cbd8", 0, tileY, VW, 1);
+}
+function drawWindow(x, y, w, h) {
+  R("#ffffff", x - 2, y - 2, w + 4, h + 4); R("#8fd0f0", x, y, w, h); R("#c8ecfa", x, y + Math.floor(h * 0.5), w, 2);
+  R("#f4f0e6", x + 2, y + Math.floor(h * 0.45), Math.floor(w * 0.4), Math.ceil(h * 0.55)); R("#e8e2d4", x + Math.floor(w * 0.52), y + Math.floor(h * 0.35), Math.floor(w * 0.44), Math.ceil(h * 0.65));
+  for (let k = 0; k < 3; k++) { R("#7fa7c0", x + 5, y + Math.floor(h * 0.55) + k * 6, 6, 2); R("#7fa7c0", x + Math.floor(w * 0.6), y + Math.floor(h * 0.45) + k * 6, 8, 2); }
+  R("#ffffff", x + Math.floor(w / 2) - 1, y, 2, h); R("#ffffff", x, y + Math.floor(h / 2) - 1, w, 2);
+  R("#e2483a", x - 4, y - 4, 6, h + 6); R("#e2483a", x + w - 2, y - 4, 6, h + 6);
+}
+function button(id, x, y, w, h, label, color, on = true, size = 6) {
+  const down = pressed && pressed.id === id ? 1 : 0;
+  R(INK, x + 2, y + 2, w, h);
+  R(on ? color : "#9aa3ab", x + down, y + down, w, h);
+  R("rgba(255,255,255,.35)", x + down, y + down, w, 1);
+  txt(label, x + down + w / 2, y + down + Math.round(h / 2 - size / 2), size, on ? "#ffffff" : "#e8e8e8", "center");
+  btns.push({ id, x, y, w, h, on });
+}
+function drawStar(x, y, on) {
+  const rows = ["....##....", "...####...", "##########", ".########.", "..######..", ".###..###.", ".##....##."];
+  rows.forEach((r, j) => { for (let i = 0; i < r.length; i++) if (r[i] === "#") R(on ? "#ffc21a" : "#c3cbd2", x + i, y + j, 1, 1); });
+}
+function drawHUD() {
+  const sec = Math.ceil(timeLeft / 60), m = Math.floor(sec / 60), s = sec % 60;
+  const warn = sec <= 20, blink = warn && (frame >> 4) % 2;
+  R("rgba(18,48,74,.88)", 4, 3, 98, 15);
+  R("#ffffff", 8, 6, 9, 9); R(INK, 9, 7, 7, 7); R("#ffffff", 12, 8, 1, 3); R("#ffffff", 12, 10, 3, 1);
+  txt(m + ":" + String(s).padStart(2, "0"), 22, 7, 7, blink ? "#ff6a3d" : "#ffffff", "left", true);
+  const steps = ["add", "mix", "oven"], cur = steps.indexOf(phase);
+  steps.forEach((p, i) => {
+    const x = 66 + i * 12, active = i === cur, done = i < cur;
+    R(active ? "#ff6a3d" : done ? "#7ab83a" : "#3b5a72", x, 5, 10, 11);
+    txt(String(i + 1), x + 5, 7, 6, "#ffffff", "center", true);
+  });
+}
+function drawRecipe(x, y) {
+  const t = L(), items = Object.entries(rec.items);
+  R(INK, x + 2, y + 2, 80, 96); R("#fffaf0", x, y, 80, 96);
+  for (let k = 0; k < 7; k++) R("#d6e6f2", x, y + 14 + k * 11, 80, 1);
+  R("#f2a0a0", x + 5, y, 1, 96); R("#e2483a", x + 38, y - 2, 4, 4);
+  txt(t.recipeTitle[rec.id], x + 41, y + 5, 5, "#b0461f", "center");
+  items.forEach(([k, v], i) => {
+    const yy = y + 15 + i * 11;
+    icon(k, x + 8, yy - 1, 1);
+    txt("×" + v, x + 22, yy + 2, 6, INK, "left", true);
+    txt(t.ingName[k], x + 76, yy + 3, 4, "#3b4a58", "right");
+  });
+  txt(rec.temp + "°", x + 8, y + 85, 6, "#b0461f", "left", true);
+  txt(t.untilGolden, x + 76, y + 86, 4, "#b0461f", "right");
+}
+function drawBowlSmall(cx, top) {
+  R("#cdd8de", cx - 27, top, 54, 3); R(count() ? batterCol() : "#b9c6ce", cx - 24, top + 1, 48, 2);
+  for (let i = 0; i < 12; i++) { const w = Math.round(54 - i * i * 0.18 - i); R(i === 4 || i === 5 ? "#5b9ad8" : "#e8eef2", cx - Math.floor(w / 2), top + 3 + i, w, 1); }
+}
+function drawAdd() {
+  const ox = OX(), t = L();
+  drawWall(150);
+  if (ox >= 64) { drawWindow(ox - 56, 34, 40, 50); drawWindow(ox + 272, 34, 40, 50); }
+  drawRecipe(ox + 4, 22);
+  for (let r = 0; r < 4; r++) { const y = 20 + r * 32; R("#a8743f", ox + 88, y + 28, 166, 3); R("#7d4f2a", ox + 88, y + 31, 166, 1); R("#7d4f2a", ox + 92, y + 31, 3, 2); R("#7d4f2a", ox + 246, y + 31, 3, 2); }
+  ING.forEach((k, i) => {
+    const c = cellPos(i), hop = flies.some(f => f.k === k && f.t < 5) ? -2 : 0;
+    icon(k, c.x + 15, c.y + hop, 2);
+    txt(t.ingName[k], c.x + 27, c.y + 23, 4, INK, "center");
+    btns.push({ id: "ing:" + k, x: c.x, y: c.y, w: 54, h: 32, on: true });
+  });
+  goldaBig(ox + 8, 122, 1, { armFwd: true });
+  R("#c48a52", 0, 166, VW, 3); R("#b07a48", 0, 169, VW, 3); R("#8a5a34", 0, 172, VW, 68);
+  for (let x = 0; x < VW; x += 40) R("#7a4c2a", x, 172, 1, 68);
+  drawBowlSmall(ox + 118, 151);
+  // what's in the bowl
+  const inside = ING.filter(k => n(k));
+  R("#f6e3bb", ox + 40, 186, 150, 44); R("#e2d0a4", ox + 40, 186, 150, 1);
+  txt(t.inBowl, ox + 115, 189, 4, "#8a5a34", "center");
+  inside.slice(0, 10).forEach((k, i) => { const x = ox + 44 + (i % 5) * 29, y = 197 + Math.floor(i / 5) * 16; icon(k, x, y, 1); txt("×" + n(k), x + 13, y + 4, 5, INK, "left", true); });
+  for (const f of flies) {
+    const p = f.t / 14, x = f.x + (ox + 106 - f.x) * p, y = f.y + (140 - f.y) * p - Math.sin(p * Math.PI) * 20;
+    icon(f.k, x, y, 2);
   }
-  if (o.bag) { const s = (frame >> 3) % 4; if (s < 2) { R("#ffd23f", x + 7, y - 14 + s, 1, 3); R("#ffd23f", x + 6, y - 13 + s, 3, 1); } }
+  button("mix", ox + 196, 178, 56, 24, t.btnMix, "#ff6a3d", count() > 0);
+  button("empty", ox + 196, 208, 56, 18, t.btnEmpty, "#5b6b7a", count() > 0, 5);
 }
+function drawMix() {
+  const ox = OX(), t = L(), cx = ox + 124, cy = 132;
+  BOWL = { x: cx, y: cy };
+  drawWall(150);
+  if (ox >= 64) { drawWindow(ox - 56, 34, 40, 50); drawWindow(ox + 272, 34, 40, 50); }
+  R("#c48a52", 0, 196, VW, 3); R("#8a5a34", 0, 199, VW, 41);
+  txt(t.tipMix, cx, 26, 7, INK, "center");
+  const turn = (frame * 0.08) % (Math.PI * 2);
+  ctx.strokeStyle = "#ff6a3d"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, 52, 8, turn, turn + 4.6); ctx.stroke();
+  // bowl body
+  ctx.fillStyle = "#e8eef2"; ctx.beginPath(); ctx.ellipse(cx, cy, 66, 60, 0, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = "#5b9ad8"; ctx.fillRect(cx - 62, cy + 18, 124, 5);
+  ctx.fillStyle = "#e8eef2"; ctx.beginPath(); ctx.ellipse(cx, cy + 22, 60, 36, 0, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = "#cdd8de"; ctx.beginPath(); ctx.ellipse(cx, cy, 66, 18, 0, 0, Math.PI * 2); ctx.fill();
+  const bc = batterCol();
+  ctx.fillStyle = mix > 1.4 ? hexMix(bc, "#000000", 0.15) : bc; ctx.beginPath(); ctx.ellipse(cx, cy + 1, 60, 15, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = hexMix(bc, "#ffffff", 0.3); ctx.lineWidth = 1.5;
+  for (let j = 0; j < 3; j++) { ctx.beginPath(); ctx.ellipse(cx, cy + 1, 46 - j * 14, 11 - j * 3.5, 0, spoonA * 0.6 + j * 2, spoonA * 0.6 + j * 2 + 2.4); ctx.stroke(); }
+  const lumps = Math.max(0, Math.round((0.9 - mix) * 16));
+  for (let i = 0; i < lumps; i++) { const a = hash(i, 3) * 6.28 + spoonA * 0.4, r = 10 + hash(i, 5) * 42; R(n("flour") ? "#fffaf0" : "#e8d39a", Math.round(cx + Math.cos(a) * r), Math.round(cy + 1 + Math.sin(a) * r * 0.25), 3, 2); }
+  // wooden spoon
+  const sx = cx + Math.cos(spoonA) * 34, sy = cy + 1 + Math.sin(spoonA) * 8;
+  ctx.strokeStyle = "#8a5a34"; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + 14, sy - 62); ctx.stroke();
+  ctx.strokeStyle = "#c48a52"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx, sy - 2); ctx.lineTo(sx + 13, sy - 60); ctx.stroke();
+  goldaBig(ox + 4, 104, 1, { armFwd: true });
+  // how well it's mixed
+  const mx = ox + 232, my = 44, mh = 120, vy = v => my + mh - Math.round(clamp(v / 1.8, 0, 1) * mh);
+  R(INK, mx - 2, my - 2, 18, mh + 4); R("#e2483a", mx, my, 14, mh);
+  R("#ffc21a", mx, vy(1.4), 14, vy(0.65) - vy(1.4)); R("#46b04a", mx, vy(1.2), 14, vy(0.85) - vy(1.2));
+  const my2 = vy(mix); R("#ffffff", mx - 5, my2 - 1, 24, 3); R(INK, mx - 5, my2, 24, 1);
+  const lbl = mix < 0.65 ? t.mixLow : mix <= 1.4 ? (mix >= 0.85 && mix <= 1.2 ? t.mixOk : t.mixAlmost) : t.mixHigh;
+  txt(lbl, mx + 7, my + mh + 6, 4, INK, "center");
+  button("oven", ox + 190, 206, 62, 26, t.btnOven, "#ff6a3d", true);
+}
+function drawOven() {
+  const ox = OX(), t = L(), x = ox + 6, y = 34, w = 152, h = 178;
+  drawWall(118);
+  for (let yy = 212; yy < VH; yy += 8) for (let xx = 0; xx < VW; xx += 8) R(((xx + yy) / 8) % 2 ? "#c9b79a" : "#b49f80", xx, yy, 8, 8);
+  if (ox >= 64) drawWindow(ox - 56, 34, 40, 50);
+  // kettle on the stove
+  R("#3a3a3a", x - 2, y - 6, w + 4, 6); R("#1e1e1e", x + 18, y - 8, 28, 2); R("#1e1e1e", x + 104, y - 8, 28, 2);
+  R("#e2483a", x + 108, y - 24, 20, 14); R("#c0392b", x + 108, y - 12, 20, 2); R("#e2483a", x + 104, y - 21, 4, 2); R("#222222", x + 112, y - 28, 12, 4);
+  // oven body
+  R("#2a2a2a", x - 1, y - 1, w + 2, h + 2); R("#f4f1ea", x, y, w, h); R("#dcd6c8", x + w - 6, y, 6, h);
+  R("#e8e2d4", x + 6, y + 6, w - 12, 30);
+  R("#1b1b1b", x + 50, y + 10, 52, 22);
+  txt(TEMPS[tempI] + "°", x + 76, y + 15, 10, baking ? "#ff9a3d" : "#ffc21a", "center", true);
+  button("tdown", x + 12, y + 10, 30, 22, "−", "#5b6b7a", !baking, 10);
+  button("tup", x + 110, y + 10, 30, 22, "+", "#5b6b7a", !baking, 10);
+  R("#ebe6da", x + 6, y + 42, w - 12, 128); R("#9aa3ab", x + 20, y + 48, w - 40, 4); R("#6f7880", x + 20, y + 52, w - 40, 1);
+  const wx0 = x + 16, wy0 = y + 60, ww = w - 32, wh = 92;
+  R("#1b1b1b", wx0 - 2, wy0 - 2, ww + 4, wh + 4); R(baking ? "#3a2416" : "#2b2b2b", wx0, wy0, ww, wh);
+  if (baking) { ctx.globalAlpha = 0.25 + 0.08 * Math.sin(frame * 0.2); R("#ff8a2a", wx0, wy0, ww, wh); ctx.globalAlpha = 1; R("#ff6a1a", wx0, wy0 + wh - 3, ww, 2); }
+  R("#666666", wx0, wy0 + 70, ww, 1);
+  const hFull = 4 + 12 * clamp(1 - 0.3 * Math.max(0, (rec.items.egg || 0) - n("egg")), 0.2, 1);
+  const hNow = hFull * clamp(0.3 + 0.7 * Math.min(dn, 1), 0, 1);
+  ctx.save(); ctx.translate(wx0 + ww / 2, wy0 + 70); ctx.scale(2, 2);
+  drawCake(0, 0, { kind: rec.id, h: 1, c: baking || bakeT ? cr * 0.95 : 0, topping: false }, { pan: true, hNow });
+  ctx.restore();
+  if (baking && cr < 1.3 && frame % 30 < 15) R("rgba(255,255,255,.35)", wx0 + 20 + (frame % 40), wy0 + 30 - (frame % 30) / 2, 2, 4);
+  R("#d9d3c4", x + 6, y + 172, w - 12, 4);
+  // note and the big button
+  const x2 = ox + 166;
+  R(INK, x2 + 6, 26, 74, 40); R("#fff38a", x2 + 4, 24, 74, 40); R("#e2483a", x2 + 39, 22, 4, 4);
+  txt(t.recipeTitle[rec.id], x2 + 41, 30, 4, "#b0461f", "center");
+  txt(rec.temp + "°", x2 + 41, 39, 9, INK, "center", true);
+  txt(t.untilGolden, x2 + 41, 53, 4, INK, "center");
+  goldaBig(x2 + 30, 120, -1, { armFwd: baking });
+  R("#c48a52", x2 - 2, 164, VW - x2 + 2, 3); R("#8a5a34", x2 - 2, 167, VW - x2 + 2, 45); R("#7a4c2a", x2 + 42, 167, 1, 45);
+  if (!baking) button("bake", x2, 176, 86, 30, t.btnBake, "#ff6a3d", true, 7);
+  else button("out", x2, 176, 86, 30, t.btnOut, (frame >> 3) % 2 && cr > 0.9 ? "#e2483a" : "#c0392b", true, 7);
+  for (const p of parts) if (p.k === "smoke") { ctx.globalAlpha = Math.max(0, 0.55 - p.t / 110); R("#6a6a6a", Math.round(p.x + Math.sin(p.t * 0.1) * 4), Math.round(p.y), 6, 6); ctx.globalAlpha = 1; }
+}
+function drawResult() {
+  const ox = OX(), t = L(), r = lastResult, o = outcomeText(r, t);
+  drawWall(150);
+  const shown = Math.max(0, Math.min(r.stars, Math.floor((resT - 30) / 14) + 1));
+  for (let i = 0; i < 5; i++) { ctx.save(); ctx.translate(ox + 84 + i * 18, 26); ctx.scale(1.5, 1.5); drawStar(0, 0, i < shown); ctx.restore(); }
+  txtWrap(o.title, ox + 128, 46, 8, INK, 240, 12);
+  goldaBig(ox + 12, 146, 1, { armFwd: true });
+  [0, 1, 2].forEach(i => { ctx.save(); ctx.translate(ox + 160 + i * 32, 194); ctx.scale(2, 2); drawGuest(0, 0, i, resT > 30 + r.stars * 14 ? r.stars : 3); ctx.restore(); });
+  R("#ffffff", 0, 192, VW, 6); R("#f4f0e6", 0, 198, VW, 42); R("#5b9ad8", 0, 206, VW, 2);
+  ctx.save(); ctx.translate(ox + 100, 194); ctx.scale(2, 2); drawCake(0, 0, r.cake); ctx.restore();
+  if (resT > 30 + r.stars * 14) {
+    const bx = ox + 136, by = 118, bw = 118;
+    R(INK, bx + 2, by + 2, bw, 30); R("#ffffff", bx, by, bw, 30); R("#ffffff", bx + 58, by + 30, 6, 4); R("#ffffff", bx + 60, by + 34, 3, 2);
+    txtWrap(t.react[r.stars], bx + bw / 2, by + 6, 5, INK, bw - 10, 10);
+  }
+  if (resT > 60 && resT < 220 && (frame >> 5) % 2) txt(t.tapOn, ox + 128, 230, 4, "#8a7a5a", "center");
+  if (flashT > 0) { ctx.globalAlpha = flashT / 16; R("#ffffff", 0, 0, VW, VH); ctx.globalAlpha = 1; }
+}
+function draw() {
+  ctx.setTransform(S, 0, 0, S, 0, 0); ctx.imageSmoothingEnabled = false;
+  btns = [];
+  if (state === "result" && lastResult) { drawResult(); return; }
+  if (phase === "mix") drawMix();
+  else if (phase === "oven") drawOven();
+  else drawAdd();
+  if (state === "play") {
+    drawHUD();
+    if (toastT > 0) { const w = 170, x = Math.round(VW / 2 - w / 2); R(INK, x, 100, w, 22); txt(toastMsg, VW / 2, 107, 6, "#ffffff", "center"); }
+  }
+}
+
 // Golda from the side (for the start card, history pages, GIF and souvenir photo)
 function drawHeroSprite(x, y, o) {
   ctx.save();
@@ -1005,97 +1196,6 @@ function drawHeroSprite(x, y, o) {
   R(HR, -8, 2, 4, 4); R(HRL, -7, 2, 2, 1); R(HRD, -8, 5, 4, 1);
   R("#222", 2, 4, 1, 1); R(HRD, 1, 3, 3, 1); R(SKD, 1, 7, 3, 1); R(SKD, 5, 6, 1, 1);
   ctx.restore();
-}
-function drawCameraShot() {
-  const W = "rgba(255,255,255,.92)";
-  if (finT < 45) {
-    const m = 10, L = 16;
-    R(W, m, m, L, 2); R(W, m, m, 2, L); R(W, VW - m - L, m, L, 2); R(W, VW - m - 2, m, 2, L);
-    R(W, m, VH - m - 2, L, 2); R(W, m, VH - m - L, 2, L); R(W, VW - m - L, VH - m - 2, L, 2); R(W, VW - m - 2, VH - m - L, 2, L);
-    const cx = wx(P.x), cy = wy(P.y) - 4, r = 16 + Math.max(0, 24 - finT), l = 6;
-    const fc = finT > 24 ? "#7dff8a" : W;
-    R(fc, cx - r, cy - r, l, 1); R(fc, cx - r, cy - r, 1, l); R(fc, cx + r - l, cy - r, l, 1); R(fc, cx + r - 1, cy - r, 1, l);
-    R(fc, cx - r, cy + r - 1, l, 1); R(fc, cx - r, cy + r - l, 1, l); R(fc, cx + r - l, cy + r - 1, l, 1); R(fc, cx + r - 1, cy + r - l, 1, l);
-    if ((frame >> 4) % 2) { ctx.fillStyle = "#ff3b30"; ctx.beginPath(); ctx.arc(m + 9, m + 12, 2.5, 0, 7); ctx.fill(); }
-    ctx.font = "6px 'Press Start 2P', monospace"; ctx.fillStyle = W; ctx.fillText("1970", m + 15, m + 15);
-  } else {
-    ctx.globalCompositeOperation = "color"; R("#7a4f22", 0, 0, VW, VH); ctx.globalCompositeOperation = "source-over";
-    R("rgba(255,240,210,.16)", 0, 0, VW, VH);
-    const b = 8, cap = 18, fr = finaleGold ? "#e8b923" : "#f7f2e6";
-    R(fr, 0, 0, VW, b); R(fr, 0, 0, b, VH); R(fr, VW - b, 0, b, VH); R(fr, 0, VH - cap, VW, cap);
-    ctx.font = "7px 'Press Start 2P', monospace"; ctx.fillStyle = "#4a3620"; ctx.textAlign = "center";
-    ctx.fillText(finaleGold ? "GOLDEN RUN · GOLDA'S KITCHEN" : "GOLDA'S KITCHEN, TEL AVIV", VW / 2, VH - 6); ctx.textAlign = "left";
-  }
-}
-function drawHUD() {
-  ctx.textBaseline = "top";
-  const txt = (s, x, y, align = "left", col = "#ffffff") => { ctx.textAlign = align; ctx.fillStyle = "rgba(10,40,60,.6)"; ctx.fillText(s, x + 1, y + 1); ctx.fillStyle = col; ctx.fillText(s, x, y); };
-  R("rgba(10,40,60,.45)", 0, 0, VW, 44);
-  ctx.font = "8px 'Press Start 2P', monospace";
-  const sc = String(score).padStart(6, "0");
-  if (lang === "he") { txt(sc, 8, 6); ctx.font = "800 10px Rubik, sans-serif"; txt("ניקוד", 61, 5); ctx.font = "8px 'Press Start 2P', monospace"; }
-  else txt("SCORE " + sc, 8, 6);
-  // the clock
-  const secs = Math.max(0, Math.ceil(timeLeft / 60)), mm = Math.floor(secs / 60), ss = String(secs % 60).padStart(2, "0");
-  const hurry = secs <= 20, blink = hurry && (frame >> 3) % 2;
-  ctx.font = "12px 'Press Start 2P', monospace";
-  txt(mm + ":" + ss, 8, 18, "left", blink ? "#ff6a3d" : hurry ? "#ffd23f" : "#ffffff");
-  // the shopping list
-  ALL_ING.forEach((k, i) => {
-    const ix = 82 + i * 15, iy = 26;
-    if (gotIngredients.has(k)) { R("rgba(122,184,58,.55)", ix - 7, iy - 8, 14, 15); drawIngredient(k, ix, iy); }
-    else { ctx.globalAlpha = 0.35; drawIngredient(k, ix, iy); ctx.globalAlpha = 1; }
-  });
-  if (P.bagT > 0) { R("rgba(10,40,60,.55)", 8, 36, 62, 5); R("#ffd23f", 9, 37, Math.round(60 * P.bagT / 600), 3); }
-  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
-}
-function draw() {
-  ctx.setTransform(S, 0, 0, S, 0, 0); ctx.imageSmoothingEnabled = false;
-  if (!maze.some(v => v === FLOOR)) { buildMaze(); placePlayer(); }
-  R("#3a2f24", 0, 0, VW, VH);
-  const t0 = Math.floor(camX / T) - 1, t1 = Math.ceil((camX + VW) / T) + 1, r0 = Math.floor(camY / T) - 1, r1 = Math.ceil((camY + VH) / T) + 1;
-  for (let ty = r0; ty <= r1; ty++) for (let tx = t0; tx <= t1; tx++) { if (tx < 0 || ty < 0 || tx >= MW || ty >= MH) continue; drawTile(tx, ty); }
-  const bob = Math.round(Math.sin(frame * 0.1) * 1.5);
-  for (const c of coins) if (!c.got) drawCoin(wx(c.tx * T + 3), wy(c.ty * T + 2), frame + c.tx * 7);
-  for (const c of coffees) if (!c.got) drawCoffee(wx(c.tx * T + 8), wy(c.ty * T + 8) + bob);
-  for (const b of bags) if (!b.got) drawBagItem(wx(b.tx * T + 8), wy(b.ty * T + 8) + bob);
-  for (const s of scrolls) if (!s.done) drawScrollItem(wx(s.tx * T + 8), wy(s.ty * T + 8) + bob);
-  for (const g of ingredients) if (!g.got) {
-    const x = wx(g.tx * T + 8), y = wy(g.ty * T + 8) + bob;
-    R("rgba(255,255,255,.4)", x - 8, y - 8, 16, 16); drawIngredient(g.k, x, y);
-    if ((frame >> 3) % 4 === 0) { R("#ffffff", x + 7, y - 9, 1, 3); R("#ffffff", x + 6, y - 8, 3, 1); }
-  }
-  const sprites = enemies.filter(e => !e.gone).map(e => ({ y: e.y, f: () => e.kind === "cat" ? drawCatTop(e, wx(e.x), wy(e.y)) : drawPigeonTop(e, wx(e.x), wy(e.y)) }));
-  const showHero = !(P.inv > 0 && (P.inv >> 2) % 2) || state !== "play";
-  if (showHero) sprites.push({ y: P.y, f: () => drawGoldaTop(wx(P.x), wy(P.y), P.face, P.anim, { bag: P.bagT > 0, swing: P.swingT }) });
-  sprites.sort((a, b) => a.y - b.y).forEach(s => s.f());
-  // once the list is done, an arrow points the way home
-  if (doorOpen && state === "play") {
-    const ang = Math.atan2(EXIT[1] * T + 8 - P.y, EXIT[0] * T + 8 - P.x), ax = wx(P.x) + Math.cos(ang) * 20, ay = wy(P.y) - 4 + Math.sin(ang) * 20;
-    ctx.fillStyle = (frame >> 3) % 2 ? "#ffd23f" : "#ff6a3d"; ctx.beginPath();
-    ctx.moveTo(ax + Math.cos(ang) * 6, ay + Math.sin(ang) * 6); ctx.lineTo(ax + Math.cos(ang + 2.5) * 5, ay + Math.sin(ang + 2.5) * 5); ctx.lineTo(ax + Math.cos(ang - 2.5) * 5, ay + Math.sin(ang - 2.5) * 5); ctx.fill();
-  }
-  for (const p of parts) {
-    if (p.k === "spark") { if (p.t < 26) { const c = "rgba(255,220,80," + (1 - p.t / 26).toFixed(2) + ")", px = wx(p.x), py = wy(p.y); R(c, px, py - 1, 1, 3); R(c, px - 1, py, 3, 1); } }
-    else { ctx.font = "6px 'Press Start 2P', monospace"; ctx.fillStyle = "rgba(10,40,60,.7)"; ctx.fillText(p.text, wx(p.x) + 1, wy(p.y) + 1); ctx.fillStyle = "#ffffff"; ctx.fillText(p.text, wx(p.x), wy(p.y)); }
-  }
-  const shooting = state === "clear" && clearT > 20;
-  if (state !== "title" && !shooting) drawHUD();
-  if (shooting) drawCameraShot();
-  if (areaT > 0 && bannerMsg && state !== "title") {
-    areaT--;
-    const bn = bannerMsg, h = bn.sub ? 42 : 32;
-    ctx.globalAlpha = Math.max(0, Math.min(1, areaT / 25, (190 - areaT) / 15));
-    const bx = Math.round(VW / 2) - 80;
-    R("rgba(255,106,61,.88)", bx, 60, 160, h);
-    ctx.textAlign = "center"; ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 11px Rubik, sans-serif"; ctx.fillText(bn.he, VW / 2, 74);
-    ctx.font = "7px 'Press Start 2P', monospace"; ctx.fillText(bn.en, VW / 2, 86);
-    if (bn.sub) { ctx.font = "bold 8px Rubik, sans-serif"; ctx.fillText(bn.sub, VW / 2, 97); }
-    if (areaT === 0) bannerMsg = null;
-    ctx.textAlign = "left"; ctx.globalAlpha = 1;
-  }
-  if (flashT > 0) { R("rgba(255,255,255," + (flashT / 14).toFixed(2) + ")", 0, 0, VW, VH); flashT--; }
 }
 
 /* ---------- how-to-play card ---------- */
@@ -1128,8 +1228,8 @@ const FACTS = [
             he: "ב־1969 הייתה גולדה לראש הממשלה הרביעית של ישראל, האישה הראשונה בתפקיד ורק האישה השלישית בעולם שעמדה בראש ממשלה. היא כיהנה עד 1974." } },
 ];
 const PHOTO_FACT = {
-  en: "As prime minister, Golda often met her closest ministers around her kitchen table, with coffee and something sweet. Israelis called this informal group \"Golda's kitchen\". Our game sends her shopping in Tel Aviv's Shuk HaCarmel.",
-  he: "כראש הממשלה נהגה גולדה להיפגש עם השרים הקרובים אליה סביב שולחן המטבח שלה, עם קפה ומשהו מתוק. הקבוצה הלא רשמית הזאת נקראה \"המטבחון של גולדה\". במשחק שלנו היא יוצאת לקניות בשוק הכרמל בתל אביב." };
+  en: "As prime minister, Golda often met her closest ministers around her kitchen table, with coffee and something sweet. Israelis called this informal group \"Golda's kitchen\". In our game, you bake the cake.",
+  he: "כראש הממשלה נהגה גולדה להיפגש עם השרים הקרובים אליה סביב שולחן המטבח שלה, עם קפה ומשהו מתוק. הקבוצה הלא רשמית הזאת נקראה \"המטבחון של גולדה\". במשחק שלנו, אתם אופים את העוגה." };
 
 const factScreen = document.getElementById("factScreen"), readToast = document.getElementById("readToast");
 let factArtKind = "stand", toastFact = -1, toastTimer = null;
@@ -1216,24 +1316,29 @@ function drawArt(c, kind) {
   const W = 120, H = 60, sc = c.width / W;
   ctx.setTransform(sc, 0, 0, sc, 0, 0); ctx.imageSmoothingEnabled = false;
   if (SCENES[kind]) { SCENES[kind](W, H); ctx = old; return; }
-  // Shuk HaCarmel: awnings, fruit, paving
-  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#4fb6e8"); g.addColorStop(1, "#f3ead2");
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  R("#fff6c8", 100, 5, 9, 9);
-  R("#f4f0e6", 0, 8, 26, 24); R("#7fa7c0", 3, 12, 20, 2); R("#7fa7c0", 3, 18, 20, 2); R("#f4f0e6", 92, 12, 28, 20); R("#7fa7c0", 95, 16, 22, 2);
-  const AW = [["#e2483a", "#ffffff"], ["#2f8a4a", "#f6e3bb"], ["#f0a93a", "#ffffff"], ["#2f74c0", "#ffffff"]], FR = ["#ff8c1a", "#e2483a", "#7ab83a", "#ffd23f"];
-  for (let i = 0; i < 4; i++) {
-    const x = i * 31 - 4;
-    for (let k = 0; k < 28; k += 4) R(AW[i][(k / 4) % 2], x + k, 22, 4, 6);
-    R("#8a5a2e", x + 2, 32, 24, 7); for (let k = 0; k < 20; k += 3) R(FR[i], x + 4 + k, 30, 2, 2);
-  }
-  R("#cfc2a6", 0, 39, W, 21); R("#e6dcc4", 0, 39, W, 2); for (let k = 0; k < W; k += 8) R("#a3957a", k, 48, 1, 12);
+  // Golda's kitchen: tiles, a window over Tel Aviv, the shelf
+  R("#f3ead7", 0, 0, W, H); for (let x = 0; x < W; x += 8) R("#ede0c6", x, 0, 1, 28);
+  for (let yy = 28; yy < H; yy += 4) for (let xx = 0; xx < W; xx += 4) R(((xx + yy) / 4) % 2 ? "#ffffff" : "#d8e8f2", xx, yy, 4, 4);
+  R("#ffffff", 84, 3, 28, 22); R("#8fd0f0", 86, 5, 24, 18); R("#f4f0e6", 87, 13, 9, 10); R("#e8e2d4", 98, 10, 11, 13);
+  R("#7fa7c0", 89, 15, 3, 1); R("#7fa7c0", 89, 19, 3, 1); R("#7fa7c0", 101, 13, 4, 1); R("#7fa7c0", 101, 17, 4, 1); R("#ffffff", 97, 5, 2, 18);
+  R("#e2483a", 82, 1, 3, 26); R("#e2483a", 111, 1, 3, 26);
+  R("#a8743f", 50, 18, 30, 2); icon("flour", 52, 6, 1); icon("lemon", 66, 6, 1);
   const serve = kind === "hs" || kind === "photo";
-  if (serve) {
-    R("#8a5a2e", 60, 30, 26, 2); R("#ffffff", 59, 29, 28, 1); R("#6b4a2a", 62, 32, 2, 7); R("#6b4a2a", 82, 32, 2, 7);
-    R("#7a4a22", 66, 24, 10, 5); R("#f6e3bb", 66, 23, 10, 1); R("#ffffff", 66, 22, 10, 1); R("#e2483a", 70, 20, 2, 2);
+  if (!serve) {
+    R("#c48a52", 0, 40, W, 2); R("#8a5a34", 0, 42, W, 18); for (let x = 0; x < W; x += 20) R("#7a4c2a", x, 42, 1, 18);
+    drawHeroSprite(36, 16, { face: 1, anim: 0, armFwd: true });
+    const a = frame * 0.15;
+    R("#8a5a34", 66 + Math.round(Math.cos(a) * 5), 22, 2, 12);
+    R("#cdd8de", 54, 32, 26, 2); R(BATTER.lemon, 56, 32, 22, 1);
+    for (let i = 0; i < 6; i++) { const w = 26 - i * 2; R(i === 2 ? "#5b9ad8" : "#e8eef2", 67 - w / 2, 34 + i, w, 1); }
+    icon("egg", 84, 29, 1); icon("butter", 98, 30, 1);
+  } else {
+    R("#ffffff", 0, 40, W, 2); R("#f4f0e6", 0, 42, W, 18); R("#5b9ad8", 0, 46, W, 1); R("#5b9ad8", 0, 56, W, 1);
+    drawHeroSprite(24, 16, { face: 1, anim: 0, armFwd: true });
+    drawCake(62, 41, lastCake || PERFECT_CAKE);
+    drawGuest(98, 41, 1, lastResult ? lastResult.stars : 5);
+    drawGuest(112, 41, 0, lastResult ? lastResult.stars : 5);
   }
-  drawHeroSprite(serve ? 44 : 52, 15, { face: 1, anim: kind === "run" ? frame * 0.12 : 0, air: false, armFwd: serve, hat: false });
   if (kind === "photo") {
     ctx.globalCompositeOperation = "color"; R(finaleGold ? "#b8860b" : "#7a4f22", 0, 0, W, H); ctx.globalCompositeOperation = "source-over";
     R("rgba(255,240,210,.18)", 0, 0, W, H);
@@ -1388,7 +1493,7 @@ document.getElementById("copyBtn").addEventListener("click", () => {
 let cachedGif = null;
 async function shareFromWebsite() {
   const blob = cachedGif && cachedGif.lang === lang ? cachedGif.blob : makeShareGif();
-  const file = new File([blob], "gordon-beach-run.gif", { type: "image/gif" });
+  const file = new File([blob], "golda-kitchen.gif", { type: "image/gif" });
   const msg = document.getElementById("copyField").value;
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try { await navigator.share({ files: [file], text: msg }); } catch (e) { /* closed the share sheet */ }
@@ -1406,7 +1511,7 @@ shareBtn.addEventListener("click", async () => {
     noteShare(L().making);
     await new Promise(r => setTimeout(r, 30));
     const blob = makeShareGif();
-    await downloadsCap.save({ filename: "gordon-beach-run.gif", data: blob });
+    await downloadsCap.save({ filename: "golda-kitchen.gif", data: blob });
     noteShare(L().saved);
   } catch (e) {
     const code = e && e.code;
@@ -1502,7 +1607,7 @@ function loop(now) {
   last = now;
   requestAnimationFrame(loop);
 }
-resize(); buildMaze(); placePlayer();
+resize();
 if (document.fonts && document.fonts.load) document.fonts.load("8px 'Press Start 2P'").catch(() => {});
 requestAnimationFrame(loop);
 })();
