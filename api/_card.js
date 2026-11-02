@@ -23,7 +23,7 @@ export function cleanScore(v) {
 // game: "gordon" (Gordon Beach Run) or "golda" (Golda's Kitchen)
 export const GAMES = {
   gordon: { title: "GORDON BEACH RUN", he: "ריצה בחוף גורדון", place: "Tel Aviv, 1957", line: "Ben-Gurion races to Frishman Beach", path: "gordon-beach-run", name: "Gordon Beach Run" },
-  golda: { title: "GOLDA'S KITCHEN", he: "המטבח של גולדה", place: "Shuk HaCarmel, 1970", line: "Golda races home with the cake", path: "golda-kitchen", name: "Golda's Kitchen" },
+  golda: { title: "GOLDA'S KITCHEN", he: "המטבח של גולדה", place: "Shuk HaCarmel, 1970", line: "8 ingredients, 2 minutes, one maze", path: "golda-kitchen", name: "Golda's Kitchen" },
 };
 export function gameOf(v) { return GAMES[v] ? v : "gordon"; }
 
