@@ -20,15 +20,23 @@ export function cleanScore(v) {
 }
 
 // mode "score": name + score (shared runs); "range": score range only; "play": game preview; "streets": platform preview
-export function card({ score = 0, nick = "", art, mode = "score" }) {
-  if (mode === "play" || mode === "streets") return poster({ art, mode });
+// game: "gordon" (Gordon Beach Run) or "golda" (Golda's Kitchen)
+export const GAMES = {
+  gordon: { title: "GORDON BEACH RUN", he: "ריצה בחוף גורדון", place: "Tel Aviv, 1957", line: "Ben-Gurion races to Frishman Beach", path: "gordon-beach-run", name: "Gordon Beach Run" },
+  golda: { title: "GOLDA'S KITCHEN", he: "המטבח של גולדה", place: "Shuk HaCarmel, 1970", line: "Golda races home with the cake", path: "golda-kitchen", name: "Golda's Kitchen" },
+};
+export function gameOf(v) { return GAMES[v] ? v : "gordon"; }
+
+export function card({ score = 0, nick = "", art, mode = "score", game = "gordon" }) {
+  const G = GAMES[gameOf(game)];
+  if (mode === "play" || mode === "streets") return poster({ art, mode, G });
   const shown = !score ? "?" : score.toLocaleString("en-US") + (mode === "range" ? "+" : "");
   const nameFont = nick.length > 11 || (!nick && mode === "range") ? 54 : 66;
   return h("div", { width: 1200, height: 630, display: "flex", position: "relative", background: "#3fb4ee", fontFamily: "Rubik" }, [
     { type: "img", props: { src: art, width: 1200, height: 600, style: { position: "absolute", left: -250, top: 30 } } },
     h("div", { position: "absolute", left: 0, top: 0, width: 1200, height: 118, background: "rgba(12,58,90,0.93)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }, [
       h("div", { fontFamily: "PressStart", fontSize: 26, color: "#ffd23f", letterSpacing: 4 }, "STREETS"),
-      h("div", { fontFamily: "PressStart", fontSize: 40, color: "#ffffff", marginTop: 12 }, "GORDON BEACH RUN"),
+      h("div", { fontFamily: "PressStart", fontSize: 40, color: "#ffffff", marginTop: 12 }, G.title),
     ]),
     h("div", { position: "absolute", left: 640, top: 150, width: 510, height: 320, background: "#12304a", display: "flex" }, []),
     h("div", { position: "absolute", left: 628, top: 140, width: 510, height: 320, background: "#f6e3bb", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }, [
@@ -46,7 +54,7 @@ export function card({ score = 0, nick = "", art, mode = "score" }) {
 }
 
 // Previews without a score: the game itself, or the Streets platform
-function poster({ art, mode }) {
+function poster({ art, mode, G }) {
   const streets = mode === "streets";
   return h("div", { width: 1200, height: 630, display: "flex", position: "relative", background: "#3fb4ee", fontFamily: "Rubik" }, [
     { type: "img", props: { src: art, width: 1200, height: 600, style: { position: "absolute", left: -250, top: 30 } } },
@@ -55,12 +63,12 @@ function poster({ art, mode }) {
         ? [h("div", { fontFamily: "PressStart", fontSize: 76, color: "#ffd23f", letterSpacing: 10 }, "STREETS"),
            h("div", { fontSize: 32, color: "#ffffff", fontWeight: 800, marginTop: 14 }, "Retro games on real streets · " + visual("משחקי רטרו ברחובות אמיתיים"))]
         : [h("div", { fontFamily: "PressStart", fontSize: 26, color: "#ffd23f", letterSpacing: 4 }, "STREETS"),
-           h("div", { fontFamily: "PressStart", fontSize: 40, color: "#ffffff", marginTop: 12 }, "GORDON BEACH RUN")]),
+           h("div", { fontFamily: "PressStart", fontSize: 40, color: "#ffffff", marginTop: 12 }, G.title)]),
     h("div", { position: "absolute", left: 640, top: streets ? 210 : 160, width: 510, height: 260, background: "#12304a", display: "flex" }, []),
     h("div", { position: "absolute", left: 628, top: streets ? 200 : 150, width: 510, height: 260, background: "#f6e3bb", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }, [
-      h("div", { fontSize: 30, color: "#b0461f", fontWeight: 800 }, streets ? "NOW PLAYING" : "Tel Aviv, 1957"),
-      h("div", { fontSize: streets ? 46 : 54, color: "#12304a", fontWeight: 800, marginTop: 10 }, streets ? "Gordon Beach Run" : visual("ריצה בחוף גורדון")),
-      h("div", { fontSize: 24, color: "#3b4a58", fontWeight: 800, marginTop: 12 }, "Ben-Gurion races to Frishman Beach"),
+      h("div", { fontSize: 30, color: "#b0461f", fontWeight: 800 }, streets ? "NOW PLAYING" : G.place),
+      h("div", { fontSize: streets ? 46 : 54, color: "#12304a", fontWeight: 800, marginTop: 10 }, streets ? "Gordon Beach Run · Golda's Kitchen" : visual(G.he)),
+      h("div", { fontSize: 24, color: "#3b4a58", fontWeight: 800, marginTop: 12 }, streets ? "Two free retro games, more coming" : G.line),
     ]),
     h("div", { position: "absolute", left: 70, top: 522, width: 1080, height: 92, background: "#12304a", display: "flex" }, []),
     h("div", { position: "absolute", left: 60, top: 512, width: 1080, height: 92, background: "#ff6a3d", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffffff", fontSize: 44, fontWeight: 800 }, [

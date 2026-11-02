@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Streets · משחקי רטרו ברחובות אמיתיים</title>
-<meta name="description" content="Streets: free retro games set on real streets and beaches. Now playing: Gordon Beach Run, Ben-Gurion's race down the Tel Aviv shore.">
+<meta name="description" content="Streets: free retro games set on real streets and beaches. Now playing: Gordon Beach Run and Golda's Kitchen.">
 <meta name="theme-color" content="#0c3a5a">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Streets">
 <meta property="og:title" content="Streets · retro games on real streets · משחקי רטרו ברחובות אמיתיים">
-<meta property="og:description" content="Now playing: Gordon Beach Run. Help Ben-Gurion race down the Tel Aviv shore. Free in your browser.">
+<meta property="og:description" content="Now playing: Gordon Beach Run and Golda's Kitchen. Free retro games in your browser.">
 <meta property="og:url" content="https://makondo-kri.github.io/Mako-Krikheli/">
 <meta property="og:image" content="https://makondo-kri.github.io/Mako-Krikheli/streets-og.png">
 <meta property="og:image:width" content="1200">
@@ -82,9 +82,23 @@ footer { text-align: center; font-size: 13px; color: #9fb8c8; }
       <h2 data-t="title">Gordon Beach Run</h2>
       <p data-t="desc">Israel's first prime minister has ditched his morning meetings and is sprinting down the shore to his famous headstand. Dodge crabs, seagulls and jellyfish, and collect hummus.</p>
       <a class="play" href="gordon-beach-run/" data-t="play">Play free</a>
-      <div class="board" id="board" hidden>
+      <div class="board" id="board" data-table="scores" hidden>
         <h3 data-t="top">Top players</h3>
-        <ol id="boardList"></ol>
+        <ol></ol>
+      </div>
+    </div>
+  </article>
+
+  <article class="sign">
+    <img src="golda-kitchen/og-image.png" alt="Pixel-art Golda Meir with her handbag in Shuk HaCarmel" width="1200" height="630">
+    <div class="body">
+      <p class="street" data-t="street2">Shuk HaCarmel → Golda's kitchen · Tel Aviv · 1970</p>
+      <h2 data-t="title2">Golda's Kitchen</h2>
+      <p data-t="desc2">Prime Minister Golda Meir has her ministers coming over tonight and the cake isn't baked. Race through the market for eggs, flour, sugar and lemons, swing her famous handbag at the pigeons, and get the cake to the kitchen table.</p>
+      <a class="play" href="golda-kitchen/" data-t="play">Play free</a>
+      <div class="board" data-table="golda_scores" hidden>
+        <h3 data-t="top">Top players</h3>
+        <ol></ol>
       </div>
     </div>
   </article>
@@ -97,10 +111,14 @@ footer { text-align: center; font-size: 13px; color: #9fb8c8; }
   const T = {
     en: { tag: "Retro games on real streets and beaches.", street: "Gordon Beach → Frishman Beach · Tel Aviv · 1957", title: "Gordon Beach Run",
       desc: "Israel's first prime minister has ditched his morning meetings and is sprinting down the shore to his famous headstand. Dodge crabs, seagulls and jellyfish, and collect hummus.",
+      street2: "Shuk HaCarmel → Golda's kitchen · Tel Aviv · 1970", title2: "Golda's Kitchen",
+      desc2: "Prime Minister Golda Meir has her ministers coming over tonight and the cake isn't baked. Race through the market for eggs, flour, sugar and lemons, swing her famous handbag at the pigeons, and get the cake to the kitchen table.",
       play: "Play free", top: "Top players", soonTitle: "MORE STREETS SOON", soon: "New games on other streets are on the way.",
       foot: "Free to play in your phone's browser. No download.", btn: "עב" },
     he: { tag: "משחקי רטרו ברחובות ובחופים אמיתיים.", street: "חוף גורדון ← חוף פרישמן · תל אביב · 1957", title: "ריצה בחוף גורדון",
       desc: "ראש הממשלה הראשון של ישראל ברח מישיבות הבוקר ורץ לאורך החוף לעמידת הראש המפורסמת שלו. התחמקו מסרטנים, שחפים ומדוזות, ואספו חומוס.",
+      street2: "שוק הכרמל ← המטבח של גולדה · תל אביב · 1970", title2: "המטבח של גולדה",
+      desc2: "השרים של ראש הממשלה גולדה מאיר מגיעים הערב, והעוגה עוד לא אפויה. רוצו בשוק בשביל ביצים, קמח, סוכר ולימון, הניפו את התיק המפורסם שלה על היונים, והביאו את העוגה לשולחן המטבח.",
       play: "שחקו בחינם", top: "השחקנים המובילים", soonTitle: "עוד רחובות בקרוב", soon: "משחקים חדשים ברחובות אחרים בדרך.",
       foot: "משחקים בחינם בדפדפן של הטלפון. בלי הורדה.", btn: "EN" },
   };
@@ -119,25 +137,27 @@ footer { text-align: center; font-size: 13px; color: #9fb8c8; }
     apply();
   });
   apply();
-  // Top players from the game's leaderboard (hidden if it isn't set up or can't be reached)
+  // Top players from each game's leaderboard (hidden if it isn't set up or can't be reached)
   const cfg = window.GBR_CONFIG || {};
   if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
     const k = cfg.supabaseAnonKey;
     const headers = k.startsWith("eyJ") ? { apikey: k, Authorization: "Bearer " + k } : { apikey: k };
-    fetch(cfg.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/scores?select=nickname,score,golden&order=score.desc,created_at.asc&limit=5", { headers })
-      .then(r => r.ok ? r.json() : [])
-      .then(rows => {
-        if (!rows.length) return;
-        const list = document.getElementById("boardList");
-        rows.forEach((r, i) => {
-          const li = document.createElement("li");
-          const a = document.createElement("span"); a.textContent = (i + 1) + ". " + r.nickname + (r.golden ? " ★" : "");
-          const b = document.createElement("span"); b.textContent = String(r.score);
-          li.append(a, b); list.appendChild(li);
-        });
-        document.getElementById("board").hidden = false;
-      })
-      .catch(() => {});
+    document.querySelectorAll(".board[data-table]").forEach(box => {
+      fetch(cfg.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/" + box.dataset.table + "?select=nickname,score,golden&order=score.desc,created_at.asc&limit=5", { headers })
+        .then(r => r.ok ? r.json() : [])
+        .then(rows => {
+          if (!rows.length) return;
+          const list = box.querySelector("ol");
+          rows.forEach((r, i) => {
+            const li = document.createElement("li");
+            const a = document.createElement("span"); a.textContent = (i + 1) + ". " + r.nickname + (r.golden ? " ★" : "");
+            const b = document.createElement("span"); b.textContent = String(r.score);
+            li.append(a, b); list.appendChild(li);
+          });
+          box.hidden = false;
+        })
+        .catch(() => {});
+    });
   }
 })();
 </script>
