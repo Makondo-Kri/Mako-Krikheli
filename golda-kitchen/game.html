@@ -297,7 +297,8 @@ body.portrait .art { max-width: 260px; }
 <script>
 (() => {
 "use strict";
-const T = 16, ROWS = 15, VH = 240, LW = 212;
+const T = 16, ROWS = 15, LW = 212;
+let VH = 240, OY = 0; // OY: the 240-tall scene sits in the middle of a taller phone screen
 const SAND = 1, PLANK = 3, BOX = 4, USED = 5, HBOX = 6, STONE = 7;
 const GOAL_TX = 191;
 const cv = document.getElementById("game");
@@ -343,7 +344,7 @@ const I18N = {
     copied: "Copied! Paste it into Messenger, WhatsApp or anywhere.", copyManual: "Copy the text below and paste it anywhere.",
     jumpBtn: "JUMP", walkLbl: "swipe anywhere or use the arrows", jumpLbl: "jump", langBtn: "עב",
     sound: ["SOUND ON", "MUSIC OFF", "SOUND OFF"],
-    story: "Tel Aviv, 1970. Prime Minister Golda Meir's ministers are coming over tonight to talk around her kitchen table, and there's no cake yet. Read the recipe, pick the right ingredients, stir, and bake it just right before they ring the bell.",
+    story: "Tel Aviv, 1970. Prime Minister Golda Meir's ministers, and even David Ben-Gurion, are coming over tonight, and there's no cake yet. Read the recipe, pick the right ingredients, stir, and bake it just right before they ring the bell.",
     shareMsg: (sc, st, title) => "I baked in Golda's kitchen: " + title + " " + st + " Score " + sc + ". Can you bake a better one?",
     legend: [["Ingredients", "Tap them on the shelf to drop them in the bowl. Follow the recipe card: the right things, the right amounts"],
       ["Careful", "Salt is not sugar, and the fish from the shuk does not go in a cake"], ["Oops", "EMPTY tips the bowl out so you can start again"],
@@ -378,6 +379,7 @@ const I18N = {
       2: { title: n => "A " + n + ", more or less", desc: "Some of the amounts were off. The ministers are polite about it." },
     },
     react: { 1: "*cough* We already ate.", 2: "Um... is there coffee?", 3: "Not bad, Golda!", 4: "Delicious! Another slice?", 5: "Golda, give us the recipe!" },
+    wow: "WOW!",
     overDesc: "The doorbell rang before the cake made it out of the oven. Next time, faster!",
     apronSub: "saves you from one hit", scarfSub: "whacks cats and pigeons", glowSub: "10 seconds: enemies turn to shekels", allIngSub: "the cake will be perfect",
     winEyebrow: "The kitchen cabinet · 1969–1974", winTitle: "Golda served the cake!", overEyebrow: "Ding dong!", overTitle: "The ministers are here, and there's no cake!",
@@ -399,7 +401,7 @@ const I18N = {
     copied: "הועתק! הדביקו במסנג׳ר, בוואטסאפ או בכל מקום.", copyManual: "העתיקו את הטקסט למטה והדביקו בכל מקום.",
     jumpBtn: "קפיצה", walkLbl: "החליקו על המסך או השתמשו בחצים", jumpLbl: "קפיצה", langBtn: "EN",
     sound: ["צליל: פועל", "מוזיקה: כבויה", "צליל: כבוי"],
-    story: "תל אביב, 1970. השרים של ראש הממשלה גולדה מאיר מגיעים הערב לשיחה סביב שולחן המטבח שלה, ועוד אין עוגה. קראו את המתכון, בחרו את המצרכים הנכונים, ערבבו ואפו בדיוק כמו שצריך, לפני שהם מצלצלים בדלת.",
+    story: "תל אביב, 1970. השרים של ראש הממשלה גולדה מאיר, ואפילו דוד בן־גוריון, מגיעים הערב, ועוד אין עוגה. קראו את המתכון, בחרו את המצרכים הנכונים, ערבבו ואפו בדיוק כמו שצריך, לפני שהם מצלצלים בדלת.",
     shareMsg: (sc, st, title) => "אפיתי במטבח של גולדה: " + title + " " + st + " ניקוד " + sc + ". תצליחו לאפות טובה יותר?",
     legend: [["מצרכים", "הקישו עליהם במדף כדי להכניס לקערה. עקבו אחרי כרטיס המתכון: המצרכים הנכונים, בכמויות הנכונות"],
       ["זהירות", "מלח זה לא סוכר, והדג מהשוק לא נכנס לעוגה"], ["אופס", "לרוקן שופך את הקערה ומתחילים מחדש"],
@@ -434,6 +436,7 @@ const I18N = {
       2: { title: n => n + ", פחות או יותר", desc: "חלק מהכמויות לא היו מדויקות. השרים מנומסים." },
     },
     react: { 1: "*השתעלות* כבר אכלנו.", 2: "אה... יש קפה?", 3: "לא רע, גולדה!", 4: "טעים! עוד פרוסה?", 5: "גולדה, תני לנו את המתכון!" },
+    wow: "וואו!",
     overDesc: "הפעמון צלצל לפני שהעוגה יצאה מהתנור. בפעם הבאה, מהר יותר!",
     apronSub: "מגן מפגיעה אחת", scarfSub: "מעיף חתולים ויונים", glowSub: "10 שניות: אויבים הופכים לשקלים", allIngSub: "העוגה תהיה מושלמת",
     winEyebrow: "המטבחון · 1969–1974", winTitle: "גולדה הגישה את העוגה!", overEyebrow: "דינג דונג!", overTitle: "השרים הגיעו, ואין עוגה!",
@@ -460,6 +463,7 @@ function resize() {
   const ah = st.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   const portrait = aw < ah * 0.9;
   document.body.classList.toggle("portrait", portrait);
+  VH = portrait ? Math.round(clamp(256 * (ah - 30) / aw, 240, 480)) : 240; OY = Math.floor((VH - 240) / 2);
   VW = portrait ? 256 : Math.round(Math.max(300, Math.min(520, VH * aw / ah)));
   let scale = Math.min(aw / VW, ah / VH);
   if (portrait) scale = Math.min(aw / VW, Math.max(120, ah - 30) / VH);
@@ -607,7 +611,7 @@ const keys = {};
 let btns = [], stir = null, BOWL = { x: 128, y: 150 };
 function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {} }
 function releaseTouches() { stir = null; }
-function toLogical(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * VW, (e.clientY - r.top) / r.height * VH]; }
+function toLogical(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * VW, (e.clientY - r.top) / r.height * VH - OY]; }
 const hitBox = (b, x, y) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h;
 addEventListener("keydown", e => {
   if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
@@ -787,11 +791,14 @@ function stepPlay() {
 function stepResult() {
   resT++;
   const st = lastResult.stars;
-  if (resT >= 30 && resT % 14 === 2 && (resT - 30) / 14 < st) sfx.coin();
-  if (resT === 30 + st * 14 + 6) { if (st >= 4) sfx.win(); else if (st === 3) sfx.oneup(); else sfx.hurt(); }
-  if (resT === 230) { flashT = 16; sfx.shutter(); buzz(30); }
+  if (resT % 4 === 0 && resT < 60) tone(220 + (resT % 8) * 20, 200, 0.03, "triangle", 0.04);
+  if (resT === 64) tone(300, 140, 0.1, "triangle", 0.12);
+  if (resT >= 80 && (resT - 80) % 12 === 0 && (resT - 80) / 12 < st) sfx.coin();
+  for (let i = 0; i < 3; i++) if (resT === 84 + i * 12) { tone(330 + i * 60, 660 + i * 80, 0.12, "square", 0.04); tone(660 + i * 80, 400 + i * 60, 0.16, "square", 0.04, 0.12); }
+  if (resT === 124) { if (st >= 3) sfx.win(); else sfx.oneup(); }
+  if (resT === 250) { flashT = 16; sfx.shutter(); buzz(30); }
   if (flashT > 0) flashT--;
-  if (resT === 290) finishResult();
+  if (resT === 310) finishResult();
 }
 function renderEnd() {
   const t = L(), won = lastWon, r = lastResult;
@@ -946,7 +953,7 @@ function drawCake(cx, by, k, o = {}) {
   }
 }
 // A minister at the table (small pixels, base = table top)
-function drawGuest(x, by, i, mood) {
+function drawGuest(x, by, i, mood, wow) {
   const SUIT = ["#3b3f4a", "#4a3b2f", "#2f3b4a"][i % 3], SK = ["#e8b48e", "#d9a07a", "#f0c4a0"][i % 3], HAIR = ["#cfcfcf", "#2a2a2a", "#8a8a8a"][i % 3];
   const bob = Math.round(Math.sin(frame * 0.08 + i * 2) * 0.6);
   ctx.save(); ctx.translate(x, by + bob);
@@ -957,10 +964,10 @@ function drawGuest(x, by, i, mood) {
   else { R(HAIR, -3, -16, 6, 1); }
   R("#222222", -2, -12, 1, 1); R("#222222", 1, -12, 1, 1);
   if (i % 3 === 2) { R("#222222", -3, -12, 6, 1); }
-  if (mood >= 4) { R("#8a3a2a", -1, -10, 2, 1); R("#8a3a2a", -2, -11, 1, 1); R("#8a3a2a", 1, -11, 1, 1); }
+  if (wow) R("#5a2a2a", -1, -10, 2, 2);
+  else if (mood >= 4) { R("#8a3a2a", -1, -10, 2, 1); R("#8a3a2a", -2, -11, 1, 1); R("#8a3a2a", 1, -11, 1, 1); }
   else if (mood === 3) R("#8a3a2a", -1, -10, 2, 1);
   else { R("#8a3a2a", -1, -10, 2, 1); R("#8a3a2a", -2, -9, 1, 1); R("#8a3a2a", 1, -9, 1, 1); }
-  if (mood <= 1 && (frame >> 4) % 2) { R(SK, 2, -10, 2, 2); R("#bbbbbb", 4, -12, 2, 2); }
   R("#ffffff", -2, -3, 4, 3); R("#d9d4c8", 2, -2, 1, 1); R("#6b4422", -1, -3, 2, 1);
   ctx.restore();
 }
@@ -991,6 +998,7 @@ function drawStar(x, y, on) {
   rows.forEach((r, j) => { for (let i = 0; i < r.length; i++) if (r[i] === "#") R(on ? "#ffc21a" : "#c3cbd2", x + i, y + j, 1, 1); });
 }
 function drawHUD() {
+  ctx.save(); ctx.translate(0, -OY);
   const sec = Math.ceil(timeLeft / 60), m = Math.floor(sec / 60), s = sec % 60;
   const warn = sec <= 20, blink = warn && (frame >> 4) % 2;
   R("rgba(18,48,74,.88)", 4, 3, 98, 15);
@@ -1002,6 +1010,7 @@ function drawHUD() {
     R(active ? "#ff6a3d" : done ? "#7ab83a" : "#3b5a72", x, 5, 10, 11);
     txt(String(i + 1), x + 5, 7, 6, "#ffffff", "center", true);
   });
+  ctx.restore();
 }
 function drawRecipe(x, y) {
   const t = L(), items = Object.entries(rec.items);
@@ -1123,31 +1132,75 @@ function drawOven() {
   else button("out", x2, 176, 86, 30, t.btnOut, (frame >> 3) % 2 && cr > 0.9 ? "#e2483a" : "#c0392b", true, 7);
   for (const p of parts) if (p.k === "smoke") { ctx.globalAlpha = Math.max(0, 0.55 - p.t / 110); R("#6a6a6a", Math.round(p.x + Math.sin(p.t * 0.1) * 4), Math.round(p.y), 6, 6); ctx.globalAlpha = 1; }
 }
+function drawBenGurion(x, by, wow) {
+  const SK = "#eab58c", SH = "#d4bc82", SHD = "#a8915a", WH = "#f4f4f4";
+  ctx.save(); ctx.translate(x, by + Math.round(Math.sin(frame * 0.08 + 1) * 0.6));
+  R(SH, -7, -8, 14, 8); R(SHD, -7, -8, 1, 8); R(SK, -1, -8, 3, 2); R(SHD, 0, -6, 2, 2);
+  R(SK, -3, -16, 7, 8); R(SK, -1, -8, 3, 1); R("#f6d2ae", -2, -16, 4, 1);
+  R(WH, -6, -14, 3, 4); R(WH, -7, -13, 2, 3); R(WH, 4, -14, 3, 4); R(WH, 6, -13, 2, 3); R("#d8d8d8", -6, -11, 2, 1); R("#d8d8d8", 5, -11, 2, 1);
+  R(WH, -2, -13, 2, 1); R(WH, 2, -13, 2, 1); R("#222222", -2, -12, 1, 1); R("#222222", 2, -12, 1, 1);
+  if (wow) { R("#5a2a2a", 0, -10, 2, 2); } else { R("#8a3a2a", 0, -10, 2, 1); R("#8a3a2a", -1, -11, 1, 1); R("#8a3a2a", 2, -11, 1, 1); }
+  R("#ffffff", -2, -3, 4, 3); R("#d9d4c8", 2, -2, 1, 1); R("#6b4422", -1, -3, 2, 1);
+  ctx.restore();
+}
+function drawLivingRoom(ox) {
+  R("#e6d3a8", 0, 0, VW, 240); for (let x = 0; x < VW; x += 12) R("#dcc594", x, 0, 2, 200);
+  R("#b07a48", 0, 196, VW, 4);
+  // a landscape painting and a bookcase
+  R("#6b4422", ox + 18, 76, 42, 32); R("#9fd6ee", ox + 21, 79, 36, 26); R("#d9b56a", ox + 21, 93, 36, 12); R("#7fae5a", ox + 21, 91, 14, 4); R("#fff6c8", ox + 46, 82, 5, 5);
+  R("#6b4422", ox + 196, 66, 56, 112); for (let r = 0; r < 4; r++) {
+    const y = 70 + r * 27; R("#4f3219", ox + 199, y + 22, 50, 3);
+    for (let k = 0; k < 8; k++) R(["#b0461f", "#2f74c0", "#e8b923", "#2f8a4a", "#7a2a5a"][(k + r * 3) % 5], ox + 200 + k * 6, y + 6 + (k % 3), 5, 16 - (k % 3));
+  }
+  R("#a8743f", 0, 200, VW, 40); for (let x = 0; x < VW; x += 24) R("#93622f", x, 200, 1, 40); R("#93622f", 0, 220, VW, 1);
+  R("#b0461f", ox + 50, 222, 160, 14); R("#e8b923", ox + 54, 225, 152, 1); R("#e8b923", ox + 54, 232, 152, 1);
+}
 function drawResult() {
   const ox = OX(), t = L(), r = lastResult, o = outcomeText(r, t);
-  drawWall(150);
-  const shown = Math.max(0, Math.min(r.stars, Math.floor((resT - 30) / 14) + 1));
-  for (let i = 0; i < 5; i++) { ctx.save(); ctx.translate(ox + 84 + i * 18, 26); ctx.scale(1.5, 1.5); drawStar(0, 0, i < shown); ctx.restore(); }
-  txtWrap(o.title, ox + 128, 46, 8, INK, 240, 12);
-  goldaBig(ox + 12, 146, 1, { armFwd: true });
-  [0, 1, 2].forEach(i => { ctx.save(); ctx.translate(ox + 160 + i * 32, 194); ctx.scale(2, 2); drawGuest(0, 0, i, resT > 30 + r.stars * 14 ? r.stars : 3); ctx.restore(); });
-  R("#ffffff", 0, 192, VW, 6); R("#f4f0e6", 0, 198, VW, 42); R("#5b9ad8", 0, 206, VW, 2);
-  ctx.save(); ctx.translate(ox + 100, 194); ctx.scale(2, 2); drawCake(0, 0, r.cake); ctx.restore();
-  if (resT > 30 + r.stars * 14) {
-    const bx = ox + 136, by = 118, bw = 118;
-    R(INK, bx + 2, by + 2, bw, 30); R("#ffffff", bx, by, bw, 30); R("#ffffff", bx + 58, by + 30, 6, 4); R("#ffffff", bx + 60, by + 34, 3, 2);
-    txtWrap(t.react[r.stars], bx + bw / 2, by + 6, 5, INK, bw - 10, 10);
+  drawLivingRoom(ox);
+  const walkIn = Math.min(1, resT / 60), gx = Math.round(ox - 46 + walkIn * 58), placed = resT >= 64;
+  const guests = [{ x: ox + 152, kind: 1 }, { x: ox + 186, bg: true }, { x: ox + 220, kind: 2 }];
+  guests.forEach((g, i) => {
+    const wow = resT >= 84 + i * 12;
+    ctx.save(); ctx.translate(g.x, 183); ctx.scale(2, 2);
+    if (g.bg) drawBenGurion(0, 0, wow); else drawGuest(0, 0, g.kind, 5, wow);
+    ctx.restore();
+  });
+  // the table
+  R("#ffffff", ox + 64, 182, 192, 4); R("#f4f0e6", ox + 64, 186, 192, 14); R("#5b9ad8", ox + 64, 194, 192, 1);
+  R("#6b4422", ox + 72, 200, 4, 16); R("#6b4422", ox + 244, 200, 4, 16);
+  if (placed) { ctx.save(); ctx.translate(ox + 106, 183); ctx.scale(2, 2); drawCake(0, 0, r.cake); ctx.restore(); }
+  goldaBig(gx, 168, 1, { armFwd: true, anim: walkIn < 1 ? resT * 0.2 : 0 });
+  if (!placed) { R("#9aa3ab", gx + 26, 190, 66, 2); ctx.save(); ctx.translate(gx + 60, 191); ctx.scale(2, 2); drawCake(0, 0, r.cake); ctx.restore(); }
+  guests.forEach((g, i) => {
+    if (resT < 84 + i * 12) return;
+    const y = 124 - (i % 2) * 22, pop = Math.min(1, (resT - 84 - i * 12) / 6);
+    const w = Math.round(36 * pop), h = Math.round(18 * pop);
+    R(INK, g.x - w / 2 + 2, y + 2, w, h); R("#ffffff", g.x - w / 2, y, w, h); R("#ffffff", g.x - 2, y + h, 4, 3 + (i % 2) * 18);
+    if (pop >= 1) txt(t.wow, g.x, y + 6, 6, "#e2483a", "center");
+  });
+  if (resT >= 80) {
+    const shown = Math.min(r.stars, Math.floor((resT - 80) / 12) + 1);
+    for (let i = 0; i < 5; i++) { ctx.save(); ctx.translate(ox + 84 + i * 18, 26); ctx.scale(1.5, 1.5); drawStar(0, 0, i < shown); ctx.restore(); }
+    txtWrap(o.title, ox + 128, 46, 8, INK, 240, 12);
   }
-  if (resT > 60 && resT < 220 && (frame >> 5) % 2) txt(t.tapOn, ox + 128, 230, 4, "#8a7a5a", "center");
-  if (flashT > 0) { ctx.globalAlpha = flashT / 16; R("#ffffff", 0, 0, VW, VH); ctx.globalAlpha = 1; }
+  if (resT > 120 && resT < 240 && (frame >> 5) % 2) txt(t.tapOn, ox + 128, 66, 4, "#8a7a5a", "center");
 }
 function draw() {
-  ctx.setTransform(S, 0, 0, S, 0, 0); ctx.imageSmoothingEnabled = false;
+  ctx.setTransform(S, 0, 0, S, 0, S * OY); ctx.imageSmoothingEnabled = false;
   btns = [];
-  if (state === "result" && lastResult) { drawResult(); return; }
-  if (phase === "mix") drawMix();
+  const room = state === "result" && lastResult;
+  if (room) drawResult();
+  else if (phase === "mix") drawMix();
   else if (phase === "oven") drawOven();
   else drawAdd();
+  if (OY > 0) {
+    const top = room ? "#e6d3a8" : "#f3ead7", line = room ? "#dcc594" : "#ede0c6", step = room ? 12 : 16;
+    R(top, 0, -OY, VW, OY); for (let x = 0; x < VW; x += step) R(line, x, -OY, room ? 2 : 1, OY);
+    const bot = room ? "#a8743f" : phase === "oven" ? "#b49f80" : "#8a5a34";
+    R(bot, 0, 240, VW, OY + 1); for (let x = 0; x < VW; x += room ? 24 : 40) R(room ? "#93622f" : "#7a4c2a", x, 240, 1, OY + 1);
+  }
+  if (room) { if (flashT > 0) { ctx.globalAlpha = flashT / 16; R("#ffffff", 0, -OY, VW, VH); ctx.globalAlpha = 1; } return; }
   if (state === "play") {
     drawHUD();
     if (toastT > 0) { const w = 170, x = Math.round(VW / 2 - w / 2); R(INK, x, 100, w, 22); txt(toastMsg, VW / 2, 107, 6, "#ffffff", "center"); }
@@ -1312,11 +1365,14 @@ function drawArt(c, kind) {
     for (let i = 0; i < 6; i++) { const w = 26 - i * 2; R(i === 2 ? "#5b9ad8" : "#e8eef2", 67 - w / 2, 34 + i, w, 1); }
     icon("egg", 84, 29, 1); icon("butter", 98, 30, 1);
   } else {
-    R("#ffffff", 0, 40, W, 2); R("#f4f0e6", 0, 42, W, 18); R("#5b9ad8", 0, 46, W, 1); R("#5b9ad8", 0, 56, W, 1);
-    drawHeroSprite(24, 16, { face: 1, anim: 0, armFwd: true });
-    drawCake(62, 41, lastCake || PERFECT_CAKE);
-    drawGuest(98, 41, 1, lastResult ? lastResult.stars : 5);
-    drawGuest(112, 41, 0, lastResult ? lastResult.stars : 5);
+    R("#e6d3a8", 0, 0, W, H); for (let x = 0; x < W; x += 6) R("#dcc594", x, 0, 1, H);
+    R("#6b4422", 8, 6, 22, 16); R("#9fd6ee", 10, 8, 18, 12); R("#d9b56a", 10, 15, 18, 5); R("#fff6c8", 22, 9, 3, 3);
+    R("#6b4422", 98, 4, 20, 34); for (let k = 0; k < 6; k++) R(["#b0461f", "#2f74c0", "#e8b923", "#2f8a4a"][k % 4], 100 + k * 3, 8, 2, 8); R("#4f3219", 99, 17, 18, 1);
+    drawBenGurion(84, 41, true); drawGuest(102, 41, 2, 5, true); drawGuest(68 + 48, 41, 1, 5, true);
+    R("#ffffff", 40, 40, W - 40, 2); R("#f4f0e6", 40, 42, W - 40, 8); R("#5b9ad8", 40, 46, W - 40, 1);
+    R("#a8743f", 0, 50, W, 10); R("#93622f", 0, 54, W, 1);
+    drawHeroSprite(22, 26, { face: 1, anim: 0, armFwd: true });
+    drawCake(58, 41, lastCake || PERFECT_CAKE);
   }
   if (kind === "photo") {
     ctx.globalCompositeOperation = "color"; R(finaleGold ? "#b8860b" : "#7a4f22", 0, 0, W, H); ctx.globalCompositeOperation = "source-over";
