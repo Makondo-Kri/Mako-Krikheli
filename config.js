@@ -8,6 +8,6 @@ window.GBR_CONFIG = {
   // Supabase dashboard → Project Settings → API:
   //   supabaseUrl     = "Project URL"        e.g. "https://abcdefgh.supabase.co"
   //   supabaseAnonKey = "anon public" key    (safe to put in a website)
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://nwzorqpgcgfdcyzilusp.supabase.co",
+  supabaseAnonKey: "sb_publishable_jak_B5V4iYAu7I0cJC19HA_uLS-t46z",
 };

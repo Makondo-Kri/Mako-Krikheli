@@ -1690,7 +1690,10 @@ shareBtn.addEventListener("click", async () => {
 /* ---------- leaderboard ---------- */
 const BOARD_ON = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
 const boardBase = BOARD_ON ? CFG.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/scores" : "";
-const boardHeaders = () => ({ apikey: CFG.supabaseAnonKey, Authorization: "Bearer " + CFG.supabaseAnonKey });
+// new "sb_publishable_" keys go only in the apikey header; older "eyJ" keys also as a bearer token
+const boardHeaders = () => CFG.supabaseAnonKey.startsWith("eyJ")
+  ? { apikey: CFG.supabaseAnonKey, Authorization: "Bearer " + CFG.supabaseAnonKey }
+  : { apikey: CFG.supabaseAnonKey };
 let boardRows = null, boardMine = null, boardState = "idle", boardSent = false;
 function cleanNick(v) { return (v || "").replace(/[\u0000-\u001f<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 16); }
 function boardMsg(text) { const n = document.getElementById("boardNote"); n.textContent = text || ""; n.hidden = !text; }

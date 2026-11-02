@@ -40,7 +40,7 @@ point to the right place.
    `supabase-setup.sql`, and click **Run**.
 3. Open **Project Settings → API** (or **Data API**) and copy:
    - **Project URL** → `supabaseUrl` in `config.js`
-   - **anon public** key → `supabaseAnonKey` in `config.js`
+   - **publishable** key (`sb_publishable_...`) or the older **anon public** key → `supabaseAnonKey` in `config.js`
 
    The anon key is meant to be public; the table rules only allow reading the
    board and adding new scores.
