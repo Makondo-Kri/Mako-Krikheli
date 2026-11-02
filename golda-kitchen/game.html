@@ -527,22 +527,30 @@ const sfx = {
   shutter: () => { tone(2400, 900, 0.04, "square", 0.05); tone(900, 300, 0.09, "square", 0.04, 0.05); },
   win: () => { [392, 523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.16, "square", 0.05, i * 0.13)); },
 };
-/* ---------- music: Hava Nagila as 8-bit chiptune ----------
-   Folk melody in E freygish (E F G# A B C D). Each pair is [note, length in eighths]; 4 eighths per bar. */
-/* Opening verse of Hava Nagila, from a published folk transcription (E freygish, 4/4).
+/* ---------- music: Zum Gali Gali as 8-bit chiptune ----------
+   Traditional pioneer song in E minor, 4/4. Written down from memory (no printed score was at hand).
    Each pair is [note, length in eighths]; "-" is a rest. 8 eighths per bar. */
-const VERSE = [
-  ["E4",2],["E4",2],["-",1],["G#4",1],["F4",1],["E4",1],     // Ha-va na-gi-la
-  ["G#4",2],["G#4",2],["-",1],["B4",1],["A4",1],["G#4",1],   // ha-va na-gi-la
-  ["A4",2],["A4",2],["-",1],["C5",1],["B4",1],["A4",1],      // ha-va na-gi-la
+const CHORUS = [
+  ["B4",2],["A4",1],["G4",1],["F#4",1],["E4",1],["F#4",1],["G4",1],   // zum ga-li ga-li ga-li
+  ["G4",2],["F#4",1],["E4",1],["F#4",1],["E4",2],["-",1],             // zum ga-li ga-li
 ];
-const SONG = [...VERSE, ["B4",2],["A4",2],["G#4",2],["F4",2], ...VERSE, ["G#4",2],["F4",2],["E4",4]]; // ve-nis-me-cha
+const VERSE = [
+  ["E4",1],["G4",1],["B4",2],["B4",1],["A4",1],["G4",2],              // he-cha-lutz le-ma-an
+  ["A4",1],["B4",1],["A4",4],["-",2],                                 // a-vo-dah
+  ["A4",1],["G4",1],["F#4",2],["F#4",1],["G4",1],["A4",2],            // a-vo-dah le-ma-an
+  ["G4",1],["F#4",1],["E4",4],["-",2],                                // he-cha-lutz
+];
+const SONG = [...CHORUS, ...CHORUS, ...VERSE, ...VERSE, ...CHORUS, ...CHORUS];
 const NOTE_IDX = { C: 0, "C#": 1, D: 2, "D#": 3, E: 4, F: 5, "F#": 6, G: 7, "G#": 8, A: 9, "A#": 10, B: 11 };
 const hz = n => { const m = n.match(/^([A-G]#?)(\d)$/); return 440 * Math.pow(2, (NOTE_IDX[m[1]] + (+m[2] + 1) * 12 - 69) / 12); };
 const GRID = []; for (const [n, len] of SONG) { GRID.push(n === "-" ? null : [n, len]); for (let i = 1; i < len; i++) GRID.push(null); }
-const CHORDS = { E: { root: "E2", fifth: "B2", pah: ["G#3", "B3"] }, Dm: { root: "D2", fifth: "A2", pah: ["F3", "A3"] }, Am: { root: "A2", fifth: "E2", pah: ["C4", "E4"] } };
-// one chord per half bar, following the chords written in the transcription
-const BAR_CHORD = ["E","E", "E","E", "Am","Am", "E","Dm", "E","E", "E","E", "Am","Am", "Dm","E"];
+const CHORDS = {
+  Em: { root: "E2", fifth: "B2", pah: ["G3", "B3"] }, Am: { root: "A2", fifth: "E2", pah: ["C4", "E4"] },
+  D: { root: "D2", fifth: "A2", pah: ["F#3", "A3"] }, B7: { root: "B1", fifth: "F#2", pah: ["D#3", "A3"] },
+};
+// one chord per half bar
+const CH_CHORUS = ["Em","Em", "B7","Em"], CH_VERSE = ["Em","Em", "Am","Am", "D","D", "B7","Em"];
+const BAR_CHORD = [...CH_CHORUS, ...CH_CHORUS, ...CH_VERSE, ...CH_VERSE, ...CH_CHORUS, ...CH_CHORUS];
 let soundMode = 0; // 0 = all on, 1 = music off, 2 = everything off
 let pulse = null, noiseBuf = null, musicOut = null;
 const music = { timer: null, step: 0, next: 0, bpm: 150 };
@@ -587,14 +595,14 @@ function musicTick() {
     const e8 = 60 / (music.bpm * (state === "play" && timeLeft <= 20 * 60 ? 1.4 : 1)) / 2;
     playStep(music.step, music.next, e8);
     music.next += e8; music.step++;
-    if (music.step >= GRID.length) { music.step = 0; music.bpm = Math.min(200, music.bpm + 8); } // speeds up every round, like a real hora
+    if (music.step >= GRID.length) { music.step = 0; music.bpm = Math.min(170, music.bpm + 6); } // a little livelier every round
   }
 }
 function musicStart(fromTop = true) {
   musicStop();
   if (!ac || soundMode !== 0) return;
   musicSetup();
-  if (fromTop) { music.step = 0; music.bpm = 126; }
+  if (fromTop) { music.step = 0; music.bpm = 116; }
   music.next = ac.currentTime + 0.08;
   music.timer = setInterval(musicTick, 25); musicTick();
 }

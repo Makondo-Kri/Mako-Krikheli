@@ -82,4 +82,4 @@ Commit the built files too.
 
 - The real statue photo on Gordon Beach Run's end card should be one you have the
   right to share. Replace it with your own photo if needed.
-- The melody is the traditional Hava Nagila folk tune, played as chiptune.
+- Gordon Beach Run plays the traditional Hava Nagila folk tune as chiptune; Golda's Kitchen plays the traditional pioneer song Zum Gali Gali (written from memory, not checked against a printed score).
