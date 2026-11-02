@@ -327,7 +327,7 @@ let VW = 400, S = 2;
 /* ---------- where the game runs ---------- */
 const CFG = window.GBR_CONFIG || {};
 const IN_CLAUDE = !!(window.claude && window.claude.use);
-const ARTIFACT_URL = "https://claude.ai/";
+const ARTIFACT_URL = "https://claude.ai/artifact/R9J525WT1do2EbXX2S7qwc";
 const GAME_URL = IN_CLAUDE ? ARTIFACT_URL : (location.origin + location.pathname.replace(/index\.html$/, ""));
 // On a host with the Streets picture server (Vercel), share links get a picture with the player's name and score.
 const NAME_PICTURES = !IN_CLAUDE && location.protocol === "https:" && !/github\.io$/.test(location.hostname);
