@@ -1,0 +1,13 @@
+// Gordon Beach Run settings. Edit this file, then run:  python3 tools/build.py
+window.GBR_CONFIG = {
+  // The web address where the game is published (must end with a slash).
+  // Used for the WhatsApp / Facebook link preview and the share messages.
+  siteUrl: "https://makondo-kri.github.io/Mako-Krikheli/",
+
+  // Leaderboard (free Supabase project). Leave both empty to hide the leaderboard.
+  // Supabase dashboard → Project Settings → API:
+  //   supabaseUrl     = "Project URL"        e.g. "https://abcdefgh.supabase.co"
+  //   supabaseAnonKey = "anon public" key    (safe to put in a website)
+  supabaseUrl: "",
+  supabaseAnonKey: "",
+};
