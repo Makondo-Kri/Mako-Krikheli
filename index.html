@@ -122,6 +122,7 @@ body.portrait #game { border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,.45
 .row { display: flex; gap: 10px; align-items: stretch; }
 .row .go { flex: 1; }
 .go.small { font-size: 11px; padding: 12px; min-height: 46px; }
+.challenge { margin: 0; padding: 10px 12px; background: #ffd23f; color: var(--ink); border: 3px solid var(--ink); border-radius: 4px; font-weight: 800; font-size: 16px; line-height: 1.35; }
 .board { display: flex; flex-direction: column; gap: 8px; border-top: 2px dashed rgba(18,48,74,.3); padding-top: 10px; }
 .board-title { font-family: var(--font-pixel); font-size: 12px; margin: 0; }
 :root[lang="he"] .board-title { font-family: var(--font-body); font-weight: 800; font-size: 17px; }
@@ -222,6 +223,7 @@ body.portrait .art { max-width: 260px; }
       <p class="eyebrow">חוף גורדון ← חוף פרישמן · Tel Aviv</p>
       <h1 data-i18n="title">Gordon Beach Run</h1>
       <p data-i18n="story">Tel Aviv, 1957. Israel's first prime minister has ditched his morning meetings and is sprinting down the shore to Frishman Beach, where the press photographers are waiting to see him stand on his head. Crabs, seagulls and jellyfish have other plans.</p>
+      <p class="challenge" id="challengeLine" hidden></p>
       <button class="go" id="startBtn" type="button" data-i18n="start">Start</button>
     </div>
   </div>
@@ -268,6 +270,7 @@ body.portrait .art { max-width: 260px; }
       <h2 id="endTitle">The jellyfish won this time</h2>
       <p id="endFact" hidden></p>
       <div class="stats" id="endStats"></div>
+      <p class="challenge" id="challengeResult" hidden></p>
       <div id="board" class="board" hidden>
         <p class="board-title" data-i18n="boardTitle">Top scores</p>
         <form id="boardForm" class="board-form" novalidate>
@@ -322,11 +325,28 @@ const CFG = window.GBR_CONFIG || {};
 const IN_CLAUDE = !!(window.claude && window.claude.use);
 const ARTIFACT_URL = "https://claude.ai/artifact/FUMR6XubrY6oMp5peZQtmg";
 const GAME_URL = IN_CLAUDE ? ARTIFACT_URL : (CFG.siteUrl || (location.origin + location.pathname));
+const CHALLENGE = (() => {
+  try {
+    const q = new URLSearchParams(location.search), sc = parseInt(q.get("s"), 10);
+    if (!(sc > 0 && sc <= 30000)) return null;
+    const n = (q.get("n") || "").replace(/[\u0000-\u001f<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 16);
+    return { score: sc, nick: n };
+  } catch (e) { return null; }
+})();
+// Score ranges that have their own preview picture on the website (c/<range>/)
+function challengeBucket(sc) { return sc < 10000 ? Math.floor(sc / 250) * 250 : Math.min(20000, Math.floor(sc / 1000) * 1000); }
+function shareUrl() {
+  if (IN_CLAUDE) return ARTIFACT_URL;
+  let nick = ""; try { nick = localStorage.getItem("gbr-nick") || ""; } catch (e) {}
+  return GAME_URL + "c/" + challengeBucket(score) + "/?s=" + score + (nick ? "&n=" + encodeURIComponent(nick) : "");
+}
 
 /* ---------- languages ---------- */
 const I18N = {
   en: {
     rotate: "Tip: turn your phone sideways for a bigger screen", title: "Gordon Beach Run",
+    chalWithName: (n, s) => n + "'s score: " + s + ". Can you beat it?", chalNoName: (s) => "Score to beat: " + s + ". Can you beat it?",
+    chalWon: (n, s) => "You beat " + (n || "your friend") + "'s " + s + "!", chalLost: (n, s) => (n ? n + "'s " : "The ") + s + " still stands. Try again!",
     story: "Tel Aviv, 1957. Israel's first prime minister has ditched his morning meetings and is sprinting down the shore to Frishman Beach, where the press photographers are waiting to see him stand on his head. Crabs, seagulls and jellyfish have other plans.",
     start: "Start", howto: "How to play", gotit: "Got it", paused: "Paused", resume: "Resume", restart: "Restart level",
     back: "Back to the beach", realCap: "The real statue · Frishman Beach", again: "Play again", savePhoto: "Save animated GIF", shareGif: "Share animated GIF",
@@ -352,6 +372,8 @@ const I18N = {
   },
   he: {
     rotate: "טיפ: סובבו את הטלפון לרוחב למסך גדול יותר", title: "ריצה בחוף גורדון",
+    chalWithName: (n, s) => "הניקוד של " + n + ": " + s + ". תצליחו לעקוף?", chalNoName: (s) => "הניקוד לעקוף: " + s + ". תצליחו?",
+    chalWon: (n, s) => "עקפתם את " + (n ? "הניקוד של " + n : "הניקוד") + " (" + s + ")!", chalLost: (n, s) => (n ? "הניקוד של " + n : "הניקוד") + " (" + s + ") עדיין מוביל. נסו שוב!",
     story: "תל אביב, 1957. ראש הממשלה הראשון של ישראל ברח מישיבות הבוקר ורץ לאורך החוף אל חוף פרישמן, שם מחכים הצלמים לראות אותו עומד על הראש. לסרטנים, לשחפים ולמדוזות יש תוכניות אחרות.",
     start: "התחילו", howto: "איך משחקים", gotit: "הבנתי", paused: "המשחק בהפסקה", resume: "המשיכו", restart: "התחילו מחדש",
     back: "חזרה לחוף", realCap: "הפסל האמיתי · חוף פרישמן", again: "שחקו שוב", savePhoto: "שמירת GIF מונפש", shareGif: "שתפו GIF מונפש",
@@ -909,10 +931,13 @@ function renderEnd() {
   document.querySelector(".fig-game figcaption").textContent = won && finaleGold ? t.goldRun : t.yourRun;
   document.getElementById("endStats").innerHTML =
     t.score + " " + String(score).padStart(6, "0") + " · " + t.best + " " + String(best).padStart(6, "0") + "<br>₪" + shekels + (won && finaleGold ? " · " + t.golden : "");
-  const msg = t.shareMsg(String(score).padStart(6, "0")) + " " + GAME_URL;
+  const msg = t.shareMsg(String(score).padStart(6, "0")) + " " + shareUrl();
+  const cr = document.getElementById("challengeResult");
+  cr.hidden = !CHALLENGE;
+  if (CHALLENGE) cr.textContent = score > CHALLENGE.score ? t.chalWon(CHALLENGE.nick, CHALLENGE.score) : t.chalLost(CHALLENGE.nick, CHALLENGE.score);
   document.getElementById("shareRow").hidden = !won;
   document.getElementById("waLink").href = "https://wa.me/?text=" + encodeURIComponent(msg);
-  document.getElementById("fbLink").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(GAME_URL);
+  document.getElementById("fbLink").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(shareUrl());
   document.getElementById("copyField").value = msg;
   shareBtn.textContent = IN_CLAUDE ? t.savePhoto : t.shareGif;
   const ep = document.getElementById("endPages"); ep.innerHTML = "";
@@ -1550,6 +1575,9 @@ function applyLang() {
   const dl = document.getElementById("helpLegend"); dl.innerHTML = "";
   for (const [k, v] of t.legend) { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd); }
   document.getElementById("lang").textContent = t.langBtn;
+  const cl = document.getElementById("challengeLine");
+  cl.hidden = !CHALLENGE;
+  if (CHALLENGE) cl.textContent = CHALLENGE.nick ? t.chalWithName(CHALLENGE.nick, CHALLENGE.score) : t.chalNoName(CHALLENGE.score);
   soundBtn.textContent = t.sound[soundMode];
   if (!document.getElementById("endScreen").hidden) renderEnd();
   if (!factScreen.hidden && curFact >= 0) {
@@ -1770,6 +1798,7 @@ document.getElementById("boardForm").addEventListener("submit", async e => {
     boardMine = { nickname: nick, score, rank };
     document.getElementById("boardForm").hidden = true;
     await loadBoard();
+    renderEnd();
   } catch (err) { boardMsg(t.boardErr); }
   finally { btn.disabled = false; }
 });
