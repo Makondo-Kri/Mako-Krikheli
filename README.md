@@ -6,8 +6,8 @@ Free retro games set on real streets and beaches, played in the phone's browser.
 
 - **Gordon Beach Run · ריצה בחוף גורדון.** Tel Aviv, 1957: help Ben-Gurion race
   from Gordon Beach to Frishman Beach.
-- **Golda's Kitchen · המטבח של גולדה.** Tel Aviv, 1970: bake Golda Meir's cake
-  for her ministers: follow the recipe, stir, and take it out of the oven at the right moment.
+- **Golda's Kitchen · המטבח של גולדה.** Tel Aviv, 1970: Golda Meir's cabinet meets
+  at her kitchen table, and you, the newest minister, have to bake her famous cake.
 
 Both are in Hebrew and English, with an animated GIF to share, a leaderboard,
 and challenge links that show the player's name and score.

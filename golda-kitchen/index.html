@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Golda's Kitchen · המטבח של גולדה</title>
-<meta name="description" content="Streets: bake Golda Meir's cake before her ministers ring the bell. A free retro game for your phone. אפו את העוגה של גולדה לפני שהשרים מצלצלים בדלת.">
+<meta name="description" content="Streets: you're the newest minister in Golda Meir's kitchen cabinet, and the cake is your job. A free retro game for your phone. אתם השר החדש במטבחון של גולדה מאיר, והעוגה היא המשימה שלכם.">
 <meta name="theme-color" content="#0c3a5a">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Streets">
 <meta property="og:title" content="Golda's Kitchen · המטבח של גולדה">
-<meta property="og:description" content="Bake Golda Meir's cake for her ministers: perfect, flat, salty or burnt? Can you beat my score? · תצליחו לעקוף אותי?">
+<meta property="og:description" content="The newest minister bakes for Golda Meir's kitchen cabinet: perfect, flat, salty or burnt? Can you beat my score? · תצליחו לעקוף אותי?">
 <meta property="og:url" content="https://makondo-kri.github.io/Mako-Krikheli/golda-kitchen/">
 <meta property="og:image" content="https://makondo-kri.github.io/Mako-Krikheli/golda-kitchen/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Pixel-art Golda Meir baking in her kitchen">
+<meta property="og:image:alt" content="Pixel-art Golda Meir and a minister in a chef's hat in her kitchen">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://makondo-kri.github.io/Mako-Krikheli/golda-kitchen/og-image.png">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -365,13 +365,13 @@ const I18N = {
     copied: "Copied! Paste it into Messenger, WhatsApp or anywhere.", copyManual: "Copy the text below and paste it anywhere.",
     jumpBtn: "JUMP", walkLbl: "swipe anywhere or use the arrows", jumpLbl: "jump", langBtn: "עב",
     sound: ["SOUND ON", "MUSIC OFF", "SOUND OFF"],
-    story: "Tel Aviv, 1970. Prime Minister Golda Meir's ministers, and even David Ben-Gurion, are coming over tonight, and there's no cake yet. Read the recipe, pick the right ingredients, stir, and bake it just right before they ring the bell.",
-    shareMsg: (sc, st, title) => "I baked in Golda's kitchen: " + title + " " + st + " Score " + sc + ". Can you bake a better one?",
+    story: "Tel Aviv, 1970. Prime Minister Golda Meir runs the country from her kitchen table, and tonight the cabinet meets there, with David Ben-Gurion as a guest. You're the newest minister, and Golda has given you a job: bake her famous cake before the meeting starts.",
+    shareMsg: (sc, st, title) => "I baked for Golda's kitchen cabinet: " + title + " " + st + " Score " + sc + ". Can you bake a better one?",
     legend: [["Ingredients", "Tap them on the shelf to drop them in the bowl. Follow the recipe card: the right things, the right amounts"],
       ["Careful", "Salt is not sugar, and the fish from the shuk does not go in a cake"], ["Oops", "EMPTY tips the bowl out so you can start again"],
       ["Stir", "Drag your finger in circles around the bowl until the bar is green. Not too little, not too much"],
       ["Oven", "Set the temperature from the recipe and press BAKE. Take the cake out when it's golden: too early is raw, too late is burnt"],
-      ["Clock", "The ministers ring the bell in 90 seconds. Time left is bonus"], ["Score", "Up to 5 stars. A perfect cake gets a golden photo"]],
+      ["Clock", "The meeting starts in 90 seconds. Time left is bonus"], ["Score", "Up to 5 stars. A perfect cake gets a golden photo"]],
     ingName: { egg: "EGGS", flour: "FLOUR", sugar: "SUGAR", salt: "SALT", butter: "BUTTER", milk: "MILK", lemon: "LEMON", chocolate: "CHOCOLATE", honey: "HONEY", cinnamon: "CINNAMON", onion: "ONION", fish: "FISH" },
     recipe: { lemon: "lemon cake", choc: "chocolate cake", honey: "honey cake" },
     recipeTitle: { lemon: "LEMON CAKE", choc: "CHOCOLATE CAKE", honey: "HONEY CAKE" },
@@ -394,16 +394,16 @@ const I18N = {
       sweetHigh: { title: "Way too sweet", desc: "Too much sugar. The ministers' teeth hurt." },
     },
     good: {
-      5: { title: n => "A perfect " + n + "!", desc: "Golden, tall and just like the recipe. The ministers want the recipe." },
+      5: { title: n => "A perfect " + n + "!", desc: "Golden, tall and exactly like Golda's recipe. Even the Prime Minister is impressed." },
       4: { title: n => "A very good " + n, desc: "Almost perfect. Nobody leaves a crumb." },
       3: { title: n => "A nice " + n, desc: "Not quite the recipe, but the ministers are happy." },
       2: { title: n => "A " + n + ", more or less", desc: "Some of the amounts were off. The ministers are polite about it." },
     },
     react: { 1: "*cough* We already ate.", 2: "Um... is there coffee?", 3: "Not bad, Golda!", 4: "Delicious! Another slice?", 5: "Golda, give us the recipe!" },
     wow: "WOW!",
-    overDesc: "The doorbell rang before the cake made it out of the oven. Next time, faster!",
+    overDesc: "The meeting started before the cake made it out of the oven. Next time, faster!",
     apronSub: "saves you from one hit", scarfSub: "whacks cats and pigeons", glowSub: "10 seconds: enemies turn to shekels", allIngSub: "the cake will be perfect",
-    winEyebrow: "The kitchen cabinet · 1969–1974", winTitle: "Golda served the cake!", overEyebrow: "Ding dong!", overTitle: "The ministers are here, and there's no cake!",
+    winEyebrow: "The kitchen cabinet · 1969–1974", winTitle: "Golda served the cake!", overEyebrow: "Ding dong!", overTitle: "The meeting started, and there's no cake!",
     yourRun: "Your cake", goldRun: "Your golden cake", read: "Read", factCap: "A page of her story",
     score: "SCORE", best: "BEST", golden: "GOLDEN FINISH", perfect: "PERFECT CAKE",
     saved: "Saved! Send the GIF in WhatsApp and challenge your friends.", making: "Making your GIF…", busy: "One moment, then try again.", noSave: "Saving isn't available here.",
@@ -422,13 +422,13 @@ const I18N = {
     copied: "הועתק! הדביקו במסנג׳ר, בוואטסאפ או בכל מקום.", copyManual: "העתיקו את הטקסט למטה והדביקו בכל מקום.",
     jumpBtn: "קפיצה", walkLbl: "החליקו על המסך או השתמשו בחצים", jumpLbl: "קפיצה", langBtn: "EN",
     sound: ["צליל: פועל", "מוזיקה: כבויה", "צליל: כבוי"],
-    story: "תל אביב, 1970. השרים של ראש הממשלה גולדה מאיר, ואפילו דוד בן־גוריון, מגיעים הערב, ועוד אין עוגה. קראו את המתכון, בחרו את המצרכים הנכונים, ערבבו ואפו בדיוק כמו שצריך, לפני שהם מצלצלים בדלת.",
-    shareMsg: (sc, st, title) => "אפיתי במטבח של גולדה: " + title + " " + st + " ניקוד " + sc + ". תצליחו לאפות טובה יותר?",
+    story: "תל אביב, 1970. ראש הממשלה גולדה מאיר מנהלת את המדינה משולחן המטבח שלה, והערב הממשלה נפגשת שם, עם דוד בן־גוריון כאורח. אתם השר החדש, וגולדה נתנה לכם משימה: לאפות את העוגה המפורסמת שלה לפני שהישיבה מתחילה.",
+    shareMsg: (sc, st, title) => "אפיתי לישיבת המטבחון של גולדה: " + title + " " + st + " ניקוד " + sc + ". תצליחו לאפות טובה יותר?",
     legend: [["מצרכים", "הקישו עליהם במדף כדי להכניס לקערה. עקבו אחרי כרטיס המתכון: המצרכים הנכונים, בכמויות הנכונות"],
       ["זהירות", "מלח זה לא סוכר, והדג מהשוק לא נכנס לעוגה"], ["אופס", "לרוקן שופך את הקערה ומתחילים מחדש"],
       ["ערבוב", "גררו את האצבע בעיגולים סביב הקערה עד שהפס ירוק. לא מעט מדי ולא יותר מדי"],
       ["תנור", "קבעו את החום מהמתכון ולחצו לאפות. הוציאו את העוגה כשהיא זהובה: מוקדם מדי היא לא אפויה, מאוחר מדי היא שרופה"],
-      ["שעון", "השרים מצלצלים בדלת בעוד 90 שניות. הזמן שנשאר = בונוס"], ["ניקוד", "עד 5 כוכבים. עוגה מושלמת מקבלת תמונה זהובה"]],
+      ["שעון", "הישיבה מתחילה בעוד 90 שניות. הזמן שנשאר = בונוס"], ["ניקוד", "עד 5 כוכבים. עוגה מושלמת מקבלת תמונה זהובה"]],
     ingName: { egg: "ביצים", flour: "קמח", sugar: "סוכר", salt: "מלח", butter: "חמאה", milk: "חלב", lemon: "לימון", chocolate: "שוקולד", honey: "דבש", cinnamon: "קינמון", onion: "בצל", fish: "דג" },
     recipe: { lemon: "עוגת לימון", choc: "עוגת שוקולד", honey: "עוגת דבש" },
     recipeTitle: { lemon: "עוגת לימון", choc: "עוגת שוקולד", honey: "עוגת דבש" },
@@ -451,16 +451,16 @@ const I18N = {
       sweetHigh: { title: "מתוקה מדי", desc: "יותר מדי סוכר. לשרים כואבות השיניים." },
     },
     good: {
-      5: { title: n => n + " מושלמת!", desc: "זהובה, גבוהה ובדיוק לפי המתכון. השרים רוצים את המתכון." },
+      5: { title: n => n + " מושלמת!", desc: "זהובה, גבוהה ובדיוק לפי המתכון של גולדה. אפילו ראש הממשלה מתרשמת." },
       4: { title: n => n + " טובה מאוד", desc: "כמעט מושלמת. לא נשאר אפילו פירור." },
       3: { title: n => n + " נחמדה", desc: "לא בדיוק לפי המתכון, אבל השרים מרוצים." },
       2: { title: n => n + ", פחות או יותר", desc: "חלק מהכמויות לא היו מדויקות. השרים מנומסים." },
     },
     react: { 1: "*השתעלות* כבר אכלנו.", 2: "אה... יש קפה?", 3: "לא רע, גולדה!", 4: "טעים! עוד פרוסה?", 5: "גולדה, תני לנו את המתכון!" },
     wow: "וואו!",
-    overDesc: "הפעמון צלצל לפני שהעוגה יצאה מהתנור. בפעם הבאה, מהר יותר!",
+    overDesc: "הישיבה התחילה לפני שהעוגה יצאה מהתנור. בפעם הבאה, מהר יותר!",
     apronSub: "מגן מפגיעה אחת", scarfSub: "מעיף חתולים ויונים", glowSub: "10 שניות: אויבים הופכים לשקלים", allIngSub: "העוגה תהיה מושלמת",
-    winEyebrow: "המטבחון · 1969–1974", winTitle: "גולדה הגישה את העוגה!", overEyebrow: "דינג דונג!", overTitle: "השרים הגיעו, ואין עוגה!",
+    winEyebrow: "המטבחון · 1969–1974", winTitle: "גולדה הגישה את העוגה!", overEyebrow: "דינג דונג!", overTitle: "הישיבה התחילה, ואין עוגה!",
     yourRun: "העוגה שלך", goldRun: "העוגה הזהובה שלך", read: "קראו", factCap: "דף מהסיפור שלה",
     score: "ניקוד", best: "שיא", golden: "סיום זהוב", perfect: "עוגה מושלמת",
     saved: "נשמר! שלחו את ה־GIF בוואטסאפ ואתגרו את החברים.", making: "מכינים את ה־GIF…", busy: "רגע אחד ונסו שוב.", noSave: "אי אפשר לשמור כאן.",
@@ -1000,6 +1000,35 @@ function drawGuest(x, by, i, mood, wow) {
   R("#ffffff", -2, -3, 4, 3); R("#d9d4c8", 2, -2, 1, 1); R("#6b4422", -1, -3, 2, 1);
   ctx.restore();
 }
+// The newest minister: suit, tie, apron and a chef's hat (side view, same frame as Golda's sprite)
+function drawMinisterSprite(x, y, o) {
+  ctx.save(); ctx.translate(x + 6, y); if (o.face < 0) ctx.scale(-1, 1);
+  const f = Math.floor(o.anim || 0) % 4, sw = [0, 1, 0, -1][f];
+  const SK = "#e8b48e", SKD = "#c58f6a", SU = "#3b3f4a", SUD = "#2a2d36", HA = "#2a2a2a";
+  R(SU, -4 + sw, 17, 3, 5); R(SU, 1 - sw, 17, 3, 5); R("#111111", -4 + sw, 22, 4, 2); R("#111111", 1 - sw, 22, 4, 2);
+  R(SUD, -6 - sw, 11, 2, 5); R(SKD, -6 - sw, 16, 2, 2);
+  R(SU, -5, 10, 10, 8); R(SUD, -5, 17, 10, 1);
+  R("#ffffff", -3, 12, 7, 8); R("#e6e6e6", -3, 19, 7, 1); R("#ffffff", -2, 10, 1, 2); R("#ffffff", 2, 10, 1, 2);
+  R("#ffffff", -1, 9, 3, 1); R("#a83232", 0, 10, 1, 2);
+  if (o.armFwd) { R(SU, 4, 11, 4, 2); R(SK, 8, 11, 2, 2); } else { R(SU, 4 + sw, 11, 2, 5); R(SK, 4 + sw, 16, 2, 2); }
+  R(SK, -1, 8, 3, 2); R(SK, -4, 1, 8, 8); R(SK, 4, 4, 2, 3);
+  R(HA, -4, 0, 8, 2); R(HA, -4, 2, 2, 3); R("#222222", 2, 4, 1, 1); R("#3a2a1a", 2, 7, 3, 1); R(SKD, 5, 6, 1, 1);
+  if (o.hat !== false) { R("#ffffff", -4, -4, 8, 4); R("#ffffff", -5, -7, 10, 4); R("#e6e6e6", -4, -1, 8, 1); }
+  ctx.restore();
+}
+function chefBig(x, y, face, o = {}) { ctx.save(); ctx.translate(x, y); ctx.scale(2, 2); drawMinisterSprite(0, 0, { face, ...o }); ctx.restore(); }
+// Golda at the head of the table, with her papers
+function drawGoldaSeated(x, by, wow) {
+  const SK = "#e8b48e", HR = "#a7adb4", HRL = "#cfd4d8", HRD = "#7f868e", DR = "#2b3350";
+  ctx.save(); ctx.translate(x, by + Math.round(Math.sin(frame * 0.08 + 2) * 0.6));
+  R(DR, -7, -8, 14, 8); R("#f2efe6", -2, -8, 4, 1); R("#f2efe6", -1, -7, 2, 1);
+  R(SK, -3, -16, 6, 8); R(SK, -1, -8, 2, 1);
+  R(HR, -4, -17, 8, 3); R(HRL, -2, -17, 4, 1); R(HR, -4, -15, 1, 4); R(HR, 3, -15, 1, 4); R(HR, -2, -19, 4, 2); R(HRD, -2, -18, 4, 1);
+  R("#222222", -2, -12, 1, 1); R("#222222", 1, -12, 1, 1);
+  if (wow) R("#5a2a2a", -1, -10, 2, 2); else R("#8a3a2a", -1, -10, 2, 1);
+  R("#ffffff", -6, -3, 6, 3); R("#b9b2a2", -5, -2, 4, 1); R("#ffffff", 2, -3, 4, 3); R("#6b4422", 3, -3, 2, 1);
+  ctx.restore();
+}
 function goldaBig(x, y, face, o = {}) { ctx.save(); ctx.translate(x, y); ctx.scale(2, 2); drawHeroSprite(0, 0, { face, anim: 0, ...o }); ctx.restore(); }
 function drawWall(tileY) {
   R("#f3ead7", 0, 0, VW, VH);
@@ -1072,7 +1101,7 @@ function drawAdd() {
     txt(t.ingName[k], c.x + 27, c.y + 23, 4, INK, "center");
     btns.push({ id: "ing:" + k, x: c.x, y: c.y, w: 54, h: 32, on: true });
   });
-  goldaBig(ox + 8, 122, 1, { armFwd: true });
+  chefBig(ox + 8, 134, 1, { armFwd: true });
   R("#c48a52", 0, 166, VW, 3); R("#b07a48", 0, 169, VW, 3); R("#8a5a34", 0, 172, VW, 68);
   for (let x = 0; x < VW; x += 40) R("#7a4c2a", x, 172, 1, 68);
   drawBowlSmall(ox + 118, 151);
@@ -1112,7 +1141,7 @@ function drawMix() {
   const sx = cx + Math.cos(spoonA) * 34, sy = cy + 1 + Math.sin(spoonA) * 8;
   ctx.strokeStyle = "#8a5a34"; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + 14, sy - 62); ctx.stroke();
   ctx.strokeStyle = "#c48a52"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx, sy - 2); ctx.lineTo(sx + 13, sy - 60); ctx.stroke();
-  goldaBig(ox + 4, 104, 1, { armFwd: true });
+  chefBig(ox + 4, 104, 1, { armFwd: true });
   // how well it's mixed
   const mx = ox + 232, my = 44, mh = 120, vy = v => my + mh - Math.round(clamp(v / 1.8, 0, 1) * mh);
   R(INK, mx - 2, my - 2, 18, mh + 4); R("#e2483a", mx, my, 14, mh);
@@ -1155,7 +1184,8 @@ function drawOven() {
   txt(t.recipeTitle[rec.id], x2 + 41, 30, 4, "#b0461f", "center");
   txt(rec.temp + "°", x2 + 41, 39, 9, INK, "center", true);
   txt(t.untilGolden, x2 + 41, 53, 4, INK, "center");
-  goldaBig(x2 + 30, 120, -1, { armFwd: baking });
+  txt("G.M.", x2 + 74, 58, 3, "#2f74c0", "right", true);
+  chefBig(x2 + 30, 120, -1, { armFwd: baking });
   R("#c48a52", x2 - 2, 164, VW - x2 + 2, 3); R("#8a5a34", x2 - 2, 167, VW - x2 + 2, 45); R("#7a4c2a", x2 + 42, 167, 1, 45);
   if (!baking) button("bake", x2, 176, 86, 30, t.btnBake, "#ff6a3d", true, 7);
   else button("out", x2, 176, 86, 30, t.btnOut, (frame >> 3) % 2 && cr > 0.9 ? "#e2483a" : "#c0392b", true, 7);
@@ -1188,18 +1218,18 @@ function drawResult() {
   const ox = OX(), t = L(), r = lastResult, o = outcomeText(r, t);
   drawLivingRoom(ox);
   const walkIn = Math.min(1, resT / 60), gx = Math.round(ox - 46 + walkIn * 58), placed = resT >= 64;
-  const guests = [{ x: ox + 152, kind: 1 }, { x: ox + 186, bg: true }, { x: ox + 220, kind: 2 }];
+  const guests = [{ x: ox + 152, kind: 1 }, { x: ox + 186, golda: true }, { x: ox + 220, bg: true }];
   guests.forEach((g, i) => {
     const wow = resT >= 84 + i * 12;
     ctx.save(); ctx.translate(g.x, 183); ctx.scale(2, 2);
-    if (g.bg) drawBenGurion(0, 0, wow); else drawGuest(0, 0, g.kind, 5, wow);
+    if (g.bg) drawBenGurion(0, 0, wow); else if (g.golda) drawGoldaSeated(0, 0, wow); else drawGuest(0, 0, g.kind, 5, wow);
     ctx.restore();
   });
   // the table
   R("#ffffff", ox + 64, 182, 192, 4); R("#f4f0e6", ox + 64, 186, 192, 14); R("#5b9ad8", ox + 64, 194, 192, 1);
   R("#6b4422", ox + 72, 200, 4, 16); R("#6b4422", ox + 244, 200, 4, 16);
   if (placed) { ctx.save(); ctx.translate(ox + 106, 183); ctx.scale(2, 2); drawCake(0, 0, r.cake); ctx.restore(); }
-  goldaBig(gx, 168, 1, { armFwd: true, anim: walkIn < 1 ? resT * 0.2 : 0 });
+  chefBig(gx, 168, 1, { armFwd: true, anim: walkIn < 1 ? resT * 0.2 : 0 });
   if (!placed) { R("#9aa3ab", gx + 26, 190, 66, 2); ctx.save(); ctx.translate(gx + 60, 191); ctx.scale(2, 2); drawCake(0, 0, r.cake); ctx.restore(); }
   guests.forEach((g, i) => {
     if (resT < 84 + i * 12) return;
@@ -1289,8 +1319,8 @@ const FACTS = [
             he: "ב־1969 הייתה גולדה לראש הממשלה הרביעית של ישראל, האישה הראשונה בתפקיד ורק האישה השלישית בעולם שעמדה בראש ממשלה. היא כיהנה עד 1974." } },
 ];
 const PHOTO_FACT = {
-  en: "As prime minister, Golda often met her closest ministers around her kitchen table, with coffee and something sweet. Israelis called this informal group \"Golda's kitchen\". In our game, you bake the cake.",
-  he: "כראש הממשלה נהגה גולדה להיפגש עם השרים הקרובים אליה סביב שולחן המטבח שלה, עם קפה ומשהו מתוק. הקבוצה הלא רשמית הזאת נקראה \"המטבחון של גולדה\". במשחק שלנו, אתם אופים את העוגה." };
+  en: "As prime minister, Golda often met her closest ministers around her kitchen table, with coffee and something sweet. Israelis called this informal group \"Golda's kitchen\". In our game, Golda chairs the meeting and you, the newest minister, bake the cake.",
+  he: "כראש הממשלה נהגה גולדה להיפגש עם השרים הקרובים אליה סביב שולחן המטבח שלה, עם קפה ומשהו מתוק. הקבוצה הלא רשמית הזאת נקראה \"המטבחון של גולדה\". במשחק שלנו גולדה מנהלת את הישיבה, ואתם, השר החדש, אופים את העוגה." };
 
 const factScreen = document.getElementById("factScreen"), readToast = document.getElementById("readToast");
 let factArtKind = "stand", toastFact = -1, toastTimer = null;
@@ -1387,7 +1417,8 @@ function drawArt(c, kind) {
   const serve = kind === "hs" || kind === "photo";
   if (!serve) {
     R("#c48a52", 0, 40, W, 2); R("#8a5a34", 0, 42, W, 18); for (let x = 0; x < W; x += 20) R("#7a4c2a", x, 42, 1, 18);
-    drawHeroSprite(36, 16, { face: 1, anim: 0, armFwd: true });
+    drawHeroSprite(30, 16, { face: 1, anim: 0, armFwd: (frame >> 4) % 2 === 0 });
+    drawMinisterSprite(56, 16, { face: -1, armFwd: true });
     const a = frame * 0.15;
     R("#8a5a34", 66 + Math.round(Math.cos(a) * 5), 22, 2, 12);
     R("#cdd8de", 54, 32, 26, 2); R(BATTER.lemon, 56, 32, 22, 1);
@@ -1397,10 +1428,10 @@ function drawArt(c, kind) {
     R("#e6d3a8", 0, 0, W, H); for (let x = 0; x < W; x += 6) R("#dcc594", x, 0, 1, H);
     R("#6b4422", 8, 6, 22, 16); R("#9fd6ee", 10, 8, 18, 12); R("#d9b56a", 10, 15, 18, 5); R("#fff6c8", 22, 9, 3, 3);
     R("#6b4422", 98, 4, 20, 34); for (let k = 0; k < 6; k++) R(["#b0461f", "#2f74c0", "#e8b923", "#2f8a4a"][k % 4], 100 + k * 3, 8, 2, 8); R("#4f3219", 99, 17, 18, 1);
-    drawBenGurion(84, 41, true); drawGuest(102, 41, 2, 5, true); drawGuest(68 + 48, 41, 1, 5, true);
+    drawGuest(84, 41, 1, 5, true); drawGoldaSeated(99, 41, true); drawBenGurion(113, 41, true);
     R("#ffffff", 40, 40, W - 40, 2); R("#f4f0e6", 40, 42, W - 40, 8); R("#5b9ad8", 40, 46, W - 40, 1);
     R("#a8743f", 0, 50, W, 10); R("#93622f", 0, 54, W, 1);
-    drawHeroSprite(22, 26, { face: 1, anim: 0, armFwd: true });
+    drawMinisterSprite(22, 26, { face: 1, armFwd: true });
     drawCake(58, 41, lastCake || PERFECT_CAKE);
   }
   if (kind === "photo") {
