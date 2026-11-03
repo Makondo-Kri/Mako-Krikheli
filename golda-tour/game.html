@@ -1,0 +1,1443 @@
+<title>Golda's Kitchen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;600;800&display=swap">
+<style>
+/* Layout: the game fills the screen edge to edge; left half of the screen moves, right half jumps */
+:root {
+  --sea: #0c3a5a;
+  --sea-deep: #072538;
+  --sand: #f6e3bb;
+  --ink: #12304a;
+  --coral: #ff6a3d;
+  --foam: #ffffff;
+  --font-pixel: "Press Start 2P", ui-monospace, monospace;
+  --font-body: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+html { overscroll-behavior: none; }
+body {
+  margin: 0; overflow: hidden; position: relative;
+  background: radial-gradient(120% 80% at 50% 0%, var(--sea), var(--sea-deep));
+  color: var(--foam);
+  font-family: var(--font-body);
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+#stage {
+  position: relative; box-sizing: border-box; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+body.portrait #stage { align-items: center; padding-top: 58px; }
+#game { touch-action: none; }
+#endFact { white-space: pre-line; }
+#game { display: block; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: none; }
+body.portrait #game { border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,.45); }
+/* Whole-screen touch layer under the menus */
+#touch { position: fixed; inset: 0; z-index: 3; touch-action: none; }
+/* Overlay screens */
+.screen {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: rgba(7, 37, 56, .6);
+  z-index: 7; box-sizing: border-box;
+}
+.card {
+  background: var(--sand); color: var(--ink);
+  border: 3px solid var(--ink); border-radius: 4px;
+  box-shadow: 6px 6px 0 var(--ink);
+  padding: 18px 20px; max-width: 26rem; width: 100%;
+  max-height: 100%; overflow: auto; box-sizing: border-box; touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column; gap: 14px; text-align: start;
+}
+.col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; color: #b0461f; margin: 0; }
+.card h1, .card h2 {
+  font-family: var(--font-pixel); font-weight: 400; margin: 0;
+  font-size: clamp(16px, 4.6vw, 22px); line-height: 1.35; text-wrap: balance;
+}
+.card p { margin: 0; font-size: 15px; line-height: 1.45; }
+.legend { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 14px; margin: 0; }
+.legend dt { font-weight: 800; }
+.legend dd { margin: 0; }
+.stats { font-family: var(--font-pixel); font-size: 11px; line-height: 2; font-variant-numeric: tabular-nums; }
+.go {
+  font-family: var(--font-pixel); font-size: 15px;
+  background: var(--coral); color: var(--foam);
+  border: 3px solid var(--ink); border-radius: 4px; box-shadow: 4px 4px 0 var(--ink);
+  padding: 16px; min-height: 54px; cursor: pointer; align-self: stretch; touch-action: manipulation;
+}
+.go.alt { background: var(--foam); color: var(--ink); }
+.go:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--ink); }
+.go:focus-visible { outline: 3px solid var(--foam); outline-offset: 2px; }
+.hint { font-size: 13px; opacity: .85; }
+:root[lang="he"] .card h1, :root[lang="he"] .card h2, :root[lang="he"] .go, :root[lang="he"] .stats,
+:root[lang="he"] .topbtn, :root[lang="he"] .year, :root[lang="he"] #jumpBtn { font-family: var(--font-body); font-weight: 800; letter-spacing: 0; }
+:root[lang="he"] .card h1 { font-size: clamp(22px, 6vw, 30px); }
+:root[lang="he"] .card h2 { font-size: clamp(20px, 5.4vw, 26px); }
+:root[lang="he"] .stats { font-size: 15px; line-height: 1.6; }
+#lang { font-family: var(--font-body); font-weight: 800; font-size: 14px; }
+.art { display: block; width: 100%; max-width: 340px; aspect-ratio: 2 / 1; image-rendering: pixelated; border: 3px solid var(--ink); border-radius: 2px; background: #9fdcf5; align-self: center; }
+.caption { font-size: 12px; opacity: .8; text-align: center; margin: 0; }
+.art.gold { border-color: #e8b923; box-shadow: 0 0 0 3px #f6d55c; }
+.photos { display: flex; gap: 10px; align-items: flex-end; justify-content: center; }
+.photos figure { margin: 0; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fig-game { flex: 1.7; }
+.fig-real { flex: 1; }
+.real { display: block; width: 100%; max-height: 200px; aspect-ratio: 2 / 3; object-fit: cover; border: 3px solid var(--ink); border-radius: 2px; }
+@media (max-height: 520px) and (orientation: landscape) { .real { max-height: 150px; } }
+.year { font-family: var(--font-pixel); font-size: 10px; color: #b0461f; margin: 0; }
+.dots { display: flex; gap: 6px; }
+.dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(18,48,74,.25); }
+.dots span.on { background: var(--ink); }
+.row { display: flex; gap: 10px; align-items: stretch; }
+.row .go { flex: 1; }
+.go.small { font-size: 11px; padding: 12px; min-height: 46px; }
+.streets-link { align-self: flex-start; font-family: var(--font-pixel); font-size: 10px; letter-spacing: .12em; color: var(--sand); background: var(--ink); padding: 7px 10px; border-radius: 3px; text-decoration: none; }
+.streets-link::before { content: "← "; }
+:root[lang="he"] .streets-link::before { content: "→ "; }
+.challenge { margin: 0; padding: 10px 12px; background: #ffd23f; color: var(--ink); border: 3px solid var(--ink); border-radius: 4px; font-weight: 800; font-size: 16px; line-height: 1.35; }
+.board { display: flex; flex-direction: column; gap: 8px; border-top: 2px dashed rgba(18,48,74,.3); padding-top: 10px; }
+.board-title { font-family: var(--font-pixel); font-size: 12px; margin: 0; }
+:root[lang="he"] .board-title { font-family: var(--font-body); font-weight: 800; font-size: 17px; }
+.board-form { display: flex; flex-direction: column; gap: 6px; margin: 0; }
+.board-form .row { align-items: stretch; }
+#nick { flex: 2; min-width: 0; font: 16px var(--font-body); padding: 10px; border: 3px solid var(--ink); border-radius: 4px; background: #fffaf0; color: var(--ink); -webkit-user-select: text; user-select: text; }
+#nick:focus-visible { outline: 3px solid var(--coral); outline-offset: 1px; }
+.board-form .go { flex: 1; }
+.board-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 15px; font-variant-numeric: tabular-nums; }
+.board-list li { display: flex; justify-content: space-between; gap: 10px; }
+.board-list li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.board-list li.me { font-weight: 800; color: #b0461f; }
+a.go { display: flex; align-items: center; justify-content: center; text-decoration: none; box-sizing: border-box; }
+.go.wa { background: #25d366; color: #0b3d1f; }
+.go.fb { background: #1877f2; color: #ffffff; }
+.share-row { display: flex; flex-direction: column; gap: 6px; }
+.share-row .row .go { flex: 1 1 40%; }
+.copy-field { width: 100%; box-sizing: border-box; font: 13px var(--font-body); padding: 8px; border: 2px solid var(--ink); border-radius: 4px; background: #fffaf0; color: var(--ink); user-select: text; -webkit-user-select: text; }
+/* Short landscape phones: two columns so the Start button is always on screen */
+@media (max-height: 520px) and (orientation: landscape) {
+  .card { flex-direction: row; max-width: 46rem; align-items: stretch; padding: 14px 18px; }
+  .card .col { flex: 1; }
+  .card h1, .card h2 { font-size: 17px; }
+  .card p { font-size: 14px; }
+  .legend { font-size: 13px; }
+  .card { gap: 18px; }
+  .card .col { gap: 8px; }
+  .card p { line-height: 1.4; }
+  .art { max-width: 300px; }
+}
+/* Touch control visuals (the touch layer does the work; these just show where to press) */
+#controls {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 4;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 max(20px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
+  pointer-events: none;
+}
+#dpad { display: flex; gap: 12px; }
+#dpad.cross { display: grid; grid-template-columns: repeat(3, 54px); grid-template-rows: repeat(3, 54px); gap: 2px; }
+#dpad.cross .btn { width: 54px; height: 54px; font-size: 16px; border-radius: 12px; }
+#bU { grid-area: 1 / 2; } #bL { grid-area: 2 / 1; } #bR { grid-area: 2 / 3; } #bD { grid-area: 3 / 2; }
+body.portrait #dpad.cross { grid-template-columns: repeat(3, 66px); grid-template-rows: repeat(3, 66px); }
+body.portrait #dpad.cross .btn { width: 66px; height: 66px; font-size: 20px; }
+body.portrait #controls { justify-content: center; }
+.btn {
+  width: 70px; height: 70px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.16); border: 3px solid rgba(255,255,255,.45);
+  color: var(--foam); font-family: var(--font-pixel); font-size: 18px;
+  box-sizing: border-box; transition: transform .06s;
+}
+.btn.on { background: rgba(255,106,61,.7); border-color: var(--foam); transform: scale(.92); }
+#jumpBtn { width: 84px; height: 84px; font-size: 10px; background: rgba(255,106,61,.35); }
+#rpad { display: flex; gap: 12px; align-items: flex-end; }
+#controls, #topbar, .zone-label { transition: opacity .3s; }
+/* the top buttons stay tappable above every card; cards start below them */
+#topbar { z-index: 10; }
+.screen { padding-top: calc(env(safe-area-inset-top, 0px) + 62px); }
+body.shooting #controls, body.shooting #topbar, body.shooting .zone-label { opacity: 0; pointer-events: none; }
+#readToast {
+  position: fixed; z-index: 6; left: 50%; transform: translateX(-50%);
+  top: calc(env(safe-area-inset-top, 0px) + 62px);
+  font-family: var(--font-body); font-weight: 800; font-size: 14px;
+  background: #f3e2b3; color: var(--ink); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 3px 3px 0 var(--ink);
+  padding: 10px 14px; min-height: 44px; cursor: pointer; touch-action: manipulation; white-space: nowrap;
+}
+#jumpBtn.on { background: rgba(255,106,61,.85); }
+body.portrait .btn:not(#dpad .btn) { width: 88px; height: 88px; font-size: 22px; }
+body.portrait #jumpBtn { width: 110px; height: 110px; font-size: 12px; }
+body.portrait #rpad { flex-direction: column-reverse; align-items: flex-end; }
+body.portrait #controls { padding-bottom: max(28px, env(safe-area-inset-bottom, 0px)); }
+.zone-label { position: fixed; z-index: 4; pointer-events: none; font-size: 12px; opacity: .6; bottom: max(8px, env(safe-area-inset-bottom, 0px)); display: none; }
+body.portrait .zone-label { display: block; }
+#zl { left: 0; right: 0; text-align: center; }
+#zr { right: max(20px, env(safe-area-inset-right, 0px)); }
+#topbar { position: fixed; z-index: 10; top: calc(env(safe-area-inset-top, 0px) + 8px); right: max(10px, env(safe-area-inset-right, 0px)); display: flex; gap: 8px; }
+.topbtn {
+  min-width: 44px; height: 44px; box-sizing: border-box;
+  font-family: var(--font-pixel); font-size: 9px; color: var(--foam);
+  background: rgba(7,37,56,.55); border: 2px solid rgba(255,255,255,.5); border-radius: 6px;
+  padding: 0 10px; cursor: pointer; touch-action: manipulation;
+}
+#rotate { font-size: 13px; text-align: center; opacity: .75; margin-top: 12px; display: none; }
+body.portrait #rotate { display: block; }
+body.portrait .art { max-width: 260px; }
+@media (max-height: 520px) and (orientation: landscape) { #titleArt { max-width: 220px; } }
+@media (hover: hover) and (pointer: fine) { #controls, #touch, .zone-label { display: none !important; } }
+@media (prefers-reduced-motion: reduce) { .go:active, .btn.on { transform: none; } }
+</style>
+
+<div id="stage">
+  <div style="display:flex;flex-direction:column;align-items:center">
+    <canvas id="game" width="400" height="240" aria-label="Game screen"></canvas>
+    <div id="rotate" data-i18n="rotate">Tip: turn your phone sideways for a bigger screen</div>
+  </div>
+</div>
+
+
+<div class="screen" id="titleScreen">
+  <div class="card" style="max-width:40rem">
+    <div class="col"><canvas class="art" id="titleArt" width="480" height="240" aria-hidden="true"></canvas></div>
+    <div class="col">
+      <a class="streets-link" id="streetsLink" href="../" hidden>STREETS</a>
+      <p class="eyebrow">אמריקה · America · 1948</p>
+      <h1 data-i18n="title">Golda's $50 Million</h1>
+      <p data-i18n="story">Tel Aviv, 1970. Prime Minister Golda Meir has her ministers coming over tonight, and the cake isn't baked yet.</p>
+      <p class="challenge" id="challengeLine" hidden></p>
+      <button class="go" id="startBtn" type="button" data-i18n="start">Start</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="helpScreen" style="z-index:9" hidden>
+  <div class="card" style="max-width:22rem;flex-direction:column;gap:12px">
+    <h2 data-i18n="howto">How to play</h2>
+    <dl class="legend" id="helpLegend"></dl>
+    <button class="go small" id="helpClose" type="button" data-i18n="gotit">Got it</button>
+  </div>
+</div>
+
+<div class="screen" id="pauseScreen" hidden>
+  <div class="card" style="max-width:20rem;flex-direction:column">
+    <h2 data-i18n="paused">Paused</h2>
+    <button class="go" id="resumeBtn" type="button" data-i18n="resume">Resume</button>
+    <button class="go alt" id="restartBtn" type="button" data-i18n="restart">Restart level</button>
+  </div>
+</div>
+
+<div class="screen" id="factScreen" style="z-index:8" hidden>
+  <div class="card" style="max-width:40rem">
+    <div class="col"><canvas class="art" id="factArt" width="480" height="240" aria-hidden="true"></canvas><p class="caption" id="factCount"></p></div>
+    <div class="col">
+      <p class="year" id="factYear"></p>
+      <h2 id="factTitle"></h2>
+      <p id="factText"></p>
+      <button class="go" id="factBtn" type="button" data-i18n="back">Back to the beach</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="endScreen" hidden>
+  <div class="card" style="max-width:44rem">
+    <div class="col" id="photoWrap">
+      <div class="photos">
+        <figure class="fig-game"><canvas class="art" id="photo" width="480" height="240" aria-hidden="true"></canvas><figcaption class="caption">Your run</figcaption></figure>
+        
+      </div>
+    </div>
+    <div class="col">
+      <p class="eyebrow" id="endEyebrow">Game over</p>
+      <h2 id="endTitle">The jellyfish won this time</h2>
+      <p id="endFact" hidden></p>
+      <div class="stats" id="endStats"></div>
+      <p class="challenge" id="challengeResult" hidden></p>
+      <div id="board" class="board" hidden>
+        <p class="board-title" data-i18n="boardTitle">Top scores</p>
+        <form id="boardForm" class="board-form" novalidate>
+          <label for="nick" class="hint" data-i18n="boardAsk">Put your score on the board?</label>
+          <div class="row">
+            <input id="nick" name="nick" maxlength="16" autocomplete="nickname" enterkeyhint="send" placeholder="Nickname" data-i18n-ph="nickPh">
+            <button class="go small" type="submit" id="boardSave" data-i18n="boardSave">Add my score</button>
+          </div>
+        </form>
+        <ol id="boardList" class="board-list"></ol>
+        <p class="hint" id="boardNote" hidden></p>
+      </div>
+      <div class="row" id="endPages" style="flex-wrap:wrap"></div>
+      <div id="shareRow" class="share-row" hidden>
+        <p class="hint" data-i18n="shareLbl">Share your run:</p>
+        <div class="row" style="flex-wrap:wrap">
+          <a class="go small wa" id="waLink" target="_blank" rel="noopener" href="https://wa.me/">WhatsApp</a>
+          <a class="go small fb" id="fbLink" target="_blank" rel="noopener" href="https://www.facebook.com/">Facebook</a>
+          <button class="go alt small" id="copyBtn" type="button" data-i18n="copy">Copy link</button>
+          <button class="go alt small" id="shareBtn" type="button" hidden>Save animated GIF</button>
+        </div>
+        <input id="copyField" class="copy-field" readonly hidden aria-label="Message to copy">
+      </div>
+      <p class="hint" id="shareNote" hidden></p>
+      <button class="go" id="againBtn" type="button" data-i18n="again">Play again</button>
+    </div>
+  </div>
+</div>
+
+<button id="readToast" type="button" hidden>Page of history found · READ</button>
+<div id="topbar"><button id="lang" class="topbtn" type="button" aria-label="Language">עב</button><button id="help" class="topbtn" type="button" aria-label="How to play" style="font-size:14px">?</button><button id="pause" class="topbtn" type="button" aria-label="Pause" hidden>❚❚</button><button id="sound" class="topbtn" type="button">SOUND ON</button></div>
+
+
+<script>
+(() => {
+"use strict";
+const T = 16, ROWS = 15, LW = 212;
+let VH = 240, OY = 0; // OY: the 240-tall scene sits in the middle of a taller phone screen
+const SAND = 1, PLANK = 3, BOX = 4, USED = 5, HBOX = 6, STONE = 7;
+const GOAL_TX = 191;
+const cv = document.getElementById("game");
+let ctx = cv.getContext("2d");
+let VW = 400, S = 2;
+
+/* ---------- where the game runs ---------- */
+const CFG = window.GBR_CONFIG || {};
+const IN_CLAUDE = !!(window.claude && window.claude.use);
+const ARTIFACT_URL = "https://claude.ai/artifact/93dCK7jWHnA8iTvVmcKU4D";
+const GAME_URL = IN_CLAUDE ? ARTIFACT_URL : (location.origin + location.pathname.replace(/index\.html$/, ""));
+// On a host with the Streets picture server (Vercel), share links get a picture with the player's name and score.
+const NAME_PICTURES = !IN_CLAUDE && location.protocol === "https:" && !/github\.io$/.test(location.hostname);
+const CHALLENGE = (() => {
+  try {
+    const q = new URLSearchParams(location.search), sc = parseInt(q.get("s"), 10);
+    if (!(sc > 0 && sc <= 30000)) return null;
+    const n = (q.get("n") || "").replace(/[\u0000-\u001f<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 16);
+    return { score: sc, nick: n };
+  } catch (e) { return null; }
+})();
+// Score ranges that have their own preview picture on the website (c/<range>/)
+function challengeBucket(sc) { return sc < 10000 ? Math.floor(sc / 250) * 250 : Math.min(20000, Math.floor(sc / 1000) * 1000); }
+function shareUrl() {
+  if (IN_CLAUDE) return ARTIFACT_URL;
+  let nick = ""; try { nick = localStorage.getItem("gbr-nick") || ""; } catch (e) {}
+  const q = "?s=" + score + (nick ? "&n=" + encodeURIComponent(nick) : "");
+  if (NAME_PICTURES) return location.origin + "/api/c" + q + "&g=tour";
+  return GAME_URL + "c/" + challengeBucket(score) + "/" + q;
+}
+
+/* ---------- languages ---------- */
+const I18N = {
+  en: {
+    rotate: "Tip: turn your phone sideways for a bigger screen", title: "Golda's $50 Million",
+    chalWithName: (n, s) => n + "'s score: " + s + ". Can you beat it?", chalNoName: (s) => "Score to beat: " + s + ". Can you beat it?",
+    chalWon: (n, s) => "You beat " + (n || "your friend") + "'s " + s + "!", chalLost: (n, s) => (n ? n + "'s " : "The ") + s + " still stands. Try again!",
+    start: "Start", howto: "How to play", gotit: "Got it", paused: "Paused", resume: "Resume", restart: "Restart level",
+    back: "Back to the tour", realCap: "", again: "Play again", savePhoto: "Save animated GIF", shareGif: "Share animated GIF",
+    boardTitle: "Top scores", boardAsk: "Put your score on the board?", nickPh: "Nickname", boardSave: "Add my score",
+    boardLoading: "Loading the board…", boardEmpty: "No scores yet. Be the first!", boardErr: "Couldn't reach the board. Check your connection and try again.",
+    boardNeedNick: "Type a nickname first (up to 16 letters).", boardDone: (r) => "You're on the board at #" + r + "!", boardSaving: "Saving…", shareLbl: "Share your run:", copy: "Copy link",
+    copied: "Copied! Paste it into Messenger, WhatsApp or anywhere.", copyManual: "Copy the text below and paste it anywhere.",
+    jumpBtn: "JUMP", walkLbl: "swipe anywhere or use the arrows", jumpLbl: "jump", langBtn: "עב",
+    sound: ["SOUND ON", "MUSIC OFF", "SOUND OFF"],
+    story: "January 1948. War is coming, and the Jewish community in the Land of Israel has no money for weapons. Golda Meir flies to America almost empty-handed to ask for $25 million. Plan her tour, win over every hall, and beat the calendar.",
+    shareMsg: (m, sc) => "I raised " + m + " for the new state with Golda in 1948! Score " + sc + ". Can you raise more?",
+    legend: [["Tour", "Pick the next city on the departures board. Flights and speeches take days, and the tour ends on 20 March 1948"],
+      ["Speech", "Golda's words scroll by. Tap anywhere when a gold word is inside the box. The better the speech, the bigger the pledge"],
+      ["Goal", "Raise $50 million, like Golda really did. Days left over are bonus"], ["Home", "You can fly home whenever you like"], ["Keyboard", "Space taps the words"]],
+    months: ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+    cityName: { chicago: "CHICAGO", newyork: "NEW YORK", philadelphia: "PHILADELPHIA", boston: "BOSTON", baltimore: "BALTIMORE", washington: "WASHINGTON", pittsburgh: "PITTSBURGH", cleveland: "CLEVELAND", detroit: "DETROIT", stlouis: "ST. LOUIS", minneapolis: "MINNEAPOLIS", losangeles: "LOS ANGELES", sanfrancisco: "SAN FRANCISCO", miami: "MIAMI", dallas: "DALLAS", denver: "DENVER", atlanta: "ATLANTA" },
+    departures: "DEPARTURES", day1: "DAY", days: "DAYS", upTo: "UP TO", homeRow: "FLY HOME TO TEL AVIV", banner: "UNITED JEWISH APPEAL · 1948",
+    perfect: "PERFECT!", good: "GOOD", tapGold: "Tap when a gold word is in the box!", pledges: n => n + " PLEDGES",
+    crowdGreat: "The hall is on its feet!", crowdGood: "Warm applause", crowdOk: "Polite applause", bgSays: "GOLDA!", homeTitle: "BACK HOME WITH", tapOn: "tap to continue",
+    speech: ["The Jewish community in Palestine will *fight* to the very *end*.", "You cannot decide whether we *fight*. Only whether we *win*.",
+      "We are not asking you to *fight* for us. We ask for your *help*.", "We need the money *now*. Not in months. *Now*.",
+      "Our young people are *ready*. Give them the *means*.", "With *arms* to defend ourselves, we will *hold*.",
+      "In a few *weeks* it may be too *late*.", "There is no *despair* among us. Only *courage*.",
+      "Every *dollar* you give today is a *home* tomorrow.", "We will build a *state*. Help us *defend* it."],
+    endTop: { title: m => m + " for the new state!", desc: "Just like the real Golda. Her money bought the weapons the new state needed. Ben-Gurion later said: \"Someday when history will be written, it will be said that there was a Jewish woman who got the money which made the state possible.\"" },
+    endMid: { title: m => m + ": a tour to remember", desc: "Not quite the $50 million Golda really raised, but every dollar bought something the new state needed." },
+    endLow: { title: m => m + " raised", desc: "Golda really raised $50 million. Try more cities and stronger speeches!" },
+    raisedLine: (m, n) => m + " · " + n + " cities",
+    apronSub: "saves you from one hit", scarfSub: "whacks cats and pigeons", glowSub: "10 seconds: enemies turn to shekels", allIngSub: "the cake will be perfect",
+    winEyebrow: "America · January to March 1948", winTitle: "Golda served the cake!", overEyebrow: "Ding dong!", overTitle: "The meeting started, and there's no cake!",
+    yourRun: "Your tour", goldRun: "Your golden tour", read: "Read", factCap: "A page of her story",
+    score: "SCORE", best: "BEST", golden: "$50 MILLION!",
+    saved: "Saved! Send the GIF in WhatsApp and challenge your friends.", making: "Making your GIF…", busy: "One moment, then try again.", noSave: "Saving isn't available here.",
+    shareTitle: "GOLDA'S $50 MILLION", shareChallenge: "Can you raise more?", shareCapGold: "My golden run · Golda's kitchen", shareCap: "My run · Golda's kitchen",
+    shareHead: "Golda's 1948 tour",
+  },
+  he: {
+    rotate: "טיפ: סובבו את הטלפון לרוחב למסך גדול יותר", title: "50 המיליון של גולדה",
+    chalWithName: (n, s) => "הניקוד של " + n + ": " + s + ". תצליחו לעקוף?", chalNoName: (s) => "הניקוד לעקוף: " + s + ". תצליחו?",
+    chalWon: (n, s) => "עקפתם את " + (n ? "הניקוד של " + n : "הניקוד") + " (" + s + ")!", chalLost: (n, s) => (n ? "הניקוד של " + n : "הניקוד") + " (" + s + ") עדיין מוביל. נסו שוב!",
+    start: "התחילו", howto: "איך משחקים", gotit: "הבנתי", paused: "המשחק בהפסקה", resume: "המשיכו", restart: "התחילו מחדש",
+    back: "חזרה למסע", realCap: "", again: "שחקו שוב", savePhoto: "שמירת GIF מונפש", shareGif: "שתפו GIF מונפש",
+    boardTitle: "טבלת השיאים", boardAsk: "להכניס את הניקוד שלכם לטבלה?", nickPh: "כינוי", boardSave: "הוסיפו אותי",
+    boardLoading: "טוענים את הטבלה…", boardEmpty: "עוד אין תוצאות. היו הראשונים!", boardErr: "לא הצלחנו להגיע לטבלה. בדקו את החיבור ונסו שוב.",
+    boardNeedNick: "כתבו קודם כינוי (עד 16 תווים).", boardDone: (r) => "נכנסתם לטבלה במקום " + r + "!", boardSaving: "שומרים…", shareLbl: "שתפו את הריצה:", copy: "העתקת קישור",
+    copied: "הועתק! הדביקו במסנג׳ר, בוואטסאפ או בכל מקום.", copyManual: "העתיקו את הטקסט למטה והדביקו בכל מקום.",
+    jumpBtn: "קפיצה", walkLbl: "החליקו על המסך או השתמשו בחצים", jumpLbl: "קפיצה", langBtn: "EN",
+    sound: ["צליל: פועל", "מוזיקה: כבויה", "צליל: כבוי"],
+    story: "ינואר 1948. מלחמה מתקרבת, וליישוב היהודי בארץ ישראל אין כסף לנשק. גולדה מאיר טסה לאמריקה כמעט בידיים ריקות, כדי לבקש 25 מיליון דולר. תכננו את המסע שלה, כבשו כל אולם והקדימו את לוח השנה.",
+    shareMsg: (m, sc) => "גייסתי " + m + " למדינה שבדרך עם גולדה ב־1948! ניקוד " + sc + ". תצליחו לגייס יותר?",
+    legend: [["מסע", "בחרו את העיר הבאה בלוח ההמראות. טיסות ונאומים לוקחים ימים, והמסע נגמר ב־20 במרץ 1948"],
+      ["נאום", "המילים של גולדה זזות על המסך. הקישו בכל מקום כשמילה זהובה בתוך המסגרת. ככל שהנאום טוב יותר, התרומה גדולה יותר"],
+      ["המטרה", "לגייס 50 מיליון דולר, כמו שגולדה באמת גייסה. ימים שנשארו = בונוס"], ["הביתה", "אפשר לטוס הביתה מתי שרוצים"], ["מקלדת", "רווח מקיש על המילים"]],
+    months: ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"],
+    cityName: { chicago: "שיקגו", newyork: "ניו יורק", philadelphia: "פילדלפיה", boston: "בוסטון", baltimore: "בולטימור", washington: "וושינגטון", pittsburgh: "פיטסבורג", cleveland: "קליבלנד", detroit: "דטרויט", stlouis: "סנט לואיס", minneapolis: "מיניאפוליס", losangeles: "לוס אנג'לס", sanfrancisco: "סן פרנסיסקו", miami: "מיאמי", dallas: "דאלאס", denver: "דנוור", atlanta: "אטלנטה" },
+    departures: "המראות", day1: "יום", days: "ימים", upTo: "עד", homeRow: "טסים הביתה לתל אביב", banner: "UNITED JEWISH APPEAL · 1948",
+    perfect: "PERFECT!", good: "GOOD", tapGold: "הקישו כשמילה זהובה בתוך המסגרת!", pledges: n => n + " תורמת",
+    crowdGreat: "האולם עומד על הרגליים!", crowdGood: "מחיאות כפיים חמות", crowdOk: "מחיאות כפיים מנומסות", bgSays: "גולדה!", homeTitle: "חוזרת הביתה עם", tapOn: "הקישו להמשך",
+    speech: ["היישוב היהודי בארץ ישראל *יילחם* עד *הסוף*.", "אינכם יכולים להחליט אם *נילחם*. רק אם *ננצח*.",
+      "איננו מבקשים שתילחמו *בשבילנו*. אנחנו מבקשים את *עזרתכם*.", "אנחנו צריכים את הכסף *עכשיו*. לא בעוד חודשים. *עכשיו*.",
+      "הצעירים שלנו *מוכנים*. תנו להם את *האמצעים*.", "עם *נשק* להגן על עצמנו, אנחנו *נעמוד*.",
+      "בעוד כמה *שבועות* זה עלול להיות *מאוחר*.", "אין בינינו *ייאוש*. יש רק *אומץ*.",
+      "כל *דולר* שתתנו היום הוא *בית* מחר.", "אנחנו נבנה *מדינה*. עזרו לנו *להגן* עליה."],
+    endTop: { title: m => m + " למדינה שבדרך!", desc: "בדיוק כמו גולדה האמיתית. הכסף שגייסה קנה את הנשק שהמדינה הצעירה הייתה צריכה. בן־גוריון אמר לימים שכאשר ייכתבו דברי הימים, יסופר שהייתה אישה יהודייה שהשיגה את הכסף שאפשר את הקמת המדינה." },
+    endMid: { title: m => m + ": מסע בלתי נשכח", desc: "לא בדיוק 50 המיליון שגולדה באמת גייסה, אבל כל דולר קנה משהו שהמדינה הצעירה הייתה צריכה." },
+    endLow: { title: m => "גויסו " + m, desc: "גולדה באמת גייסה 50 מיליון דולר. נסו יותר ערים ונאומים חזקים יותר!" },
+    raisedLine: (m, n) => m + " · " + n + " ערים",
+    apronSub: "מגן מפגיעה אחת", scarfSub: "מעיף חתולים ויונים", glowSub: "10 שניות: אויבים הופכים לשקלים", allIngSub: "העוגה תהיה מושלמת",
+    winEyebrow: "אמריקה · ינואר עד מרץ 1948", winTitle: "גולדה הגישה את העוגה!", overEyebrow: "דינג דונג!", overTitle: "הישיבה התחילה, ואין עוגה!",
+    yourRun: "המסע שלך", goldRun: "המסע הזהוב שלך", read: "קראו", factCap: "דף מהסיפור שלה",
+    score: "ניקוד", best: "שיא", golden: "50 מיליון!",
+    saved: "נשמר! שלחו את ה־GIF בוואטסאפ ואתגרו את החברים.", making: "מכינים את ה־GIF…", busy: "רגע אחד ונסו שוב.", noSave: "אי אפשר לשמור כאן.",
+    shareTitle: "50 המיליון של גולדה", shareChallenge: "תצליחו לגייס יותר?", shareCapGold: "הריצה הזהובה שלי · המטבח של גולדה", shareCap: "הריצה שלי · המטבח של גולדה",
+    shareHead: "המסע של גולדה, 1948",
+  },
+};
+// Follow the phone's language (Hebrew phones get Hebrew, everyone else English);
+// a player's own choice (EN / עב button) is remembered and wins
+const phoneLang = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+let lang = /^(he|iw)\b/i.test(phoneLang) ? "he" : "en";
+try { lang = localStorage.getItem("gbr-lang-v2") || lang; } catch (e) {}
+if (!I18N[lang]) lang = "en";
+const L = () => I18N[lang];
+
+/* ---------- sizing ---------- */
+function resize() {
+  const st = document.getElementById("stage");
+  const cs = getComputedStyle(st);
+  const aw = st.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const ah = st.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const portrait = aw < ah * 0.9;
+  document.body.classList.toggle("portrait", portrait);
+  VH = portrait ? Math.round(clamp(256 * (ah - 30) / aw, 240, 480)) : 240; OY = Math.floor((VH - 240) / 2);
+  VW = portrait ? 256 : Math.round(Math.max(300, Math.min(520, VH * aw / ah)));
+  let scale = Math.min(aw / VW, ah / VH);
+  if (portrait) scale = Math.min(aw / VW, Math.max(120, ah - 30) / VH);
+  const dpr = window.devicePixelRatio || 1;
+  S = Math.max(1, Math.min(4, Math.round(scale * dpr)));
+  cv.width = VW * S; cv.height = VH * S;
+  cv.style.width = Math.floor(VW * scale) + "px";
+  cv.style.height = Math.floor(VH * scale) + "px";
+}
+addEventListener("resize", resize);
+addEventListener("orientationchange", () => setTimeout(resize, 200));
+
+/* ---------- rng ---------- */
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const hash = (x, y) => { let h = x * 374761393 + y * 668265263; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+
+/* ---------- audio ---------- */
+let ac = null, muted = false;
+let unlocked = false, keepAlive = null;
+function silentWav() {
+  // 0.5s of silence as a WAV data URI; playing it through an <audio> element moves iPhones to "playback" audio, so the silent switch doesn't mute the game
+  const n = 4000, buf = new Uint8Array(44 + n), v = new DataView(buf.buffer), w = (o, s) => { for (let i = 0; i < s.length; i++) buf[o + i] = s.charCodeAt(i); };
+  w(0, "RIFF"); v.setUint32(4, 36 + n, true); w(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, "data"); v.setUint32(40, n, true);
+  buf.fill(128, 44); let s = ""; for (let i = 0; i < buf.length; i++) s += String.fromCharCode(buf[i]);
+  return "data:audio/wav;base64," + btoa(s);
+}
+function initAudio() {
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+  if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } }
+  if (!ac) return;
+  if (ac.state !== "running") { try { const r = ac.resume(); if (r && r.catch) r.catch(() => {}); } catch (e) {} }
+  if (!unlocked) {
+    unlocked = true;
+    try { const b = ac.createBuffer(1, 1, 22050), s = ac.createBufferSource(); s.buffer = b; s.connect(ac.destination); s.start(0); } catch (e) {}
+    try { keepAlive = new Audio(silentWav()); keepAlive.loop = true; keepAlive.setAttribute("playsinline", ""); const pr = keepAlive.play(); if (pr && pr.catch) pr.catch(() => {}); } catch (e) {}
+  }
+}
+// Any tap re-wakes the audio if the phone suspended it (incoming call, app switch, first tap missed)
+["pointerdown", "touchend", "keydown"].forEach(t => document.addEventListener(t, () => {
+  if (!ac || ac.state !== "running" || !unlocked) initAudio();
+  if (ac && state === "play" && !gamePaused && soundMode === 0 && !music.timer) musicStart(false);
+}, true));
+function tone(f1, f2, dur, type = "square", vol = 0.05, delay = 0) {
+  if (!ac || muted) return;
+  const t0 = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.setValueAtTime(f1, t0); o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+  g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g).connect(ac.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+}
+const sfx = {
+  jump: () => tone(280, 620, 0.14, "square", 0.04),
+  coin: () => { tone(988, 988, 0.06, "square", 0.04); tone(1319, 1319, 0.18, "square", 0.04, 0.06); },
+  stomp: () => tone(260, 70, 0.14, "triangle", 0.12),
+  bump: () => tone(140, 90, 0.08, "triangle", 0.1),
+  power: () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.1, "square", 0.04, i * 0.07)); },
+  hurt: () => tone(500, 90, 0.4, "sawtooth", 0.05),
+  oneup: () => { [659, 784, 1319, 1047, 1175, 1568].forEach((f, i) => tone(f, f, 0.09, "square", 0.04, i * 0.08)); },
+  bigjump: () => { tone(380, 1250, 0.22, "square", 0.045); },
+  flip: () => { tone(300, 900, 0.18, "triangle", 0.1); },
+  shutter: () => { tone(2400, 900, 0.04, "square", 0.05); tone(900, 300, 0.09, "square", 0.04, 0.05); },
+  win: () => { [392, 523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.16, "square", 0.05, i * 0.13)); },
+};
+/* ---------- music: Zum Gali Gali as 8-bit chiptune ----------
+   Traditional pioneer song in E minor, 4/4. Written down from memory (no printed score was at hand).
+   Each pair is [note, length in eighths]; "-" is a rest. 8 eighths per bar. */
+const CHORUS = [
+  ["B4",2],["A4",1],["G4",1],["F#4",1],["E4",1],["F#4",1],["G4",1],   // zum ga-li ga-li ga-li
+  ["G4",2],["F#4",1],["E4",1],["F#4",1],["E4",2],["-",1],             // zum ga-li ga-li
+];
+const VERSE = [
+  ["E4",1],["G4",1],["B4",2],["B4",1],["A4",1],["G4",2],              // he-cha-lutz le-ma-an
+  ["A4",1],["B4",1],["A4",4],["-",2],                                 // a-vo-dah
+  ["A4",1],["G4",1],["F#4",2],["F#4",1],["G4",1],["A4",2],            // a-vo-dah le-ma-an
+  ["G4",1],["F#4",1],["E4",4],["-",2],                                // he-cha-lutz
+];
+const SONG = [...CHORUS, ...CHORUS, ...VERSE, ...VERSE, ...CHORUS, ...CHORUS];
+const NOTE_IDX = { C: 0, "C#": 1, D: 2, "D#": 3, E: 4, F: 5, "F#": 6, G: 7, "G#": 8, A: 9, "A#": 10, B: 11 };
+const hz = n => { const m = n.match(/^([A-G]#?)(\d)$/); return 440 * Math.pow(2, (NOTE_IDX[m[1]] + (+m[2] + 1) * 12 - 69) / 12); };
+const GRID = []; for (const [n, len] of SONG) { GRID.push(n === "-" ? null : [n, len]); for (let i = 1; i < len; i++) GRID.push(null); }
+const CHORDS = {
+  Em: { root: "E2", fifth: "B2", pah: ["G3", "B3"] }, Am: { root: "A2", fifth: "E2", pah: ["C4", "E4"] },
+  D: { root: "D2", fifth: "A2", pah: ["F#3", "A3"] }, B7: { root: "B1", fifth: "F#2", pah: ["D#3", "A3"] },
+};
+// one chord per half bar
+const CH_CHORUS = ["Em","Em", "B7","Em"], CH_VERSE = ["Em","Em", "Am","Am", "D","D", "B7","Em"];
+const BAR_CHORD = [...CH_CHORUS, ...CH_CHORUS, ...CH_VERSE, ...CH_VERSE, ...CH_CHORUS, ...CH_CHORUS];
+let soundMode = 0; // 0 = all on, 1 = music off, 2 = everything off
+let pulse = null, noiseBuf = null, musicOut = null;
+const music = { timer: null, step: 0, next: 0, bpm: 150 };
+function musicSetup() {
+  if (pulse || !ac) return;
+  const N = 32, re = new Float32Array(N), im = new Float32Array(N), d = 0.25; // 25% pulse, the classic NES lead
+  for (let n = 1; n < N; n++) { re[n] = 2 / (n * Math.PI) * Math.sin(2 * Math.PI * n * d); im[n] = 2 / (n * Math.PI) * (1 - Math.cos(2 * Math.PI * n * d)); }
+  pulse = ac.createPeriodicWave(re, im);
+  noiseBuf = ac.createBuffer(1, ac.sampleRate * 0.3, ac.sampleRate);
+  const ch = noiseBuf.getChannelData(0); for (let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1;
+  musicOut = ac.createGain(); musicOut.gain.value = 0.8; musicOut.connect(ac.destination);
+}
+function mNote(freq, t, dur, vol, wave) {
+  const o = ac.createOscillator(), g = ac.createGain();
+  if (wave === "pulse") o.setPeriodicWave(pulse); else o.type = wave;
+  o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(vol, t); g.gain.setValueAtTime(vol * 0.75, t + Math.min(0.05, dur / 2)); g.gain.linearRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(musicOut); o.start(t); o.stop(t + dur + 0.02);
+}
+function mNoise(t, dur, vol, hp) {
+  const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  s.buffer = noiseBuf; f.type = "highpass"; f.frequency.value = hp;
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f).connect(g).connect(musicOut); s.start(t); s.stop(t + dur + 0.02);
+}
+function playStep(i, t, e8) {
+  const lead = GRID[i];
+  if (lead) mNote(hz(lead[0]), t, lead[1] * e8 * 0.86, 0.11, "pulse");
+  const c = CHORDS[BAR_CHORD[i >> 2]], beat = i % 4;
+  // oom-pah bass on the triangle, chord stabs on the off-beats
+  if (beat === 0) mNote(hz(c.root), t, e8 * 0.9, 0.32, "triangle");
+  if (beat === 2) mNote(hz(c.fifth), t, e8 * 0.9, 0.32, "triangle");
+  if (beat === 1 || beat === 3) for (const n of c.pah) mNote(hz(n), t, e8 * 0.45, 0.035, "square");
+  // drums
+  if (beat === 0) { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.1); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12); o.connect(g).connect(musicOut); o.start(t); o.stop(t + 0.14); }
+  if (beat === 2) mNoise(t, 0.09, 0.25, 1500);
+  mNoise(t, 0.025, 0.07, 7000);
+}
+function musicTick() {
+  if (!ac) return;
+  while (music.next < ac.currentTime + 0.15) {
+    const e8 = 60 / (music.bpm * (state === "play" && timeLeft <= 20 * 60 ? 1.4 : 1)) / 2;
+    playStep(music.step, music.next, e8);
+    music.next += e8; music.step++;
+    if (music.step >= GRID.length) { music.step = 0; music.bpm = Math.min(170, music.bpm + 6); } // a little livelier every round
+  }
+}
+function musicStart(fromTop = true) {
+  musicStop();
+  if (!ac || soundMode !== 0) return;
+  musicSetup();
+  if (fromTop) { music.step = 0; music.bpm = 116; }
+  music.next = ac.currentTime + 0.08;
+  music.timer = setInterval(musicTick, 25); musicTick();
+}
+function musicStop() { if (music.timer) { clearInterval(music.timer); music.timer = null; } }
+const soundBtn = document.getElementById("sound");
+
+soundBtn.addEventListener("click", () => {
+  initAudio(); soundMode = (soundMode + 1) % 3; muted = soundMode === 2; soundBtn.textContent = L().sound[soundMode];
+  if (soundMode === 0 && state === "play") musicStart(false); else if (soundMode !== 0) musicStop();
+});
+
+/* ---------- input: tap the board, tap the strong words ---------- */
+const keys = {};
+let btns = [], pressed = null;
+function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {} }
+function releaseTouches() {}
+function toLogical(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * VW, (e.clientY - r.top) / r.height * VH - OY]; }
+const hitBox = (b, x, y) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h;
+addEventListener("keydown", e => {
+  if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+  if (e.code === "Space" || e.code.startsWith("Arrow")) e.preventDefault();
+  if ((e.code === "Enter" || e.code === "Space") && state !== "play" && state !== "result" && factScreen.hidden && helpScreen.hidden) { startGame(); return; }
+  if (e.code === "Space" && !e.repeat && state === "play" && !gamePaused) tapWord();
+  keys[e.code] = true;
+});
+addEventListener("keyup", e => { keys[e.code] = false; });
+cv.addEventListener("pointerdown", e => {
+  if (gamePaused || (state !== "play" && state !== "result")) return;
+  e.preventDefault(); initAudio();
+  const [x, y] = toLogical(e);
+  if (state === "result") { if (resT > 60) finishResult(); return; }
+  const b = btns.find(b => hitBox(b, x, y));
+  if (b) { if (b.on) { pressed = { id: b.id, t: 6 }; press(b.id); } else sfx.bump(); return; }
+  tapWord();
+});
+document.addEventListener("touchmove", e => { if (!e.target.closest || !e.target.closest(".card")) e.preventDefault(); }, { passive: false });
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+/* ---------- the tour ---------- */
+// [id, lon, lat, how much the city can give, in thousands of dollars]
+const CITIES = [
+  ["chicago", -87.6, 41.9, 6000], ["newyork", -74.0, 40.7, 12000], ["philadelphia", -75.2, 39.95, 4000], ["boston", -71.06, 42.36, 4000],
+  ["baltimore", -76.6, 39.3, 2000], ["washington", -77.0, 38.9, 1500], ["pittsburgh", -80.0, 40.44, 2000], ["cleveland", -81.7, 41.5, 2500],
+  ["detroit", -83.05, 42.33, 3000], ["stlouis", -90.2, 38.63, 2000], ["minneapolis", -93.27, 44.98, 1500], ["losangeles", -118.24, 34.05, 6000],
+  ["sanfrancisco", -122.42, 37.77, 2500], ["miami", -80.19, 25.76, 2500], ["dallas", -96.8, 32.78, 1500], ["denver", -104.99, 39.74, 1000],
+  ["atlanta", -84.39, 33.75, 1000],
+].map(([id, lon, lat, pot]) => ({ id, lon, lat, pot }));
+const US = [[-124.7,48.4],[-123,49],[-95.2,49],[-89.6,48],[-84.5,46.5],[-82.4,43],[-79,43.3],[-76.5,44.2],[-74.7,45],[-71.5,45],[-69.2,47.4],[-67.8,47.1],[-67,44.8],[-70.6,43.1],[-70,41.7],[-71.9,41.3],[-74,40.6],[-74.2,39.5],[-75.5,38.5],[-76,37],[-75.5,35.3],[-77.9,34],[-79.9,32.7],[-81.4,30.5],[-80,26.7],[-80.4,25.2],[-81.8,26.1],[-82.7,28],[-84.2,30],[-85.4,29.7],[-87.5,30.3],[-89.6,30.2],[-89.4,29],[-91.3,29.3],[-93.8,29.7],[-95,29.3],[-97.4,27.8],[-97.2,25.9],[-99.5,27.5],[-101.4,29.8],[-103,29],[-104.5,29.6],[-106.5,31.8],[-108.2,31.3],[-111,31.3],[-114.8,32.5],[-117.1,32.5],[-118.5,34],[-120.6,34.6],[-121.9,36.6],[-122.5,37.8],[-123.8,39.8],[-124.2,42],[-124,46]];
+const LAKES = [[[-92,46.7],[-84.6,46.5],[-86,47.3],[-89.5,48]], [[-87.8,41.8],[-87.2,45.6],[-86,45],[-86.4,42.2]], [[-84.6,45.8],[-82.4,43.1],[-81.7,44.4],[-80.3,45.4]], [[-83.5,41.7],[-79,42.9],[-80.5,42.4],[-82.5,41.6]], [[-79.8,43.3],[-76.2,43.5],[-76.6,44.2],[-79.2,43.6]]];
+const GOAL = 50000, DAYS = 59, SPEECH_DAYS = 2;
+const factsFound = new Set();
+let state = "title", frame = 0, score = 0, shekels = 0, best = 0, timeLeft = 99999;
+try { best = +localStorage.getItem("golda-tour-best") || 0; } catch (e) {}
+let phase = "map", day = 0, raised = 0, here = 0, visited = new Set(), page = 0, route = [];
+let flight = null, sp = null, resT = 0, flashT = 0, finaleGold = false, lastPledge = null, lastWon = false, parts = [], speechNo = 0;
+
+const OX = () => Math.floor((VW - 256) / 2);
+const MAP = { x: 30, y: 24, w: 196, h: 112 };
+const proj = (lon, lat) => [OX() + MAP.x + (lon + 125) / 59 * MAP.w, MAP.y + (49.5 - lat) / 25.5 * MAP.h];
+function km(a, b) {
+  const r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLon = (b.lon - a.lon) * r;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLon / 2) ** 2;
+  return 12742 * Math.asin(Math.sqrt(h));
+}
+const flyDays = (a, b) => Math.max(1, Math.round(km(a, b) / 1300));
+const money = k => "$" + (k / 1000).toFixed(1) + "M";
+function dateStr(d) {
+  const t = new Date(1948, 0, 21 + d), m = L().months[t.getMonth()];
+  return lang === "he" ? t.getDate() + " ב" + m + " 1948" : t.getDate() + " " + m + " 1948";
+}
+
+function startGame() {
+  initAudio();
+  day = 0; raised = 0; here = 0; visited = new Set(); page = 0; route = [CITIES[0]]; score = 0;
+  flight = null; sp = null; resT = 0; flashT = 0; finaleGold = false; lastPledge = null; parts = []; speechNo = 0;
+  state = "play";
+  document.body.classList.remove("shooting");
+  document.getElementById("titleScreen").hidden = true;
+  document.getElementById("endScreen").hidden = true;
+  pauseBtn.hidden = false; gamePaused = false; pauseScreen.hidden = true; hideToast();
+  startSpeech(0); // the tour opens in Chicago
+}
+document.getElementById("startBtn").addEventListener("click", startGame);
+document.getElementById("againBtn").addEventListener("click", startGame);
+let gamePaused = false;
+const pauseBtn = document.getElementById("pause"), pauseScreen = document.getElementById("pauseScreen");
+function setPaused(on) {
+  if (on && state !== "play") return;
+  gamePaused = on; pauseScreen.hidden = !on;
+  if (on) musicStop(); else if (state === "play" && phase !== "speech") { initAudio(); musicStart(false); }
+}
+pauseBtn.addEventListener("click", () => setPaused(true));
+document.getElementById("resumeBtn").addEventListener("click", () => setPaused(false));
+document.getElementById("restartBtn").addEventListener("click", () => { setPaused(false); startGame(); });
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+
+function options() {
+  const cur = CITIES[here];
+  return CITIES.map((c, i) => ({ i, c, d: flyDays(cur, c) })).filter(o => !visited.has(o.i) && o.i !== here)
+    .sort((a, b) => a.d - b.d || b.c.pot - a.c.pot);
+}
+function press(id) {
+  if (id === "pgL") { page = Math.max(0, page - 1); sfx.bump(); return; }
+  if (id === "pgR") { page++; sfx.bump(); return; }
+  if (id === "home") { goHome(); return; }
+  if (id.startsWith("fly:")) {
+    const i = +id.slice(4), d = flyDays(CITIES[here], CITIES[i]);
+    flight = { from: here, to: i, days: d, t: 0, d0: day }; phase = "flight"; page = 0;
+    tone(300, 600, 0.3, "triangle", 0.06);
+  }
+}
+function goHome() {
+  phase = "home"; state = "result"; resT = 0; musicStop();
+  score = Math.floor(raised / 10) + (raised >= GOAL ? 1000 + Math.max(0, DAYS - day) * 50 : 0);
+  finaleGold = raised >= GOAL;
+  document.body.classList.add("shooting"); pauseBtn.hidden = true;
+  tone(400, 800, 0.4, "triangle", 0.08);
+}
+function finishResult() { if (state === "result") endGame(true); }
+
+/* ---------- the speech ---------- */
+function measureW(text) {
+  ctx.save(); ctx.font = lang === "he" ? "800 13px " + BODYF : "7px " + PIXF; const w = ctx.measureText(text).width; ctx.restore(); return Math.ceil(w);
+}
+function startSpeech(i) {
+  phase = "speech"; here = i; musicStop(); musicSetup && ac && musicSetup();
+  const pool = L().speech, picks = [];
+  for (let k = 0; k < 2; k++) picks.push(pool[(speechNo * 2 + k) % pool.length]);
+  speechNo++;
+  const words = []; let off = 0; const space = lang === "he" ? 5 : 7;
+  for (const sentence of picks) {
+    for (const tok of sentence.split(" ")) {
+      const m = tok.match(/^\*(.+?)\*(.*)$/), key = !!m, text = m ? m[1] + m[2] : tok;
+      const w = measureW(text); words.push({ text, key, off, w, judged: false, res: "" }); off += w + space;
+    }
+    off += 46;
+  }
+  const v = 1.15 + Math.min(0.8, (speechNo - 1) * 0.06);
+  sp = { words, len: off, v, s: -20, pts: 0, keysN: words.filter(w => w.key).length, combo: 0, cheer: 0, done: false, endT: 0, pledge: 0, msg: "", msgT: 0 };
+}
+const TX = () => lang === "he" ? OX() + 190 : OX() + 66;
+function wordX(w) { return lang === "he" ? sp.s - w.off - w.w : VW + 4 + w.off - sp.s; }
+function tapWord() {
+  if (phase !== "speech" || !sp || sp.done) return;
+  const tx = TX(); let bestW = null, bd = 1e9;
+  for (const w of sp.words) if (w.key && !w.judged) { const d = Math.abs(wordX(w) + w.w / 2 - tx); if (d < bd) { bd = d; bestW = w; } }
+  if (bestW && bd <= 18) {
+    bestW.judged = true;
+    if (bd <= 8) { bestW.res = "perfect"; sp.pts += 2; sp.combo++; sp.cheer = Math.min(1, sp.cheer + 0.35); applause(0.5); popWord(L().perfect); }
+    else { bestW.res = "good"; sp.pts += 1; sp.combo++; sp.cheer = Math.min(1, sp.cheer + 0.2); applause(0.3); popWord(L().good); }
+    buzz(15);
+  } else { sp.combo = 0; sp.cheer = Math.max(0, sp.cheer - 0.15); tone(200, 150, 0.08, "triangle", 0.06); }
+}
+function popWord(m) { sp.msg = m; sp.msgT = 40; }
+function applause(v) {
+  if (!ac || muted) return;
+  if (!noiseBuf) musicSetup();
+  const t = ac.currentTime;
+  for (let k = 0; k < 8; k++) mNoise(t + k * 0.05 + Math.random() * 0.04, 0.05, 0.12 * v, 2500 + Math.random() * 2000);
+}
+function stepSpeech() {
+  if (!sp.done) {
+    sp.s += sp.v; sp.cheer = Math.max(0, sp.cheer - 0.004);
+    const tx = TX();
+    for (const w of sp.words) if (w.key && !w.judged) {
+      const c = wordX(w) + w.w / 2, past = lang === "he" ? c - tx : tx - c;
+      if (past > 18) { w.judged = true; w.res = "miss"; sp.combo = 0; sp.cheer = Math.max(0, sp.cheer - 0.1); }
+    }
+    if (sp.msgT > 0) sp.msgT--;
+    if (sp.s > sp.len + VW + 10) {
+      sp.done = true; sp.endT = 0;
+      const q = sp.keysN ? sp.pts / (2 * sp.keysN) : 0, c = CITIES[here];
+      sp.q = q; sp.pledge = Math.round(c.pot * clamp(0.25 + 0.75 * q, 0.25, 1) / 10) * 10;
+      applause(1); setTimeout(() => applause(1), 300); sfx.oneup();
+    }
+  } else {
+    sp.endT++;
+    if (sp.endT === 50) { raised += sp.pledge; visited.add(here); day += SPEECH_DAYS; sfx.coin(); }
+    if (sp.endT === 150) {
+      lastPledge = { city: here, amount: sp.pledge }; sp = null;
+      if (day >= DAYS || visited.size === CITIES.length || !options().some(o => day + o.d < DAYS)) { goHome(); return; }
+      phase = "map"; musicStart(true);
+    }
+  }
+}
+
+/* ---------- update ---------- */
+function stepPlay() {
+  if (pressed && --pressed.t <= 0) pressed = null;
+  if (phase === "speech" && sp) stepSpeech();
+  else if (phase === "flight" && flight) {
+    flight.t++;
+    const T = 40 + flight.days * 20;
+    const nd = flight.d0 + Math.min(flight.days, Math.floor(flight.t / T * flight.days));
+    if (nd !== day) { day = nd; tone(900, 900, 0.03, "square", 0.02); }
+    if (flight.t >= T) { day = flight.d0 + flight.days; const to = flight.to; route.push(CITIES[to]); flight = null; startSpeech(to); }
+  }
+}
+function stepResult() {
+  resT++;
+  if (resT === 20) sfx.win();
+  if (resT === 300) { flashT = 16; sfx.shutter(); buzz(30); }
+  if (flashT > 0) flashT--;
+  if (resT === 360) finishResult();
+}
+function renderEnd() {
+  const t = L(), pad = v => String(v).padStart(6, "0");
+  const o = raised >= GOAL ? t.endTop : raised >= 35000 ? t.endMid : t.endLow;
+  document.getElementById("endEyebrow").textContent = t.winEyebrow;
+  document.getElementById("endTitle").textContent = o.title(money(raised));
+  document.getElementById("endFact").textContent = o.desc + "\n\n" + PHOTO_FACT[lang];
+  document.querySelector(".fig-game figcaption").textContent = finaleGold ? t.goldRun : t.yourRun;
+  document.getElementById("endStats").innerHTML = t.score + " " + pad(score) + " · " + t.best + " " + pad(best) +
+    "<br>" + t.raisedLine(money(raised), visited.size) + (finaleGold ? " · " + t.golden : "");
+  const msg = t.shareMsg(money(raised), pad(score)) + " " + shareUrl();
+  const cr2 = document.getElementById("challengeResult");
+  cr2.hidden = !CHALLENGE;
+  if (CHALLENGE) cr2.textContent = score > CHALLENGE.score ? t.chalWon(CHALLENGE.nick, CHALLENGE.score) : t.chalLost(CHALLENGE.nick, CHALLENGE.score);
+  document.getElementById("shareRow").hidden = false;
+  document.getElementById("waLink").href = "https://wa.me/?text=" + encodeURIComponent(msg);
+  document.getElementById("fbLink").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(shareUrl());
+  document.getElementById("copyField").value = msg;
+  shareBtn.textContent = IN_CLAUDE ? t.savePhoto : t.shareGif;
+  const ep = document.getElementById("endPages"); ep.innerHTML = "";
+  FACTS.forEach((fct, i) => {
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "go alt small";
+    btn.textContent = t.read + " " + fct.year.slice(-4); btn.addEventListener("click", () => showFact(i)); ep.appendChild(btn);
+  });
+}
+function endGame(won) {
+  document.body.classList.remove("shooting");
+  pauseBtn.hidden = true;
+  state = "won";
+  if (score > best) { best = score; try { localStorage.setItem("golda-tour-best", String(best)); } catch (e) {} }
+  lastWon = true; renderEnd();
+  document.getElementById("endFact").hidden = false;
+  document.getElementById("photoWrap").hidden = false;
+  drawArt(document.getElementById("photo"), "photo");
+  document.getElementById("photo").classList.toggle("gold", finaleGold);
+  shareBtn.hidden = !(IN_CLAUDE ? downloadsCap : true); shareNote.hidden = true;
+  cachedGif = null;
+  if (!IN_CLAUDE) setTimeout(() => { try { cachedGif = { lang, blob: makeShareGif() }; } catch (e) { cachedGif = null; } }, 400);
+  openBoard();
+  hideToast();
+  document.getElementById("endScreen").hidden = false;
+}
+function step() {
+  frame++;
+  if (state === "play") stepPlay();
+  else if (state === "result") stepResult();
+  for (const p of parts) { p.t++; p.y += p.vy; }
+  parts = parts.filter(p => p.t < 60);
+}
+
+/* ---------- drawing ---------- */
+const R = (c, x, y, w, h) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
+const INK = "#12304a", BODYF = "Rubik, system-ui, sans-serif", PIXF = "'Press Start 2P', monospace";
+function txt(s, x, y, size, color, align = "left", pix = false) {
+  const he = lang === "he" && !pix;
+  ctx.font = he ? "800 " + Math.round(size * 1.6) + "px " + BODYF : size + "px " + PIXF;
+  ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = "top"; ctx.direction = he ? "rtl" : "ltr";
+  ctx.fillText(s, x, he ? y - Math.round(size * 0.35) : y);
+  ctx.direction = "ltr"; ctx.textAlign = "left";
+}
+function txtWrap(s, cx, y, size, color, maxW, lh) {
+  const he = lang === "he";
+  ctx.font = he ? "800 " + Math.round(size * 1.6) + "px " + BODYF : size + "px " + PIXF;
+  const words = s.split(" "), lines = []; let cur = "";
+  for (const w of words) { const tryL = cur ? cur + " " + w : w; if (ctx.measureText(tryL).width > maxW && cur) { lines.push(cur); cur = w; } else cur = tryL; }
+  if (cur) lines.push(cur);
+  lines.forEach((l, i) => txt(l, cx, y + i * lh, size, color, "center"));
+  return lines.length;
+}
+function drawHUD() {
+  ctx.save(); ctx.translate(0, -OY);
+  R("rgba(18,48,74,.9)", 4, 3, 112, 15);
+  txt(dateStr(Math.min(day, DAYS)), lang === "he" ? 111 : 9, 7, lang === "he" ? 5 : 6, day >= DAYS - 7 && (frame >> 4) % 2 ? "#ff6a3d" : "#ffffff", lang === "he" ? "right" : "left", lang !== "he");
+  const x = 4, y = 20, w = 112;
+  R("rgba(18,48,74,.9)", x, y, w, 13); R("#3b5a72", x + 3, y + 3, w - 6, 7);
+  R("#46b04a", x + 3, y + 3, Math.round((w - 6) * Math.min(1, raised / GOAL)), 7);
+  txt(money(raised) + " / $50M", x + w / 2, y + 3, 5, "#ffffff", "center", true);
+  ctx.restore();
+}
+function drawPlane(x, y, ang, s = 1) {
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(ang); ctx.scale(s, s);
+  R("#f4f4f4", -7, -1, 14, 3); R("#c9ced3", -7, 1, 14, 1); R("#2f74c0", -6, 0, 12, 1);
+  R("#f4f4f4", -2, -6, 3, 13); R("#c9ced3", -6, -3, 2, 7); R("#e2483a", 7, -1, 1, 3); R("#9fd6ee", 5, -1, 2, 1);
+  ctx.restore();
+}
+function drawMap() {
+  const ox = OX(), t = L();
+  R("#9fc9e0", 0, -OY, VW, VH + OY);
+  for (let y = 0; y < 240; y += 12) R("#93bfd8", 0, y, VW, 1);
+  ctx.fillStyle = "#efe2c0"; ctx.strokeStyle = "#8a6a3a"; ctx.lineWidth = 1;
+  ctx.beginPath(); US.forEach(([lo, la], i) => { const [x, y] = proj(lo, la); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#9fc9e0";
+  for (const lk of LAKES) { ctx.beginPath(); lk.forEach(([lo, la], i) => { const [x, y] = proj(lo, la); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); ctx.fill(); }
+  txt("U.S.A. 1948", ox + 128, 70, 5, "#c9b48e", "center", true);
+  // the route so far
+  ctx.strokeStyle = "#b0461f"; ctx.setLineDash([3, 2]); ctx.lineWidth = 1; ctx.beginPath();
+  route.forEach((c, i) => { const [x, y] = proj(c.lon, c.lat); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke(); ctx.setLineDash([]);
+  CITIES.forEach((c, i) => {
+    const [x, y] = proj(c.lon, c.lat), done = visited.has(i);
+    R(INK, Math.round(x) - 2, Math.round(y) - 2, 5, 5); R(done ? "#46b04a" : "#e2483a", Math.round(x) - 1, Math.round(y) - 1, 3, 3);
+  });
+  if (phase === "flight" && flight) {
+    const a = CITIES[flight.from], b = CITIES[flight.to], [x0, y0] = proj(a.lon, a.lat), [x1, y1] = proj(b.lon, b.lat);
+    const T = 40 + flight.days * 20, p = Math.min(1, flight.t / T), lift = Math.hypot(x1 - x0, y1 - y0) * 0.25;
+    const x = x0 + (x1 - x0) * p, y = y0 + (y1 - y0) * p - Math.sin(p * Math.PI) * lift;
+    const dx = (x1 - x0), dy = (y1 - y0) - Math.cos(p * Math.PI) * Math.PI * lift;
+    drawPlane(x, y, Math.atan2(dy, dx));
+    txt(t.cityName[b.id], ox + 128, 140, 6, INK, "center");
+  } else {
+    const c = CITIES[here], [x, y] = proj(c.lon, c.lat);
+    R("#ffd23f", Math.round(x) - 3, Math.round(y) - 3, 7, 1); R("#ffd23f", Math.round(x) - 3, Math.round(y) + 3, 7, 1);
+    R("#ffd23f", Math.round(x) - 3, Math.round(y) - 3, 1, 7); R("#ffd23f", Math.round(x) + 3, Math.round(y) - 3, 1, 7);
+  }
+  if (phase === "map") drawBoard(ox);
+}
+function drawBoard(ox) {
+  const t = L(), he = lang === "he", x = ox + 6, y = 142, w = 244;
+  R(INK, x + 2, y + 2, w, 96); R("#1b1b1b", x, y, w, 96);
+  txt(t.departures + " · " + t.cityName[CITIES[here].id], x + w / 2, y + 3, 5, "#ffd23f", "center");
+  const opts = options(), pages = Math.max(1, Math.ceil(opts.length / 4)); page = Math.min(page, pages - 1);
+  if (pages > 1) {
+    R(page > 0 ? "#3b3b3b" : "#262626", x + 2, y + 1, 18, 11); txt("◀", x + 11, y + 3, 5, "#ffd23f", "center", true); btns.push({ id: "pgL", x: x, y: y, w: 26, h: 13, on: page > 0 });
+    R(page < pages - 1 ? "#3b3b3b" : "#262626", x + w - 20, y + 1, 18, 11); txt("▶", x + w - 11, y + 3, 5, "#ffd23f", "center", true); btns.push({ id: "pgR", x: x + w - 26, y: y, w: 26, h: 13, on: page < pages - 1 });
+  }
+  opts.slice(page * 4, page * 4 + 4).forEach((o, k) => {
+    const ry = y + 14 + k * 17, ok = day + o.d < DAYS, down = pressed && pressed.id === "fly:" + o.i;
+    R(down ? "#3b5a72" : "#2a2a2a", x + 2, ry, w - 4, 15);
+    const col = ok ? "#ffe9a8" : "#6b6b6b";
+    const name = t.cityName[o.c.id], dd = o.d + " " + (o.d === 1 ? t.day1 : t.days), pot = t.upTo + " " + money(o.c.pot);
+    if (he) { txt(name, x + w - 6, ry + 4, 5, col, "right"); txt(dd, x + 112, ry + 4, 5, col, "center"); txt(pot, x + 6, ry + 4, 5, col, "left"); }
+    else { txt(name, x + 6, ry + 4, 5, col, "left", true); txt(dd, x + 128, ry + 4, 5, col, "center", true); txt(pot, x + w - 6, ry + 4, 5, col, "right", true); }
+    btns.push({ id: "fly:" + o.i, x: x + 2, y: ry, w: w - 4, h: 15, on: ok });
+  });
+  const hy = y + 14 + 4 * 17 + 1, hd = pressed && pressed.id === "home";
+  R(hd ? "#c0392b" : "#b0461f", x + 2, hy, w - 4, 12);
+  txt(t.homeRow, x + w / 2, hy + 3, 5, "#ffffff", "center");
+  btns.push({ id: "home", x: x + 2, y: hy, w: w - 4, h: 12, on: true });
+}
+function drawCrowd(ox, cheer) {
+  const HAIR = ["#2a2a2a", "#6b4422", "#8a8a8a", "#3a2a1a", "#c9a36a"], SUIT = ["#3b3f4a", "#4a3b2f", "#2f3b4a", "#5a4a3a", "#7a2a3a"];
+  for (let r = 0; r < 3; r++) for (let i = -2; i < Math.ceil(VW / 16) + 2; i++) {
+    const x = i * 16 + (r % 2) * 8 - (ox % 16), y = 196 + r * 15, k = (i * 7 + r * 3 + 99) % 5;
+    const jump = cheer > 0.2 ? Math.round(Math.max(0, Math.sin(frame * 0.3 + i * 1.7 + r)) * cheer * 4) : 0;
+    R(SUIT[k], x - 6, y + 6 - jump, 13, 14); R("#e8b48e", x - 3, y - 2 - jump, 7, 8);
+    if (k % 2 === 0) { R("#2b2b2b", x - 5, y - 3 - jump, 11, 2); R("#2b2b2b", x - 3, y - 6 - jump, 7, 4); R("#7a2a2a", x - 3, y - 3 - jump, 7, 1); }
+    else R(HAIR[k], x - 3, y - 3 - jump, 7, 3);
+    if (cheer > 0.5 && (i + r) % 3 === 0) { R("#e8b48e", x - 7, y - 6 - jump, 2, 4); R("#e8b48e", x + 6, y - 6 - jump, 2, 4); }
+  }
+}
+function drawSpeech() {
+  const ox = OX(), t = L();
+  R("#5a1a1a", 0, -OY, VW, VH + OY);
+  for (let x = 0; x < VW; x += 10) { R("#7a2424", x, -OY, 5, 200 + OY); R("#6a1f1f", x + 5, -OY, 1, 200 + OY); }
+  R("#b0861f", 0, 30, VW, 2);
+  R("#f6e3bb", ox + 40, 36, 176, 18); R("#b0861f", ox + 40, 36, 176, 1); R("#b0861f", ox + 40, 53, 176, 1);
+  txt(t.banner, ox + 128, 42, 5, "#1f4fa8", "center", true);
+  R("#8a5a34", 0, 168, VW, 30); R("#a8743f", 0, 168, VW, 3);
+  const cheer = sp ? sp.cheer : 0;
+  ctx.save(); ctx.translate(ox + 110, 104); ctx.scale(2, 2);
+  drawHeroSprite(0, 0, { face: 1, anim: 0, armUp: cheer > 0.4 && (frame >> 4) % 2 === 0, armFwd: cheer <= 0.4 });
+  ctx.restore();
+  R("#6b4422", ox + 114, 130, 34, 40); R("#8a5a34", ox + 112, 128, 38, 5); R("#4f3219", ox + 114, 160, 34, 2);
+  R("#b0861f", ox + 124, 140, 14, 10); R("#ffd23f", ox + 126, 142, 10, 6);
+  R("#333333", ox + 140, 110, 2, 20); R("#555555", ox + 137, 106, 8, 6); R("#888888", ox + 138, 107, 6, 1);
+  drawCrowd(ox, cheer);
+  // the speech lane
+  R("rgba(0,0,0,.75)", 0, 60, VW, 26);
+  const tx = TX();
+  R("#ffd23f", tx - 12, 58, 24, 2); R("#ffd23f", tx - 12, 84, 24, 2); R("#ffd23f", tx - 12, 58, 2, 28); R("#ffd23f", tx + 10, 58, 2, 28);
+  if (sp) {
+    for (const w of sp.words) {
+      const x = wordX(w); if (x > VW + 4 || x + w.w < -4) continue;
+      let col = "#ffffff";
+      if (w.key) { col = w.res === "miss" ? "#8a8a8a" : w.res ? "#7dff8a" : "#ffd23f"; if (!w.res) R("rgba(255,210,63,.18)", x - 2, 64, w.w + 4, 18); }
+      if (lang === "he") { ctx.font = "800 13px " + BODYF; ctx.fillStyle = col; ctx.textBaseline = "top"; ctx.direction = "rtl"; ctx.textAlign = "left"; ctx.fillText(w.text, x, 65); ctx.direction = "ltr"; }
+      else txt(w.text, x, 70, 7, col, "left", true);
+    }
+    if (sp.msgT > 0) txt(sp.msg, tx, 90 + (40 - sp.msgT) / 4, 5, "#7dff8a", "center", true);
+    if (sp.combo >= 2 && !sp.done) txt("x" + sp.combo, lang === "he" ? tx - 34 : tx + 34, 90, 6, "#ffd23f", "center", true);
+    if (!sp.done && sp.s < 90) txt(t.tapGold, ox + 128, 100, 6, "#ffffff", "center");
+    if (sp.done) {
+      const c = CITIES[here], k = Math.min(1, sp.endT / 30);
+      R(INK, ox + 30, 96, 196, 52); R("#fff6dd", ox + 28, 94, 196, 52);
+      txt(t.pledges(t.cityName[c.id]), ox + 126, 102, 6, "#b0461f", "center");
+      txt(money(Math.round(sp.pledge * k)), ox + 126, 118, 12, INK, "center", true);
+      const st = sp.q >= 0.85 ? t.crowdGreat : sp.q >= 0.55 ? t.crowdGood : t.crowdOk;
+      txt(st, ox + 126, 135, 5, "#3b4a58", "center");
+    }
+  }
+}
+function drawBGStanding(x, y) {
+  ctx.save(); ctx.translate(x + 6, y); ctx.scale(-1, 1);
+  const SK = "#eab58c", SH = "#d4bc82", SHD = "#a8915a", WH = "#f4f4f4";
+  R("#6b5836", -4, 16, 3, 6); R("#6b5836", 1, 16, 3, 6); R("#5b3a1d", -4, 22, 4, 2); R("#5b3a1d", 1, 22, 4, 2);
+  R(SH, -5, 9, 10, 8); R(SHD, -5, 16, 10, 1); R(SK, 0, 9, 2, 2); R(SH, 4, 7, 2, 4); R(SK, 4, 5, 2, 2);
+  R(SK, -4, 1, 8, 8); R(SK, 4, 4, 2, 3); R("#f6d2ae", -2, 1, 4, 1);
+  R(WH, -7, 2, 3, 5); R(WH, -8, 3, 2, 3); R(WH, 4, 1, 3, 3); R("#222222", 2, 4, 1, 1); R("#c98f66", 1, 7, 3, 1);
+  ctx.restore();
+}
+function drawHome() {
+  const ox = OX(), t = L();
+  const g = ctx.createLinearGradient(0, -OY, 0, 200); g.addColorStop(0, "#4fb6e8"); g.addColorStop(1, "#f3dca0");
+  ctx.fillStyle = g; ctx.fillRect(0, -OY, VW, 200 + OY);
+  R("#c9b79a", 0, 176, VW, 64 + OY); R("#a8987a", 0, 176, VW, 2); for (let x = 0; x < VW; x += 30) R("#f4f0e6", x + ((frame >> 1) % 30) * 0, 206, 14, 2);
+  R("#e8e2d4", ox + 190, 140, 60, 36); R("#d9d3c4", ox + 190, 140, 60, 4); R("#7fa7c0", ox + 198, 152, 10, 8); R("#7fa7c0", ox + 214, 152, 10, 8); R("#7fa7c0", ox + 230, 152, 10, 8);
+  R("#ffffff", ox + 214, 124, 2, 16); R("#ffffff", ox + 216, 125, 14, 9); R("#1f4fa8", ox + 216, 126, 14, 1); R("#1f4fa8", ox + 216, 132, 14, 1);
+  // the plane on the ground and its stairs
+  const land = Math.min(1, resT / 70), px = ox - 40 + land * 110, py = 120 + (1 - land) * -60;
+  ctx.save(); ctx.translate(px, py); ctx.scale(3, 3); drawPlane(0, 0, -(1 - land) * 0.25); ctx.restore();
+  if (resT > 80) {
+    R("#9aa3ab", ox + 92, 126, 4, 50); for (let k = 0; k < 6; k++) R("#6f7880", ox + 76 + k * 3, 130 + k * 8, 14, 2);
+    const walk = Math.min(1, (resT - 90) / 60), gx = ox + 70 + walk * 40, gy = 112 + walk * 40;
+    ctx.save(); ctx.translate(Math.round(gx), Math.round(gy)); ctx.scale(2, 2); drawHeroSprite(0, 0, { face: 1, anim: walk < 1 ? resT * 0.2 : 0, armUp: walk >= 1 }); ctx.restore();
+  }
+  ctx.save(); ctx.translate(ox + 156, 152); ctx.scale(2, 2); drawBGStanding(0, 0); ctx.restore();
+  if (resT > 150) {
+    R(INK, ox + 152, 118, 72, 22); R("#ffffff", ox + 150, 116, 72, 22); R("#ffffff", ox + 166, 138, 4, 4);
+    txt(t.bgSays, ox + 186, 123, 6, "#b0461f", "center");
+  }
+  R("rgba(18,48,74,.88)", ox + 28, 30, 200, 44);
+  txt(t.homeTitle, ox + 128, 36, 6, "#ffd23f", "center");
+  txt(money(raised), ox + 128, 50, 12, "#ffffff", "center", true);
+  if (resT > 120 && resT < 290 && (frame >> 5) % 2) txt(t.tapOn, ox + 128, 228, 4, "#5a4a2a", "center");
+}
+function draw() {
+  ctx.setTransform(S, 0, 0, S, 0, S * OY); ctx.imageSmoothingEnabled = false;
+  btns = [];
+  if (state === "result") drawHome();
+  else if (phase === "speech") drawSpeech();
+  else drawMap();
+  if (state === "play") drawHUD();
+  if (flashT > 0) { ctx.globalAlpha = flashT / 16; R("#ffffff", 0, -OY, VW, VH); ctx.globalAlpha = 1; }
+}
+
+// Golda from the side (for the start card, history pages, GIF and souvenir photo)
+function drawHeroSprite(x, y, o) {
+  ctx.save();
+  ctx.translate(x + 6, y);
+  if (o.face < 0) ctx.scale(-1, 1);
+  const f = Math.floor(o.anim) % 4, sw = [0, 1, 0, -1][f];
+  const SK = "#e8b48e", SKD = "#c58f6a", HR = "#a7adb4", HRL = "#cfd4d8", HRD = "#7f868e";
+  const DR = o.outfit === "work" ? "#6b5836" : "#2b3350", DRD = o.outfit === "work" ? "#4f4026" : "#1d2338", SH = "#1b1b1b";
+  if (o.air) { R(SK, -3, 19, 2, 3); R(SK, 1, 18, 2, 3); R(SH, -4, 21, 4, 2); R(SH, 1, 20, 4, 2); }
+  else { R(SK, -3 + sw, 20, 2, 2); R(SK, 1 - sw, 20, 2, 2); R(SH, -4 + sw, 22, 4, 2); R(SH, 1 - sw, 22, 4, 2); }
+  R(DRD, -6 - sw, 11, 2, 5); R(SKD, -6 - sw, 16, 2, 2);
+  R(DR, -5, 10, 10, 10); R(DR, -6, 15, 12, 5); R(DRD, -6, 19, 12, 1); R("#f2efe6", -1, 10, 3, 2);
+  if (o.air || o.armUp) { R(DR, 4, 7, 2, 4); R(SK, 4, 5, 2, 2); }
+  else if (o.armFwd) { R(DR, 4, 11, 4, 2); R(SK, 8, 11, 2, 2); }
+  else { R(DR, 4 + sw, 11, 2, 5); R(SK, 4 + sw, 16, 2, 2); R("#1b1b1b", 4 + sw, 17, 5, 4); R("#3a3a3a", 5 + sw, 16, 3, 1); R("#8a8a8a", 6 + sw, 18, 1, 1); }
+  R(SK, -1, 9, 3, 1);
+  R(SK, -4, 1, 8, 8); R(SK, 4, 4, 2, 3); R("#f2c7a3", -2, 2, 3, 1);
+  R(HR, -5, 0, 9, 3); R(HRL, -3, 0, 5, 1); R(HR, -5, 2, 2, 5); R(HRD, -5, 6, 2, 1);
+  R(HR, -8, 2, 4, 4); R(HRL, -7, 2, 2, 1); R(HRD, -8, 5, 4, 1);
+  R("#222", 2, 4, 1, 1); R(HRD, 1, 3, 3, 1); R(SKD, 1, 7, 3, 1); R(SKD, 5, 6, 1, 1);
+  ctx.restore();
+}
+
+/* ---------- how-to-play card ---------- */
+const helpScreen = document.getElementById("helpScreen");
+let helpPaused = false;
+document.getElementById("help").addEventListener("click", () => {
+  helpPaused = state === "play" && !gamePaused;
+  if (helpPaused) { gamePaused = true; musicStop(); }
+  releaseTouches(); helpScreen.hidden = false;
+});
+document.getElementById("helpClose").addEventListener("click", () => {
+  helpScreen.hidden = true;
+  if (helpPaused && state === "play") { gamePaused = false; initAudio(); musicStart(false); }
+  helpPaused = false;
+});
+
+/* ---------- story and history ---------- */
+const FACTS = [
+  { year: "1921", art: "merhavia",
+    title: { en: "From Kyiv to the kibbutz", he: "מקייב לקיבוץ" },
+    text: { en: "Golda was born in Kyiv in 1898 and grew up in Milwaukee, where she trained as a teacher. In 1921 she came to the Land of Israel and joined Kibbutz Merhavia, where she looked after the chickens.",
+            he: "גולדה נולדה בקייב ב־1898 וגדלה במילווקי שבארצות הברית, שם הוכשרה להיות מורה. ב־1921 עלתה לארץ והצטרפה לקיבוץ מרחביה, שם עבדה בלול התרנגולות." } },
+  { year: "14 May 1948", yearHe: "14 במאי 1948", art: "declare",
+    title: { en: "One of two women", he: "אחת משתי נשים" },
+    text: { en: "In the hall of the Tel Aviv Museum on Rothschild Boulevard, a short walk from this market, Golda signed Israel's Declaration of Independence. She was one of only two women among the signatories.",
+            he: "באולם מוזיאון תל אביב בשדרות רוטשילד, לא רחוק מהשוק הזה, חתמה גולדה על מגילת העצמאות. היא הייתה אחת משתי הנשים היחידות בין החותמים." } },
+  { year: "1969", art: "pm",
+    title: { en: "Prime Minister", he: "ראש הממשלה" },
+    text: { en: "In 1969 Golda became Israel's fourth prime minister, the first woman in the job and only the third woman in the world to lead a government. She served until 1974.",
+            he: "ב־1969 הייתה גולדה לראש הממשלה הרביעית של ישראל, האישה הראשונה בתפקיד ורק האישה השלישית בעולם שעמדה בראש ממשלה. היא כיהנה עד 1974." } },
+];
+const PHOTO_FACT = {
+  en: "In January 1948, a few weeks after the UN vote on partition, Golda flew to the United States. Her first speech, in Chicago, was unplanned and had no script. In about two months she raised some $50 million, twice what she had been sent for, and the money bought weapons for the war that was coming.",
+  he: "בינואר 1948, כמה שבועות אחרי החלטת החלוקה באו\"ם, טסה גולדה לארצות הברית. הנאום הראשון שלה, בשיקגו, לא היה מתוכנן ולא היה כתוב. בתוך כחודשיים היא גייסה כ־50 מיליון דולר, פי שניים ממה שנשלחה לגייס, והכסף קנה נשק למלחמה שהתקרבה." };
+
+const factScreen = document.getElementById("factScreen"), readToast = document.getElementById("readToast");
+let factArtKind = "stand", toastFact = -1, toastTimer = null;
+function offerFact(i) {
+  toastFact = i; readToast.textContent = "Page of history: " + FACTS[i].year + " · READ";
+  readToast.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, 6500);
+}
+function hideToast() { readToast.hidden = true; clearTimeout(toastTimer); }
+readToast.addEventListener("click", () => { if (toastFact >= 0) { hideToast(); showFact(toastFact); } });
+let curFact = -1;
+function showFact(i) {
+  const fct = FACTS[i]; curFact = i;
+  if (state === "play") { gamePaused = true; musicStop(); releaseTouches(); }
+  document.getElementById("factYear").textContent = lang === "he" && fct.yearHe ? fct.yearHe : fct.year;
+  document.getElementById("factTitle").textContent = fct.title[lang];
+  document.getElementById("factText").textContent = fct.text[lang];
+  document.getElementById("factCount").textContent = L().factCap;
+  factArtKind = fct.art; factScreen.hidden = false;
+}
+document.getElementById("factBtn").addEventListener("click", () => {
+  factScreen.hidden = true;
+  if (state !== "play") return;
+  gamePaused = false;
+  if (state === "play") { initAudio(); musicStart(false); }
+});
+
+// Animated scenes for the pages of history
+const SCENES = {
+  // 1921: Kibbutz Merhavia, Golda feeding the chickens
+  merhavia(W, H) {
+    const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#9fd6ee"); g.addColorStop(1, "#e9f4dc");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#7fae5a"; ctx.beginPath(); ctx.moveTo(0, 30); ctx.lineTo(40, 20); ctx.lineTo(90, 28); ctx.lineTo(120, 22); ctx.lineTo(120, 40); ctx.lineTo(0, 40); ctx.fill();
+    R("#c9a86a", 0, 39, W, 21); R("#b8955a", 0, 39, W, 1);
+    R("#e8dcc0", 84, 18, 30, 21); R("#a8743f", 82, 15, 34, 4); R("#6b4a2a", 95, 28, 7, 11);
+    for (let k = 0; k < 4; k++) R("#8a8a8a", 2 + k * 9, 26, 1, 13); R("#8a8a8a", 2, 28, 28, 1); R("#8a8a8a", 2, 34, 28, 1);
+    const hx = 46, hy = 15, up = Math.sin(frame * 0.1) > 0;
+    drawHeroSprite(hx, hy, { face: 1, anim: 0, outfit: "work", armUp: up });
+    if (!up) for (let k = 0; k < 3; k++) { const dy = (frame * 0.4 + k * 5) % 12; R("#f0d640", hx + 12 + k * 2, hy + 8 + dy, 1, 1); }
+    for (let k = 0; k < 4; k++) {
+      const cx = 66 + k * 9 + Math.round(Math.sin(frame * 0.05 + k) * 2), peck = ((frame >> 3) + k) % 3 === 0 ? 1 : 0;
+      R("#f7f2e6", cx, 33, 6, 5); R("#f7f2e6", cx + 4, 30 + peck, 3, 4); R("#e2483a", cx + 5, 29 + peck, 2, 1); R("#f0a93a", cx + 7, 32 + peck, 1, 1); R("#f0a93a", cx + 2, 38, 1, 1);
+    }
+  },
+  // 14 May 1948: signing the declaration in the museum hall
+  declare(W, H) {
+    R("#efe6d2", 0, 0, W, H); R("#e2d6bb", 0, 0, W, 3);
+    R("#8a5a34", 0, 44, W, 16); R("#7a4c2a", 0, 44, W, 1);
+    R("#6b4a2a", 48, 3, 24, 14); R("#d9c9a3", 50, 5, 20, 10); R("#c2ad80", 50, 12, 20, 3);
+    for (const fx of [16, 92]) {
+      const sway = Math.round(Math.sin(frame * 0.06 + fx) * 1);
+      R("#6b6b6b", fx + 6, 2, 1, 4);
+      R("#ffffff", fx + sway, 6, 13, 22); R("#1f4fa8", fx + 2 + sway, 6, 2, 22); R("#1f4fa8", fx + 9 + sway, 6, 2, 22);
+      ctx.strokeStyle = "#1f4fa8"; ctx.lineWidth = 0.8; const cx = fx + 6.5 + sway, cy = 17;
+      ctx.beginPath(); ctx.moveTo(cx, cy - 3); ctx.lineTo(cx + 2.6, cy + 1.5); ctx.lineTo(cx - 2.6, cy + 1.5); ctx.closePath(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, cy + 3); ctx.lineTo(cx + 2.6, cy - 1.5); ctx.lineTo(cx - 2.6, cy - 1.5); ctx.closePath(); ctx.stroke();
+    }
+    const hx = 46, hy = 12;
+    drawHeroSprite(hx, hy, { face: 1, anim: 0, armFwd: true });
+    R("#6b4a2a", 24, 32, 72, 3); R("#7d5634", 26, 35, 68, 9); R("#5b3d22", 26, 43, 68, 1);
+    R("#ffffff", hx + 12, 28, 14, 4); R("#b9b2a2", hx + 14, 29, 10, 1);
+    const pen = Math.round(Math.sin(frame * 0.2) * 2);
+    R("#111111", hx + 16 + pen, 25, 1, 4); R("#1f4fa8", hx + 15 + pen, 30, 3, 1);
+    for (let i = 0; i < 9; i++) { const bob = Math.round(Math.sin(frame * 0.05 + i) * 0.6); ctx.fillStyle = i % 2 ? "#2b2b33" : "#3b3328"; ctx.beginPath(); ctx.arc(8 + i * 13, 58 + bob, 5, 0, 7); ctx.fill(); }
+  },
+  // 1969: the prime minister at her desk, a flag and a phone that keeps ringing
+  pm(W, H) {
+    R("#dfe8ee", 0, 0, W, H); R("#cbd7df", 0, 0, W, 3); R("#8a5a34", 0, 44, W, 16);
+    R("#7fa6bf", 82, 8, 26, 20); R("#ffffff", 83, 9, 24, 18); R("#9fd6ee", 84, 10, 22, 16); R("#efe6d2", 84, 20, 22, 6);
+    const sway = Math.round(Math.sin(frame * 0.06) * 1);
+    R("#6b6b6b", 14, 4, 1, 36); R("#ffffff", 15 + sway, 5, 15, 11); R("#1f4fa8", 15 + sway, 6, 15, 1); R("#1f4fa8", 15 + sway, 14, 15, 1);
+    const hx = 48, hy = 14;
+    drawHeroSprite(hx, hy, { face: 1, anim: 0, armFwd: (frame >> 5) % 2 === 1 });
+    R("#6b4a2a", 34, 33, 56, 3); R("#7d5634", 36, 36, 52, 8);
+    R("#1b1b1b", 74, 28, 8, 5); R("#3a3a3a", 75, 27, 6, 1);
+    if ((frame >> 3) % 4 < 2) { R("#e2483a", 84, 26, 1, 2); R("#e2483a", 86, 25, 1, 3); }
+    R("#ffffff", 40, 30, 8, 3); R("#ffffff", 50, 31, 6, 2);
+  },
+};
+
+// Small illustrations drawn with the game's own sprite
+function drawArt(c, kind) {
+  const old = ctx; ctx = c.getContext("2d");
+  const W = 120, H = 60, sc = c.width / W;
+  ctx.setTransform(sc, 0, 0, sc, 0, 0); ctx.imageSmoothingEnabled = false;
+  if (SCENES[kind]) { SCENES[kind](W, H); ctx = old; return; }
+  const serve = kind === "hs" || kind === "photo";
+  if (!serve) {
+    // Golda at the podium, 1948
+    R("#5a1a1a", 0, 0, W, H); for (let x = 0; x < W; x += 6) { R("#7a2424", x, 0, 3, 46); }
+    R("#f6e3bb", 14, 4, 92, 9); R("#b0861f", 14, 4, 92, 1); R("#b0861f", 14, 12, 92, 1);
+    ctx.font = "4px 'Press Start 2P', monospace"; ctx.fillStyle = "#1f4fa8"; ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.fillText("UNITED JEWISH APPEAL", 60, 7); ctx.textAlign = "left";
+    R("#8a5a34", 0, 38, W, 8);
+    drawHeroSprite(46, 14, { face: 1, anim: 0, armUp: (frame >> 4) % 2 === 0, armFwd: (frame >> 4) % 2 === 1 });
+    R("#6b4422", 52, 28, 18, 18); R("#8a5a34", 51, 27, 20, 3); R("#b0861f", 57, 33, 8, 5);
+    R("#333333", 68, 18, 1, 10); R("#555555", 66, 15, 5, 4);
+    for (let i = 0; i < 16; i++) { const x = i * 8 - 2, y = 50 + (i % 2) * 3, j = Math.round(Math.max(0, Math.sin(frame * 0.3 + i)) * 2); R(["#3b3f4a", "#4a3b2f", "#2f3b4a"][i % 3], x, y + 4 - j, 7, 8); R("#e8b48e", x + 1, y - 1 - j, 5, 5); if (i % 2 === 0) { R("#2b2b2b", x, y - 2 - j, 7, 1); R("#2b2b2b", x + 1, y - 4 - j, 5, 2); } else R("#3a2a1a", x + 1, y - 2 - j, 5, 2); }
+  } else {
+    // home: the plane, Golda and Ben-Gurion
+    const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#4fb6e8"); g.addColorStop(1, "#f3dca0");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    R("#c9b79a", 0, 42, W, 18); R("#a8987a", 0, 42, W, 1);
+    R("#e8e2d4", 92, 26, 28, 16); R("#7fa7c0", 96, 31, 5, 4); R("#7fa7c0", 106, 31, 5, 4);
+    ctx.save(); ctx.translate(24, 24); ctx.scale(2.5, 2.5); drawPlane(0, 0, 0); ctx.restore();
+    drawHeroSprite(44, 18, { face: 1, anim: 0, armUp: true });
+    drawBGStanding(62, 18);
+    R("#ffd23f", 56, 10, 3, 3); R("#ffd23f", 70, 6, 2, 2); R("#ffd23f", 40, 8, 2, 2);
+  }
+  if (kind === "photo") {
+    ctx.globalCompositeOperation = "color"; R(finaleGold ? "#b8860b" : "#7a4f22", 0, 0, W, H); ctx.globalCompositeOperation = "source-over";
+    R("rgba(255,240,210,.18)", 0, 0, W, H);
+    ctx.font = "5px 'Press Start 2P', monospace"; ctx.fillStyle = "#3b2a17"; ctx.fillText("TEL AVIV", 4, 56);
+  }
+  ctx = old;
+}
+
+/* ---------- language switch ---------- */
+function applyLang() {
+  const t = L(), he = lang === "he";
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { const v = t[el.dataset.i18n]; if (typeof v === "string") el.textContent = v; });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { const v = t[el.dataset.i18nPh]; if (typeof v === "string") el.placeholder = v; });
+  if (!document.getElementById("board").hidden) renderBoard();
+  document.querySelectorAll(".card").forEach(c => { c.dir = he ? "rtl" : "ltr"; });
+  const dl = document.getElementById("helpLegend"); dl.innerHTML = "";
+  for (const [k, v] of t.legend) { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd); }
+  document.getElementById("lang").textContent = t.langBtn;
+  document.getElementById("streetsLink").hidden = IN_CLAUDE;
+  const cl = document.getElementById("challengeLine");
+  cl.hidden = !CHALLENGE;
+  if (CHALLENGE) cl.textContent = CHALLENGE.nick ? t.chalWithName(CHALLENGE.nick, CHALLENGE.score) : t.chalNoName(CHALLENGE.score);
+  soundBtn.textContent = t.sound[soundMode];
+  if (!document.getElementById("endScreen").hidden) renderEnd();
+  if (!factScreen.hidden && curFact >= 0) {
+    const f = FACTS[curFact];
+    document.getElementById("factYear").textContent = he && f.yearHe ? f.yearHe : f.year;
+    document.getElementById("factTitle").textContent = f.title[lang];
+    document.getElementById("factText").textContent = f.text[lang];
+    document.getElementById("factCount").textContent = t.factCap;
+  }
+}
+document.getElementById("lang").addEventListener("click", () => {
+  lang = lang === "he" ? "en" : "he";
+  try { localStorage.setItem("gbr-lang-v2", lang); } catch (e) {}
+  applyLang();
+});
+
+/* ---------- share my photo ---------- */
+const shareBtn = document.getElementById("shareBtn"), shareNote = document.getElementById("shareNote");
+let downloadsCap = null;
+(async () => {
+  try { if (window.claude && window.claude.use) downloadsCap = await window.claude.use("downloads"); } catch (e) { downloadsCap = null; }
+  if (downloadsCap && lastWon && !document.getElementById("endScreen").hidden) shareBtn.hidden = false;
+})();
+/* ---------- animated GIF: Golda runs, then serves the cake ---------- */
+function gifLZW(px, out) {
+  const minCode = 8, clear = 256, eoi = 257;
+  out.push(minCode);
+  let size = 9, next = 258, dict = new Map(), cur = 0, bits = 0;
+  const bytes = [];
+  const emit = c => { cur |= c << bits; bits += size; while (bits >= 8) { bytes.push(cur & 255); cur >>>= 8; bits -= 8; } };
+  emit(clear);
+  let prefix = px[0];
+  for (let i = 1; i < px.length; i++) {
+    const k = px[i], key = prefix * 256 + k, v = dict.get(key);
+    if (v !== undefined) { prefix = v; continue; }
+    emit(prefix);
+    if (next === 4096) { emit(clear); dict = new Map(); size = 9; next = 258; }
+    else { if (next >= (1 << size)) size++; dict.set(key, next++); }
+    prefix = k;
+  }
+  emit(prefix); emit(eoi);
+  if (bits > 0) bytes.push(cur & 255);
+  for (let i = 0; i < bytes.length; i += 255) { const n = Math.min(255, bytes.length - i); out.push(n); for (let j = 0; j < n; j++) out.push(bytes[i + j]); }
+  out.push(0);
+}
+function encodeGif(w, h, frames, palette, delays) {
+  const out = [], b = v => out.push(v & 255), w16 = v => { b(v); b(v >> 8); }, str = t => { for (let i = 0; i < t.length; i++) b(t.charCodeAt(i)); };
+  str("GIF89a"); w16(w); w16(h); b(0xF7); b(0); b(0);
+  for (let i = 0; i < 256; i++) { const c = palette[i] || [0, 0, 0]; b(c[0]); b(c[1]); b(c[2]); }
+  b(0x21); b(0xFF); b(11); str("NETSCAPE2.0"); b(3); b(1); w16(0); b(0);
+  frames.forEach((idx, f) => {
+    b(0x21); b(0xF9); b(4); b(0); w16(delays[f]); b(0); b(0);
+    b(0x2C); w16(0); w16(0); w16(w); w16(h); b(0);
+    gifLZW(idx, out);
+  });
+  b(0x3B);
+  return new Uint8Array(out);
+}
+function makeShareGif() {
+  const W = 360, H = 270, t = L(), he = lang === "he";
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const k = c.getContext("2d", { willReadFrequently: true });
+  const art = document.createElement("canvas"); art.width = 360; art.height = 180;
+  const body = "Rubik, system-ui, sans-serif", pix = "'Press Start 2P', monospace";
+  const savedFrame = frame, rgba = [], delays = [];
+  const N = 34;
+  for (let i = 0; i < N; i++) {
+    const hs = i >= 20;
+    frame = savedFrame + i * 5;
+    drawArt(art, hs ? (i >= 30 && finaleGold ? "photo" : "hs") : "run");
+    k.fillStyle = "#12304a"; k.fillRect(0, 0, W, H);
+    k.imageSmoothingEnabled = false; k.drawImage(art, 0, 36);
+    if (hs && i < 30) for (let s = 0; s < 6; s++) { const a = (i * 0.7 + s) % 6.28; k.fillStyle = "#ffd23f"; k.fillRect(Math.round(180 + Math.cos(a) * 44), Math.round(110 + Math.sin(a) * 30), 4, 4); }
+    k.textAlign = "center"; k.direction = he ? "rtl" : "ltr"; k.fillStyle = "#ffffff";
+    k.font = he ? "800 24px " + body : "16px " + pix; k.fillText(t.shareTitle, W / 2, he ? 27 : 26);
+    k.fillStyle = "#ffd23f"; k.font = he ? "800 20px " + body : "12px " + pix;
+    k.fillText(t.score + " " + String(score).padStart(6, "0") + (finaleGold ? " ★" : ""), W / 2, he ? 240 : 238);
+    k.fillStyle = "#ffffff"; k.font = "800 15px " + body; k.fillText(i < 20 ? t.shareHead : t.shareChallenge, W / 2, 262);
+    rgba.push(k.getImageData(0, 0, W, H).data);
+    delays.push(i === 19 ? 30 : i === N - 1 ? 150 : 9);
+  }
+  frame = savedFrame;
+  // palette: the 256 most used colours, every other colour mapped to its nearest
+  const count = new Map();
+  for (const d of rgba) for (let p = 0; p < d.length; p += 16) { const key = (d[p] << 16) | (d[p + 1] << 8) | d[p + 2]; count.set(key, (count.get(key) || 0) + 1); }
+  const top = [...count.entries()].sort((a, b) => b[1] - a[1]).slice(0, 256).map(e => e[0]);
+  const palette = top.map(v => [v >> 16 & 255, v >> 8 & 255, v & 255]);
+  const lookup = new Map(); top.forEach((v, i) => lookup.set(v, i));
+  const nearest = key => {
+    let hit = lookup.get(key); if (hit !== undefined) return hit;
+    const r = key >> 16 & 255, g = key >> 8 & 255, bl = key & 255; let best = 0, bd = 1e9;
+    for (let i = 0; i < palette.length; i++) { const q = palette[i], dd = (q[0] - r) ** 2 + (q[1] - g) ** 2 + (q[2] - bl) ** 2; if (dd < bd) { bd = dd; best = i; } }
+    lookup.set(key, best); return best;
+  };
+  const frames = rgba.map(d => { const idx = new Uint8Array(W * H); for (let p = 0, j = 0; p < d.length; p += 4, j++) idx[j] = nearest((d[p] << 16) | (d[p + 1] << 8) | d[p + 2]); return idx; });
+  return new Blob([encodeGif(W, H, frames, palette, delays)], { type: "image/gif" });
+}
+function makeShareImage() {
+  const W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H;
+  const k = c.getContext("2d"), t = L(), he = lang === "he";
+  const pix = "'Press Start 2P', monospace", body = "Rubik, system-ui, sans-serif";
+  k.fillStyle = "#12304a"; k.fillRect(0, 0, W, H);
+  k.fillStyle = "#f6e3bb"; k.fillRect(28, 28, W - 56, H - 56);
+  k.textAlign = "center"; k.direction = he ? "rtl" : "ltr";
+  k.fillStyle = "#b0461f"; k.font = "600 38px " + body; k.fillText("חוף גורדון ← חוף פרישמן · Tel Aviv", W / 2, 118);
+  k.fillStyle = "#12304a"; k.font = he ? "800 92px " + body : "56px " + pix; k.fillText(t.shareTitle, W / 2, 222);
+  const art = document.createElement("canvas"); art.width = 480; art.height = 240; drawArt(art, "photo");
+  const px = 60, py = 290, pw = 960, ph = 480;
+  k.fillStyle = finaleGold ? "#e8b923" : "#12304a"; k.fillRect(px - 14, py - 14, pw + 28, ph + 28);
+  k.imageSmoothingEnabled = false; k.drawImage(art, px, py, pw, ph);
+  k.fillStyle = "#3b4a58"; k.font = "500 36px " + body; k.fillText(finaleGold ? t.shareCapGold : t.shareCap, W / 2, py + ph + 74);
+  k.fillStyle = "#12304a"; k.font = "800 46px " + body; k.fillText(t.shareHead, W / 2, py + ph + 150);
+  k.font = he ? "800 64px " + body : "50px " + pix; k.fillText(t.score + " " + String(score).padStart(6, "0"), W / 2, py + ph + 250);
+  k.font = "800 44px " + body; k.fillText("₪" + shekels + (finaleGold ? " · " + t.golden : ""), W / 2, py + ph + 320);
+  k.fillStyle = "#ff6a3d"; k.fillRect(110, py + ph + 365, W - 220, 100);
+  k.fillStyle = "#ffffff"; k.font = "800 50px " + body; k.fillText(t.shareChallenge, W / 2, py + ph + 432);
+  k.direction = "ltr"; k.fillStyle = "#12304a"; k.font = "500 30px " + body; k.fillText(GAME_URL.replace(/^https?:\/\//, ""), W / 2, H - 62);
+  return new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error("no image")), "image/png"));
+}
+function noteShare(msg) { shareNote.textContent = msg; shareNote.hidden = false; }
+document.getElementById("copyBtn").addEventListener("click", () => {
+  const field = document.getElementById("copyField");
+  const showField = () => { field.hidden = false; field.focus(); field.select(); noteShare(L().copyManual); };
+  try {
+    if (!navigator.clipboard || !navigator.clipboard.writeText) { showField(); return; }
+    navigator.clipboard.writeText(field.value).then(() => { field.hidden = true; noteShare(L().copied); }, showField);
+  } catch (e) { showField(); }
+});
+let cachedGif = null;
+async function shareFromWebsite() {
+  const blob = cachedGif && cachedGif.lang === lang ? cachedGif.blob : makeShareGif();
+  const file = new File([blob], "golda-50-million.gif", { type: "image/gif" });
+  const msg = document.getElementById("copyField").value;
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], text: msg }); } catch (e) { /* closed the share sheet */ }
+    return;
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  noteShare(L().saved);
+}
+shareBtn.addEventListener("click", async () => {
+  if (!IN_CLAUDE) { shareBtn.disabled = true; try { await shareFromWebsite(); } finally { shareBtn.disabled = false; } return; }
+  if (!downloadsCap) return;
+  shareBtn.disabled = true;
+  try {
+    noteShare(L().making);
+    await new Promise(r => setTimeout(r, 30));
+    const blob = makeShareGif();
+    await downloadsCap.save({ filename: "golda-50-million.gif", data: blob });
+    noteShare(L().saved);
+  } catch (e) {
+    const code = e && e.code;
+    if (code === "declined") { /* the player changed their mind */ }
+    else if (code === "rate_limited") noteShare(L().busy);
+    else { shareBtn.hidden = true; noteShare(L().noSave); }
+  } finally { shareBtn.disabled = false; }
+});
+/* ---------- leaderboard ---------- */
+const BOARD_ON = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+const boardBase = BOARD_ON ? CFG.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/" + (CFG.scoresTable || "scores") : "";
+// new "sb_publishable_" keys go only in the apikey header; older "eyJ" keys also as a bearer token
+const boardHeaders = () => CFG.supabaseAnonKey.startsWith("eyJ")
+  ? { apikey: CFG.supabaseAnonKey, Authorization: "Bearer " + CFG.supabaseAnonKey }
+  : { apikey: CFG.supabaseAnonKey };
+let boardRows = null, boardMine = null, boardState = "idle", boardSent = false;
+function cleanNick(v) { return (v || "").replace(/[\u0000-\u001f<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 16); }
+function boardMsg(text) { const n = document.getElementById("boardNote"); n.textContent = text || ""; n.hidden = !text; }
+function renderBoard() {
+  const t = L(), list = document.getElementById("boardList"); list.innerHTML = "";
+  if (boardState === "loading") { boardMsg(t.boardLoading); return; }
+  if (boardState === "error") { boardMsg(t.boardErr); return; }
+  if (boardRows && !boardRows.length) { boardMsg(t.boardEmpty); return; }
+  (boardRows || []).forEach((r, i) => {
+    const li = document.createElement("li");
+    if (boardMine && r.nickname === boardMine.nickname && r.score === boardMine.score) li.className = "me";
+    const a = document.createElement("span"); a.textContent = (i + 1) + ". " + r.nickname + (r.golden ? " ★" : "");
+    const b = document.createElement("span"); b.textContent = String(r.score);
+    li.append(a, b); list.appendChild(li);
+  });
+  boardMsg(boardMine && boardMine.rank ? t.boardDone(boardMine.rank) : "");
+}
+async function loadBoard() {
+  boardState = "loading"; renderBoard();
+  try {
+    const r = await fetch(boardBase + "?select=nickname,score,golden&order=score.desc,created_at.asc&limit=10", { headers: boardHeaders() });
+    if (!r.ok) throw new Error(String(r.status));
+    boardRows = await r.json(); boardState = "ok";
+  } catch (e) { boardState = "error"; }
+  renderBoard();
+}
+function openBoard() {
+  const box = document.getElementById("board");
+  box.hidden = !BOARD_ON; if (!BOARD_ON) return;
+  boardSent = false; boardMine = null;
+  document.getElementById("boardForm").hidden = false;
+  let saved = ""; try { saved = localStorage.getItem("gbr-nick") || ""; } catch (e) {}
+  document.getElementById("nick").value = saved;
+  loadBoard();
+}
+document.getElementById("boardForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!BOARD_ON || boardSent) return;
+  const t = L(), nick = cleanNick(document.getElementById("nick").value);
+  if (!nick) { boardMsg(t.boardNeedNick); document.getElementById("nick").focus(); return; }
+  const btn = document.getElementById("boardSave"); btn.disabled = true; boardMsg(t.boardSaving);
+  try {
+    const row = { nickname: nick, score, golden: !!(lastWon && finaleGold), lang };
+    const r = await fetch(boardBase, { method: "POST", headers: { ...boardHeaders(), "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify(row) });
+    if (!r.ok) throw new Error(String(r.status));
+    boardSent = true;
+    try { localStorage.setItem("gbr-nick", nick); } catch (err) {}
+    let rank = null;
+    try {
+      const c = await fetch(boardBase + "?select=id&score=gt." + score, { headers: { ...boardHeaders(), Prefer: "count=exact", Range: "0-0" } });
+      const cr = c.headers.get("content-range"); if (cr && cr.includes("/")) rank = Number(cr.split("/")[1]) + 1;
+    } catch (err) {}
+    boardMine = { nickname: nick, score, rank };
+    document.getElementById("boardForm").hidden = true;
+    await loadBoard();
+    renderEnd();
+  } catch (err) { boardMsg(t.boardErr); }
+  finally { btn.disabled = false; }
+});
+
+applyLang();
+
+/* ---------- loop ---------- */
+let last = performance.now(), acc = 0, paused = false;
+document.addEventListener("visibilitychange", () => {
+  paused = document.hidden; last = performance.now();
+  if (paused) { musicStop(); releaseTouches(); if (state === "play") setPaused(true); }
+});
+function loop(now) {
+  if (!paused) {
+    acc += Math.min(100, now - last);
+    if (gamePaused) acc = 0;
+    while (acc >= 1000 / 60) { step(); acc -= 1000 / 60; }
+    draw();
+    if (!factScreen.hidden) drawArt(document.getElementById("factArt"), factArtKind);
+    if (!document.getElementById("titleScreen").hidden) drawArt(document.getElementById("titleArt"), "run");
+  }
+  last = now;
+  requestAnimationFrame(loop);
+}
+resize();
+if (document.fonts && document.fonts.load) document.fonts.load("8px 'Press Start 2P'").catch(() => {});
+requestAnimationFrame(loop);
+})();
+</script>

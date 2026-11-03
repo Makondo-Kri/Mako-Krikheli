@@ -37,11 +37,14 @@ async function sceneOf(browser, game) {
   const png = (u) => Buffer.from(u.split(",")[1], "base64");
   const [gordonArt, gordonIcon] = await sceneOf(browser, "gordon-beach-run");
   const [goldaArt, goldaIcon] = await sceneOf(browser, "golda-kitchen");
+  const [tourArt, tourIcon] = await sceneOf(browser, "golda-tour");
   await browser.close();
   fs.writeFileSync(path.join(root, "api", "_assets", "share-art.png"), png(gordonArt));
   fs.writeFileSync(path.join(root, "api", "_assets", "golda-art.png"), png(goldaArt));
   fs.writeFileSync(path.join(root, "gordon-beach-run", "favicon.png"), png(gordonIcon));
   fs.writeFileSync(path.join(root, "golda-kitchen", "favicon.png"), png(goldaIcon));
+  fs.writeFileSync(path.join(root, "api", "_assets", "tour-art.png"), png(tourArt));
+  fs.writeFileSync(path.join(root, "golda-tour", "favicon.png"), png(tourIcon));
   fs.writeFileSync(path.join(root, "favicon.png"), png(gordonIcon));
 
   const { ImageResponse } = await import("@vercel/og");
@@ -57,7 +60,7 @@ async function sceneOf(browser, game) {
   };
   await draw({ art: gordonArt, mode: "streets" }, path.join(root, "streets-og.png"));
   let n = 1;
-  for (const [game, key, art] of [["gordon-beach-run", "gordon", gordonArt], ["golda-kitchen", "golda", goldaArt]]) {
+  for (const [game, key, art] of [["gordon-beach-run", "gordon", gordonArt], ["golda-kitchen", "golda", goldaArt], ["golda-tour", "tour", tourArt]]) {
     await draw({ art, game: key, mode: "play" }, path.join(root, game, "og-image.png"));
     for (const b of BUCKETS) await draw({ art, game: key, mode: "range", score: b }, path.join(root, game, "c", String(b), "og.png"));
     n += 1 + BUCKETS.length;

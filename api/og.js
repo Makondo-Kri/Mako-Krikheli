@@ -1,4 +1,4 @@
-// Picture for a shared score: /api/og?s=4850&n=Mako&g=golda  (1200x630 PNG; g is gordon or golda)
+// Picture for a shared score: /api/og?s=4850&n=Mako&g=golda  (1200x630 PNG; g is gordon, golda or tour)
 import { ImageResponse } from "@vercel/og";
 import { card, cleanNick, cleanScore, gameOf } from "./_card.js";
 
@@ -9,6 +9,7 @@ const pixel = fetch(new URL("./_fonts/PressStart2P.ttf", import.meta.url)).then(
 const arts = {
   gordon: fetch(new URL("./_assets/share-art.png", import.meta.url)).then((r) => r.arrayBuffer()),
   golda: fetch(new URL("./_assets/golda-art.png", import.meta.url)).then((r) => r.arrayBuffer()),
+  tour: fetch(new URL("./_assets/tour-art.png", import.meta.url)).then((r) => r.arrayBuffer()),
 };
 
 function toBase64(buf) {

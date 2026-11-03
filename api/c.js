@@ -1,4 +1,4 @@
-// Challenge link: /api/c?s=4850&n=Mako&g=golda   (g is gordon or golda)
+// Challenge link: /api/c?s=4850&n=Mako&g=golda   (g is gordon, golda or tour)
 // WhatsApp / Facebook read the preview tags here (picture with the name and score),
 // people are sent straight on to the game, which shows the score to beat.
 import { cleanNick, cleanScore, gameOf, GAMES } from "./_card.js";

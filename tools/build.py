@@ -14,6 +14,7 @@ root = pathlib.Path(__file__).resolve().parent.parent
 GAMES = {
     "gordon-beach-run": "Gordon Beach Run",
     "golda-kitchen": "Golda's Kitchen",
+    "golda-tour": "Golda's $50 Million",
 }
 buckets = list(range(0, 10000, 250)) + list(range(10000, 20001, 1000))
 

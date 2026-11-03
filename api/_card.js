@@ -3,12 +3,14 @@
 const h = (type, style, children) => ({ type, props: { style, children } });
 
 const HEBREW = /[֐-׿]/;
-const LATIN_OR_DIGIT = /[A-Za-z0-9]/;
-// The picture library lays text out left to right only. Hebrew-only text is
-// reversed by hand so it reads correctly; mixed text is left as typed.
+const LATIN = /[A-Za-z]/;
+// The picture library lays text out left to right only. Hebrew text (with or
+// without numbers) is put in visual order by hand: the words swap places and each
+// Hebrew word is spelled backwards, numbers stay as they are. Text with Latin
+// letters is left as typed.
 function visual(text) {
-  if (HEBREW.test(text) && !LATIN_OR_DIGIT.test(text)) return [...text].reverse().join("");
-  return text;
+  if (!HEBREW.test(text) || LATIN.test(text)) return text;
+  return text.split(" ").reverse().map(w => HEBREW.test(w) ? [...w].reverse().join("") : w).join(" ");
 }
 
 export function cleanNick(v) {
@@ -20,10 +22,11 @@ export function cleanScore(v) {
 }
 
 // mode "score": name + score (shared runs); "range": score range only; "play": game preview; "streets": platform preview
-// game: "gordon" (Gordon Beach Run) or "golda" (Golda's Kitchen)
+// game: "gordon" (Gordon Beach Run), "golda" (Golda's Kitchen) or "tour" (Golda's $50 Million)
 export const GAMES = {
   gordon: { title: "GORDON BEACH RUN", he: "ריצה בחוף גורדון", place: "Tel Aviv, 1957", line: "Ben-Gurion races to Frishman Beach", path: "gordon-beach-run", name: "Gordon Beach Run" },
   golda: { title: "GOLDA'S KITCHEN", he: "המטבח של גולדה", place: "Tel Aviv, 1970", line: "The newest minister bakes for Golda's cabinet", path: "golda-kitchen", name: "Golda's Kitchen" },
+  tour: { title: "GOLDA'S $50 MILLION", he: "50 המיליון של גולדה", place: "America, 1948", line: "Golda's 1948 tour to raise money for the new state", path: "golda-tour", name: "Golda's $50 Million" },
 };
 export function gameOf(v) { return GAMES[v] ? v : "gordon"; }
 
@@ -67,8 +70,8 @@ function poster({ art, mode, G }) {
     h("div", { position: "absolute", left: 640, top: streets ? 210 : 160, width: 510, height: 260, background: "#12304a", display: "flex" }, []),
     h("div", { position: "absolute", left: 628, top: streets ? 200 : 150, width: 510, height: 260, background: "#f6e3bb", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }, [
       h("div", { fontSize: 30, color: "#b0461f", fontWeight: 800 }, streets ? "NOW PLAYING" : G.place),
-      h("div", { fontSize: streets ? 46 : 54, color: "#12304a", fontWeight: 800, marginTop: 10 }, streets ? "Gordon Beach Run · Golda's Kitchen" : visual(G.he)),
-      h("div", { fontSize: 24, color: "#3b4a58", fontWeight: 800, marginTop: 12 }, streets ? "Two free retro games, more coming" : G.line),
+      h("div", { fontSize: streets ? 46 : G.he.length > 14 ? 44 : 54, color: "#12304a", fontWeight: 800, marginTop: 10 }, streets ? "Ben-Gurion · Golda Meir" : visual(G.he)),
+      h("div", { fontSize: 24, color: "#3b4a58", fontWeight: 800, marginTop: 12 }, streets ? "Three free retro games, more coming" : G.line),
     ]),
     h("div", { position: "absolute", left: 70, top: 522, width: 1080, height: 92, background: "#12304a", display: "flex" }, []),
     h("div", { position: "absolute", left: 60, top: 512, width: 1080, height: 92, background: "#ff6a3d", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffffff", fontSize: 44, fontWeight: 800 }, [
