@@ -8,7 +8,8 @@ Free retro games set on real streets and beaches, played in the phone's browser.
 **Games in the repo**
 
 - **Gordon Beach Run · ריצה בחוף גורדון.** Tel Aviv, 1957: help Ben-Gurion race
-  from Gordon Beach to Frishman Beach.
+  from Gordon Beach to Frishman Beach (level 1), then along the promenade to the
+  Jaffa clock tower (level 2).
 - **Golda's Kitchen · המטבח של גולדה.** Tel Aviv, 1970: Golda Meir's cabinet meets
   at her kitchen table, and you, the newest minister, have to bake her famous cake.
 - **Golda's $50 Million · 50 המיליון של גולדה.** America, 1948: plan Golda Meir's
