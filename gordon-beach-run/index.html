@@ -112,9 +112,10 @@ body.portrait #game { border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,.45
 .photos { display: flex; gap: 10px; align-items: flex-end; justify-content: center; }
 .photos figure { margin: 0; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .fig-game { flex: 1.7; }
-.fig-real { flex: 1; }
-.real { display: block; width: 100%; max-height: 200px; aspect-ratio: 2 / 3; object-fit: cover; border: 3px solid var(--ink); border-radius: 2px; }
-@media (max-height: 520px) and (orientation: landscape) { .real { max-height: 150px; } }
+.fig-real { flex: 0 1 auto; align-items: center; }
+/* the statue photo always keeps its own 2:3 shape, so nothing is cut off */
+.real { display: block; height: 200px; width: auto; max-width: 100%; aspect-ratio: 2 / 3; object-fit: contain; border: 3px solid var(--ink); border-radius: 2px; }
+@media (max-height: 520px) and (orientation: landscape) { .real { height: 150px; } }
 .year { font-family: var(--font-pixel); font-size: 10px; color: #b0461f; margin: 0; }
 .dots { display: flex; gap: 6px; }
 .dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(18,48,74,.25); }
@@ -143,6 +144,7 @@ a.go { display: flex; align-items: center; justify-content: center; text-decorat
 .go.fb { background: #1877f2; color: #ffffff; }
 .share-row { display: flex; flex-direction: column; gap: 6px; }
 .share-row .row .go { flex: 1 1 40%; }
+#shareMenu .wa { flex-basis: 100%; }
 .copy-field { width: 100%; box-sizing: border-box; font: 13px var(--font-body); padding: 8px; border: 2px solid var(--ink); border-radius: 4px; background: #fffaf0; color: var(--ink); user-select: text; -webkit-user-select: text; }
 /* Short landscape phones: two columns so the Start button is always on screen */
 @media (max-height: 520px) and (orientation: landscape) {
@@ -289,8 +291,8 @@ body.portrait .art { max-width: 260px; }
       </div>
       <div class="row" id="endPages" style="flex-wrap:wrap"></div>
       <div id="shareRow" class="share-row" hidden>
-        <p class="hint" data-i18n="shareLbl">Share your run:</p>
-        <div class="row" style="flex-wrap:wrap">
+        <button class="go alt" id="shareOpen" type="button" aria-expanded="false" aria-controls="shareMenu" data-i18n="shareOne">Share</button>
+        <div class="row" id="shareMenu" style="flex-wrap:wrap" hidden>
           <a class="go small wa" id="waLink" target="_blank" rel="noopener" href="https://wa.me/">WhatsApp</a>
           <a class="go small fb" id="fbLink" target="_blank" rel="noopener" href="https://www.facebook.com/">Facebook</a>
           <button class="go alt small" id="copyBtn" type="button" data-i18n="copy">Copy link</button>
@@ -360,7 +362,7 @@ const I18N = {
     back: "Back to the beach", realCap: "The real statue · Frishman Beach", again: "Play again", savePhoto: "Save animated GIF", shareGif: "Share animated GIF",
     boardTitle: "Top scores", boardAsk: "Put your score on the board?", nickPh: "Nickname", boardSave: "Add my score",
     boardLoading: "Loading the board…", boardEmpty: "No scores yet. Be the first!", boardErr: "Couldn't reach the board. Check your connection and try again.",
-    boardNeedNick: "Type a nickname first (up to 16 letters).", boardDone: (r) => "You're on the board at #" + r + "!", boardSaving: "Saving…", shareLbl: "Share your run:", copy: "Copy link",
+    boardNeedNick: "Type a nickname first (up to 16 letters).", boardDone: (r) => "You're on the board at #" + r + "!", boardSaving: "Saving…", shareLbl: "Share your run:", shareOne: "Share", copy: "Copy link",
     copied: "Copied! Paste it into Messenger, WhatsApp or anywhere.", copyManual: "Copy the text below and paste it anywhere.",
     shareMsg: (sc) => "I got Ben-Gurion to his headstand on Frishman Beach! Score " + sc + ". Can you beat me?",
     jumpBtn: "JUMP", walkLbl: "← walk →", jumpLbl: "jump", langBtn: "עב",
@@ -369,7 +371,7 @@ const I18N = {
       ["Keyboard", "Arrows to walk, space to jump (twice for a big jump)"], ["Crabs & gulls", "Jump on them"],
       ["Jellyfish", "Don't touch, they sting"], ["₪ blocks", "Hit from below for shekels"],
       ["Hummus", "Bowl 1: a tembel hat. Bowl 2: a scarf. Bowl 3: a golden glow. Hat and scarf save you once each. The glow lasts 10 seconds: nothing can hurt you, you run faster, and enemies turn into shekels. Glow at the flag for a golden finish"],
-      ["Scrolls", "Halfway along the beach, a page of his real story"], ["Goal", "Reach the flag on Frishman Beach, then run on to the Jaffa clock tower"], ["Jaffa", "Watch out for rolling Jaffa oranges and stray matkot balls"]],
+      ["Scrolls", "Halfway along the beach, a page of his real story"], ["Goal", "Reach the flag on Frishman Beach"]],
     scarfSub: "saves you from one more hit", l2Sub: "follow the promenade to the clock tower", glowSub: "10 seconds: enemies turn to shekels",
     winEyebrow: "Herzliya 1957 · Tel Aviv today", winTitle: "Ben-Gurion's headstand", overEyebrow: "Game over", overTitle: "Out of lives on the sand",
     yourRun: "Your run", goldRun: "Your golden run", read: "Read", factCap: "A page of his story",
@@ -387,7 +389,7 @@ const I18N = {
     back: "חזרה לחוף", realCap: "הפסל האמיתי · חוף פרישמן", again: "שחקו שוב", savePhoto: "שמירת GIF מונפש", shareGif: "שתפו GIF מונפש",
     boardTitle: "טבלת השיאים", boardAsk: "להכניס את הניקוד שלכם לטבלה?", nickPh: "כינוי", boardSave: "הוסיפו אותי",
     boardLoading: "טוענים את הטבלה…", boardEmpty: "עוד אין תוצאות. היו הראשונים!", boardErr: "לא הצלחנו להגיע לטבלה. בדקו את החיבור ונסו שוב.",
-    boardNeedNick: "כתבו קודם כינוי (עד 16 תווים).", boardDone: (r) => "נכנסתם לטבלה במקום " + r + "!", boardSaving: "שומרים…", shareLbl: "שתפו את הריצה:", copy: "העתקת קישור",
+    boardNeedNick: "כתבו קודם כינוי (עד 16 תווים).", boardDone: (r) => "נכנסתם לטבלה במקום " + r + "!", boardSaving: "שומרים…", shareLbl: "שתפו את הריצה:", shareOne: "שתפו", copy: "העתקת קישור",
     copied: "הועתק! הדביקו במסנג׳ר, בוואטסאפ או בכל מקום.", copyManual: "העתיקו את הטקסט למטה והדביקו בכל מקום.",
     shareMsg: (sc) => "הבאתי את בן־גוריון לעמידת ראש בחוף פרישמן! ניקוד " + sc + ". תצליחו לעקוף אותי?",
     jumpBtn: "קפיצה", walkLbl: "← הליכה →", jumpLbl: "קפיצה", langBtn: "EN",
@@ -396,7 +398,7 @@ const I18N = {
       ["מקלדת", "חצים להליכה, רווח לקפיצה (פעמיים לקפיצה גבוהה)"], ["סרטנים ושחפים", "קפצו עליהם"],
       ["מדוזות", "לא לגעת, הן צורבות"], ["קוביות ₪", "הכו מלמטה וקבלו שקלים"],
       ["חומוס", "קערה 1: כובע טמבל. קערה 2: צעיף. קערה 3: זוהר זהב. הכובע והצעיף מגינים מפגיעה אחת כל אחד. הזוהר נמשך 10 שניות: שום דבר לא פוגע בכם, אתם רצים מהר יותר ואויבים הופכים לשקלים. הגיעו לדגל זוהרים וקבלו סיום זהוב"],
-      ["מגילה", "באמצע החוף, דף מהסיפור האמיתי שלו"], ["המטרה", "להגיע לדגל בחוף פרישמן, ואז להמשיך עד מגדל השעון ביפו"], ["יפו", "היזהרו מתפוזי יפו מתגלגלים ומכדורי מטקות"]],
+      ["מגילה", "באמצע החוף, דף מהסיפור האמיתי שלו"], ["המטרה", "להגיע לדגל בחוף פרישמן"]],
     scarfSub: "מגן מעוד פגיעה אחת", l2Sub: "לאורך הטיילת עד מגדל השעון", glowSub: "10 שניות: אויבים הופכים לשקלים",
     winEyebrow: "הרצליה 1957 · תל אביב היום", winTitle: "עמידת הראש של בן־גוריון", overEyebrow: "המשחק נגמר", overTitle: "נגמרו החיים על החול",
     yourRun: "הריצה שלך", goldRun: "הריצה הזהובה שלך", read: "קראו", factCap: "דף מהסיפור שלו",
@@ -610,6 +612,7 @@ const factsFound = new Set();
 const FINAL_X = 194.5 * 16;
 
 let level = 1;
+const WITH_JAFFA = false; // level 2 (the promenade to Jaffa) is built but switched off: the game is one round
 function buildLevel() {
   if (level === 2) return buildJaffa();
   map.fill(0); coins = []; enemies = []; items = []; decos = []; parts = []; bumps = [];
@@ -1006,7 +1009,7 @@ function stepClear() {
         finT++;
         if (finT === 1) document.body.classList.add("shooting");
         if (finT === 45) { flashT = 16; sfx.shutter(); buzz(30); }
-        if (finT === 150) { if (level === 1) startJaffa(); else endGame(true); }
+        if (finT === 150) { if (level === 1 && WITH_JAFFA) startJaffa(); else endGame(true); }
       }
     }
   }
@@ -1048,6 +1051,7 @@ function endGame(won) {
   document.getElementById("photo").classList.toggle("gold", won && finaleGold);
 
   shareBtn.hidden = !(won && (IN_CLAUDE ? downloadsCap : true)); shareNote.hidden = true;
+  shareMenu.hidden = true; shareOpen.setAttribute("aria-expanded", "false");
   cachedGif = null;
   if (won && !IN_CLAUDE) setTimeout(() => { try { cachedGif = { lang, blob: makeShareGif() }; } catch (e) { cachedGif = null; } }, 400);
   openBoard();
@@ -1882,6 +1886,11 @@ document.getElementById("copyBtn").addEventListener("click", () => {
   } catch (e) { showField(); }
 });
 let cachedGif = null;
+const shareOpen = document.getElementById("shareOpen"), shareMenu = document.getElementById("shareMenu");
+shareOpen.addEventListener("click", () => {
+  const open = shareMenu.hidden; shareMenu.hidden = !open; shareOpen.setAttribute("aria-expanded", String(open));
+  if (open) document.getElementById("waLink").focus();
+});
 async function shareFromWebsite() {
   const blob = cachedGif && cachedGif.lang === lang ? cachedGif.blob : makeShareGif();
   const file = new File([blob], "gordon-beach-run.gif", { type: "image/gif" });
