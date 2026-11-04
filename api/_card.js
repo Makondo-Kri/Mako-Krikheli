@@ -70,8 +70,8 @@ function poster({ art, mode, G }) {
     h("div", { position: "absolute", left: 640, top: streets ? 210 : 160, width: 510, height: 260, background: "#12304a", display: "flex" }, []),
     h("div", { position: "absolute", left: 628, top: streets ? 200 : 150, width: 510, height: 260, background: "#f6e3bb", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }, [
       h("div", { fontSize: 30, color: "#b0461f", fontWeight: 800 }, streets ? "NOW PLAYING" : G.place),
-      h("div", { fontSize: streets ? 46 : G.he.length > 14 ? 44 : 54, color: "#12304a", fontWeight: 800, marginTop: 10 }, streets ? "Ben-Gurion · Golda Meir" : visual(G.he)),
-      h("div", { fontSize: 24, color: "#3b4a58", fontWeight: 800, marginTop: 12 }, streets ? "Three free retro games, more coming" : G.line),
+      h("div", { fontSize: streets ? 46 : G.he.length > 14 ? 44 : 54, color: "#12304a", fontWeight: 800, marginTop: 10 }, streets ? "Gordon Beach Run" : visual(G.he)),
+      h("div", { fontSize: 24, color: "#3b4a58", fontWeight: 800, marginTop: 12 }, streets ? "Ben-Gurion on the beach. More streets coming" : G.line),
     ]),
     h("div", { position: "absolute", left: 70, top: 522, width: 1080, height: 92, background: "#12304a", display: "flex" }, []),
     h("div", { position: "absolute", left: 60, top: 512, width: 1080, height: 92, background: "#ff6a3d", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffffff", fontSize: 44, fontWeight: 800 }, [

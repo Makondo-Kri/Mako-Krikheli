@@ -2,7 +2,10 @@
 
 Free retro games set on real streets and beaches, played in the phone's browser.
 
-**Now playing**
+**Now playing:** Gordon Beach Run. The two Golda games are hidden from the home page for now
+(their folders stay in the repo; to bring one back, un-comment its card in `tools/streets.html`).
+
+**Games in the repo**
 
 - **Gordon Beach Run · ריצה בחוף גורדון.** Tel Aviv, 1957: help Ben-Gurion race
   from Gordon Beach to Frishman Beach.
